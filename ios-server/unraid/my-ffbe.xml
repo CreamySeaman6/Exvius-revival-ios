@@ -12,7 +12,7 @@
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
   <Support/>
-  <Project>https://github.com/CreamySeaman6/Exvius-revival-iOS</Project>
+  <Project>https://github.com/CreamySeaman6/Exvius-revival-ios</Project>
   <Overview>Exvius Offline game server for the iPhone app, with Tailscale in the same container (it joins your tailnet as "ffbe"; no ports are opened on the server). The image is built locally from the repository: docker compose build in /mnt/user/appdata/ffbe/repo/ios-server.</Overview>
   <Category>GameServers:</Category>
   <WebUI/>

@@ -50,7 +50,7 @@ The commands are the same on Windows (PowerShell), macOS (Terminal) and Linux un
    ```bash
    mkdir exvius
    cd exvius
-   git clone https://github.com/CreamySeaman6/Exvius-revival-iOS.git repo
+   git clone https://github.com/CreamySeaman6/Exvius-revival-ios.git repo
    cd repo/ios-server
    ```
 
