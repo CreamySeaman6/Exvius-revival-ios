@@ -1,0 +1,28 @@
+{
+  "source": "Global challenge masters for dungeons 441201, 621101 and 633301. Point types, values and icons follow the matching suffixes in the original Global series point master. The unit series IDs come from the Global unit master and the archived JP unit data for Kira.",
+  "tables": {
+    "F_UNIT_SERIES_POWER_UP_POINT_MST": {
+      "key": "RvN2W9Qx",
+      "rows": [
+        {"RvN2W9Qx":"214000611","G4L0YIB2":"HP Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_HP","Yc8Mm6y7":"30","0HUPxDf1":"240001400"},
+        {"RvN2W9Qx":"214000612","G4L0YIB2":"MP Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_MP","Yc8Mm6y7":"10","0HUPxDf1":"240001500"},
+        {"RvN2W9Qx":"214000613","G4L0YIB2":"ATK Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_ATK","Yc8Mm6y7":"5","0HUPxDf1":"240001600"},
+        {"RvN2W9Qx":"214000614","G4L0YIB2":"DEF Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_DEF","Yc8Mm6y7":"5","0HUPxDf1":"240001700"},
+        {"RvN2W9Qx":"214000615","G4L0YIB2":"MAG Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_INT","Yc8Mm6y7":"5","0HUPxDf1":"240001800"},
+        {"RvN2W9Qx":"214000616","G4L0YIB2":"SPR Door (Y'shtola, the Sorceress)","woghJa61":"214000605","K5LEG0Da":"MAX_LIMIT_EX_MND","Yc8Mm6y7":"5","0HUPxDf1":"240001900"},
+        {"RvN2W9Qx":"311000111","G4L0YIB2":"HP Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_HP","Yc8Mm6y7":"30","0HUPxDf1":"240001400"},
+        {"RvN2W9Qx":"311000112","G4L0YIB2":"MP Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_MP","Yc8Mm6y7":"10","0HUPxDf1":"240001500"},
+        {"RvN2W9Qx":"311000113","G4L0YIB2":"ATK Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_ATK","Yc8Mm6y7":"5","0HUPxDf1":"240001600"},
+        {"RvN2W9Qx":"311000114","G4L0YIB2":"DEF Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_DEF","Yc8Mm6y7":"5","0HUPxDf1":"240001700"},
+        {"RvN2W9Qx":"311000115","G4L0YIB2":"MAG Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_INT","Yc8Mm6y7":"5","0HUPxDf1":"240001800"},
+        {"RvN2W9Qx":"311000116","G4L0YIB2":"SPR Door (Hero)","woghJa61":"311000105","K5LEG0Da":"MAX_LIMIT_EX_MND","Yc8Mm6y7":"5","0HUPxDf1":"240001900"},
+        {"RvN2W9Qx":"346000211","G4L0YIB2":"HP Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_HP","Yc8Mm6y7":"30","0HUPxDf1":"240001400"},
+        {"RvN2W9Qx":"346000212","G4L0YIB2":"MP Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_MP","Yc8Mm6y7":"10","0HUPxDf1":"240001500"},
+        {"RvN2W9Qx":"346000213","G4L0YIB2":"ATK Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_ATK","Yc8Mm6y7":"5","0HUPxDf1":"240001600"},
+        {"RvN2W9Qx":"346000214","G4L0YIB2":"DEF Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_DEF","Yc8Mm6y7":"5","0HUPxDf1":"240001700"},
+        {"RvN2W9Qx":"346000215","G4L0YIB2":"MAG Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_INT","Yc8Mm6y7":"5","0HUPxDf1":"240001800"},
+        {"RvN2W9Qx":"346000216","G4L0YIB2":"SPR Door (Kira)","woghJa61":"346000207","K5LEG0Da":"MAX_LIMIT_EX_MND","Yc8Mm6y7":"5","0HUPxDf1":"240001900"}
+      ]
+    }
+  }
+}

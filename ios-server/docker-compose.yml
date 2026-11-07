@@ -1,0 +1,109 @@
+# Exvius Offline server for the iPhone app, on its own Tailscale address.
+#
+# One container, "ffbe": Tailscale joins your tailnet as the machine "ffbe", and the game server runs beside
+# it. If either stops, both restart together. On Unraid it shows in the Docker tab as "ffbe" and can be
+# started and stopped there.
+#
+# Everything this stack creates lives in ${FFBE_DIR} (set in .env). See README.md.
+name: ffbe
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "3"
+
+services:
+  server:
+    build:
+      context: ..
+      dockerfile: ios-server/Dockerfile
+    image: ffbe-ios-server:local
+    container_name: ffbe
+    hostname: ffbe
+    # Tailscale runs inside this container (entrypoint.sh) and needs the tunnel device.
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      TZ: America/New_York
+      # Tailscale. TS_AUTHKEY (from .env) is only needed the first time; after that the state folder keeps
+      # this machine signed in as "ffbe".
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+      TS_HOSTNAME: ffbe
+      # Disk use of the server's own records (serve.py housekeeping, hourly): request records older than
+      # FFBE_REQUEST_LOG_DAYS or beyond FFBE_REQUEST_LOG_MB in total are deleted, oldest first; only the newest
+      # FFBE_CLIENT_REPORTS_KEEP game logs are kept. The container log itself is capped at 60 MB (logging, above).
+      FFBE_REQUEST_LOG_DAYS: "3"
+      FFBE_REQUEST_LOG_MB: "300"
+      FFBE_CLIENT_REPORTS_KEEP: "30"
+      # Weekly summon rotation (see source/server/gacha_rotation.py). Set to 0 to show every banner.
+      EXVIUS_SUMMON_ROTATION: "1"
+      EXVIUS_ROTATION_TZ: America/New_York
+      EXVIUS_ROTATION_DAY: "6"        # 0 = Monday ... 6 = Sunday
+      EXVIUS_ROTATION_HOUR: "22"      # 10 PM
+      EXVIUS_ROTATION_SPECIAL: "1"    # sets with step-up / ticket / select banners each week
+      EXVIUS_ROTATION_FEATURED: "2"   # other featured sets each week
+      # Without the replay: your first week opens with Noctis's Dec 2016 banner; later weeks are random.
+      EXVIUS_ROTATION_FIRST_WEEK: "2016-12-16"
+      # Holiday sets (Christmas, Halloween, Valentine's, Easter) only in the week before the holiday and the
+      # holiday's own week, oldest first.
+      EXVIUS_ROTATION_HOLIDAYS: "1"
+      # Historical replay (source/server/replay.py): summons, Vortex and shops follow Global's own history,
+      # starting at EXVIUS_REPLAY_START and moving EXVIUS_REPLAY_PACE historical weeks per real week.
+      # Permanent summons only draw units released by then. "0" goes back to the random weekly rotation.
+      # Delete server/state/replay.json to restart the replay from EXVIUS_REPLAY_START.
+      EXVIUS_REPLAY: "1"
+      EXVIUS_REPLAY_START: "2016-12-16"
+      EXVIUS_REPLAY_PACE: "3,2@2020-08-20"   # 3 weeks per week, then 2 from the first Neo Vision banner
+      # A "This week" notice on the News board for each replay week ("0" turns them off).
+      EXVIUS_REPLAY_NOTICES: "1"
+      # Home screen banners: this replay week's event banners (the original art, same as the Vortex tiles).
+      # MARQUEE_FLAG turns the home banner strip on; set it to "0" if the home screen misbehaves.
+      EXVIUS_REPLAY_MARQUEE: "1"
+      MARQUEE_FLAG: "1"
+      # The Vortex follows the summons: permanent dungeons, the events that launched with this week's sets,
+      # and EXVIUS_VORTEX_EXTRA undated recurring events. "0" opens every archived event at once.
+      EXVIUS_VORTEX_ROTATION: "1"
+      EXVIUS_VORTEX_EXTRA: "2"
+      # Resource packs downloaded before the tutorial (the first battle needs them). "all" or "0" also work.
+      EXVIUS_EARLY_RESOURCES: "resources_common.cpk,resources.cpk"
+      # Sound banks for the iPhone: "1" removes the Android banks' HCA cipher, "0" serves them as shipped.
+      EXVIUS_IOS_HCA_PLAIN: "1"
+      # Change this to any new value to make the phone download every sound bank again.
+      EXVIUS_IOS_SOUND_REFETCH: ""
+      # "1" mails a free 8th-Anniversary 10+1 summon ticket every day; "0" turns it off.
+      ANNIVERSARY_TICKET: "0"
+      # Other players (source/server/friend_players.py): made-up accounts you can add, borrow units from
+      # and remove. Each lends a different unit every week. EXVIUS_START_FRIENDS of them are your friends
+      # in a new save. "0" players turns the crowd off.
+      EXVIUS_PLAYERS: "200"
+      EXVIUS_START_FRIENDS: "15"
+      EXVIUS_PLAYER_SUGGESTIONS: "10"
+      # Arena (source/server/arena_ladder.py): the other players' teams and a weekly leaderboard. The best of
+      # them ends the week near EXVIUS_ARENA_TOP points; your final rank pays that week's ranking reward.
+      EXVIUS_ARENA_TOP: "12000"
+      EXVIUS_ARENA_RIVALS: "5"
+      # Earned Lapis (source/server/lapis_economy.py). Shop purchases are never multiplied.
+      EXVIUS_LAPIS_MULTIPLIER: "5"        # every Lapis amount earned by playing
+      EXVIUS_DAILY_QUEST_LAPIS: "150"     # Lapis per daily quest (0 = the old gil/Lapis mix)
+      EXVIUS_DAILY_ALL_BONUS: "200"       # extra Lapis for finishing all of a day's dailies
+      EXVIUS_DAILY_CUSTOM: "1"            # custom daily quests (source/server/daily_quests_custom.json); 0 = shipped only
+      EXVIUS_DAILY_QUEST_COUNT: "5"       # daily quests a day while the custom ones are on
+      EXVIUS_WEEKLY_GIFT: "23:50:10,23:70:1"   # mailed each week: 10 Rare Summon Tickets + a Guaranteed Ticket; "" = off
+      # Trust from clearing quests (source/server/quest_trust.py). Japan's rule: each of your party's units has a
+      # 30% chance of +1% trust per clear. Global's rule: CHANCE "10", POINTS "1" (10% chance of +0.1%).
+      EXVIUS_QUEST_TRUST: "1"             # 0 = off
+      EXVIUS_QUEST_TRUST_CHANCE: "30"     # percent chance per unit per clear
+      EXVIUS_QUEST_TRUST_POINTS: "10"     # trust per hit in tenths of a percent (1 = 0.1%, 10 = 1%)
+      EXVIUS_QUEST_TRUST_BIG_CHANCE: "5"  # percent of hits that give EXVIUS_QUEST_TRUST_BIG_POINTS instead; 0 = none
+      EXVIUS_QUEST_TRUST_BIG_POINTS: "50" # 50 = +5%
+      # Products kept out of the exchange shops that sell for Lapis (kind:id). Default: King Metal Minituar.
+      EXVIUS_LAPIS_SHOP_EXCLUDE: "10:900020401"
+    volumes:
+      - ${FFBE_DIR}/data:/srv/ffbe/data
+      - ${FFBE_DIR}/server:/srv/ffbe/server-root
+      - ${FFBE_DIR}/tailscale:/var/lib/tailscale
+    restart: unless-stopped
+    logging: *logging

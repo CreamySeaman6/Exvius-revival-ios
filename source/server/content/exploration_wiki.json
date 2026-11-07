@@ -1,0 +1,9357 @@
+{
+"source": "Final Fantasy Brave Exvius Wiki (exvius.fandom.com), read 2026-11-06 through its MediaWiki API: the Battle Infobox ('monster' with per-zone counts, 'battle', 'boss') and the Unit EXP Guide zone table of each page.",
+"note": "story: pages in Category:Explorations, keyed by page title; z = zone table rows [name, battles]; i = infoboxes {battle, boss, m: [[monster, [count per zone]]]}. events: [page, section (named after the in-game mission), battles, bosses, monsters] for event explorations. Event records were trimmed to exploration missions (no 'Battle in the Vaults', King Mog single-battle maps or Material Quests), section names 'Battle Info' replaced by the page's mission name,. The Enchanted Maze: its wiki gives 2-6 battles (BGN, INT) and 4 (ADV) per run with no counts; recorded as 6 and 4 battles (the 'battle' field counts one boss, so 7 and 5). The Dreadnought: the wiki gives battles per difficulty (INT 21-23, ADV 26-27, PRO 31-33, ELT 35-36; BGN is the Captain alone) but no monster list; the monsters recorded are those of the event's own random-battle groups in the battle data (71301xx01-24; 80-90 are the Captain fights), battles the range's midpoint. Into the Abyss (Vortex exploration, Aug 2016, mission 'Expedition - Into the Abyss'): its page's Possible Monsters and Battles. same_as: the Aquapolis Olderion quest explorations the wiki describes as based on another exploration ('no chests, only collection points') use that exploration's record.",
+"story": {
+"Earth Shrine/Exploration": {
+"z": [
+[
+"Zone",
+"13"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "14",
+"boss": "Belmodar",
+"m": [
+[
+"Dire Rat",
+[
+12
+]
+],
+[
+"Steel Bat",
+[
+11
+]
+],
+[
+"Tarantula",
+[
+2
+]
+]
+]
+}
+]
+},
+"Latius Woods/Exploration": {
+"z": [
+[
+"Zone",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "16",
+"boss": "Ochu;Microchu (3)",
+"m": [
+[
+"Gigantoad",
+[
+3
+]
+],
+[
+"Goblin",
+[
+3
+]
+],
+[
+"Hornet",
+[
+9
+]
+],
+[
+"Ivy",
+[
+4
+]
+],
+[
+"Killer Mantis",
+[
+1
+]
+],
+[
+"Microchu",
+[
+5
+]
+],
+[
+"Nutkin",
+[
+6
+]
+],
+[
+"Woodwatcher",
+[
+4
+]
+]
+]
+}
+]
+},
+"Dalnakya Cavern/Exploration": {
+"z": [
+[
+"Zone",
+"18"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "19",
+"boss": "Goblin Guard;Goblin (4)",
+"m": [
+[
+"Abtu",
+[
+4
+]
+],
+[
+"Black Widow",
+[
+2
+]
+],
+[
+"Blue Wisp",
+[
+4
+]
+],
+[
+"Goblin",
+[
+22
+]
+],
+[
+"Green Slime",
+[
+6
+]
+],
+[
+"Skeleton",
+[
+5
+]
+],
+[
+"Steel Bat",
+[
+5
+]
+],
+[
+"Wolf",
+[
+5
+]
+]
+]
+}
+]
+},
+"Grandshelt Catacombs/Exploration": {
+"z": [
+[
+"Zone",
+"21"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "22",
+"boss": "Architeuth;Tentacles (3)",
+"m": [
+[
+"Green Soul",
+[
+11
+]
+],
+[
+"Wild Rat",
+[
+16
+]
+],
+[
+"Yellow Jelly",
+[
+14
+]
+],
+[
+"Zombie",
+[
+9
+]
+]
+]
+}
+]
+},
+"Fulan Pass/Exploration": {
+"z": [
+[
+"Zone",
+"22"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "23",
+"boss": "Cutpurse (5)",
+"m": [
+[
+"Centipede",
+[
+2
+]
+],
+[
+"Coeurl",
+[
+6
+]
+],
+[
+"Cutpurse",
+[
+10
+]
+],
+[
+"Human Trap",
+[
+6
+]
+],
+[
+"Magitek Armor",
+[
+9
+]
+],
+[
+"Mammon",
+[
+7
+]
+],
+[
+"Mu",
+[
+5
+]
+],
+[
+"Rukh",
+[
+1
+]
+],
+[
+"Security Eye",
+[
+8
+]
+]
+]
+}
+]
+},
+"Lanzelt Highlands/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"13"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "28",
+"boss": "Wyvern",
+"m": [
+[
+"Balloon",
+[
+13
+]
+],
+[
+"Bone Dragon",
+[
+1
+]
+],
+[
+"Hill Gigas",
+[
+1
+]
+],
+[
+"Poison Eagle",
+[
+17
+]
+],
+[
+"Rudra",
+[
+2
+]
+],
+[
+"Tyrannosaur",
+[
+8
+]
+],
+[
+"Werepanther",
+[
+10
+]
+]
+]
+}
+]
+},
+"Lanzelt Ruins/Exploration": {
+"z": [
+[
+"Zone 1",
+"12"
+],
+[
+"Zone 2",
+"14"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "27",
+"boss": "Wandering One",
+"m": [
+[
+"Abyssal",
+[
+7
+]
+],
+[
+"Dire Lizard",
+[
+9
+]
+],
+[
+"Epimetheus",
+[
+4
+]
+],
+[
+"Medusa",
+[
+5
+]
+],
+[
+"Scolopendra",
+[
+9
+]
+],
+[
+"Searcher",
+[
+9
+]
+],
+[
+"Skuldier",
+[
+12
+]
+]
+]
+}
+]
+},
+"Kolobos Marsh/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Amoebozoa",
+"m": [
+[
+"Abyssal",
+[
+1,
+0
+]
+],
+[
+"Akhkhazu",
+[
+5,
+12
+]
+],
+[
+"Damia",
+[
+3,
+12
+]
+],
+[
+"Poison Toad",
+[
+9,
+5
+]
+],
+[
+"Sahagin",
+[
+5,
+6
+]
+],
+[
+"Yellow Jelly",
+[
+2,
+4
+]
+],
+[
+"Zombie",
+[
+3,
+6
+]
+]
+]
+}
+]
+},
+"Golzas Canyon/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Mahadeva",
+"m": [
+[
+"Bloody Eye",
+[
+2,
+1
+]
+],
+[
+"Dark Wizard",
+[
+3,
+5
+]
+],
+[
+"Ghost",
+[
+5,
+8
+]
+],
+[
+"Goblin Guard",
+[
+3,
+4
+]
+],
+[
+"Golden Eagle",
+[
+5,
+5
+]
+],
+[
+"Treant",
+[
+4,
+8
+]
+],
+[
+"Wolf",
+[
+2,
+3
+]
+],
+[
+"Zombie",
+[
+4,
+3
+]
+]
+]
+}
+]
+},
+"Kolobos Reef/Exploration": {
+"z": [
+[
+"Zone 1",
+"15"
+],
+[
+"Zone 2",
+"14"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Apatosaurus",
+"m": [
+[
+"Abtu",
+[
+6,
+9
+]
+],
+[
+"Adamantoise",
+[
+5,
+7
+]
+],
+[
+"Sahagin",
+[
+5,
+3
+]
+],
+[
+"Sea Scorpion",
+[
+3,
+3
+]
+],
+[
+"Shark",
+[
+2,
+1
+]
+],
+[
+"Toadgre",
+[
+4,
+4
+]
+],
+[
+"Undine",
+[
+2,
+1
+]
+]
+]
+}
+]
+},
+"Dwarves' Forge/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"14"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "29",
+"boss": "Liquid Flame",
+"m": [
+[
+"Barbarus",
+[
+1,
+0
+]
+],
+[
+"Bloody Eye",
+[
+2,
+0
+]
+],
+[
+"Grenade",
+[
+3,
+8
+]
+],
+[
+"Goblin Guard",
+[
+3,
+4
+]
+],
+[
+"Mercury Bat",
+[
+3,
+5
+]
+],
+[
+"Poplium",
+[
+6,
+9
+]
+],
+[
+"Red Elemental",
+[
+7,
+9
+]
+],
+[
+"Red Marshmallow",
+[
+3,
+6
+]
+]
+]
+}
+]
+},
+"Junkyard/Exploration": {
+"z": [
+[
+"Zone 1",
+"15"
+],
+[
+"Zone 2",
+"14"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Crane (2)",
+"m": [
+[
+"Centipede",
+[
+2,
+1
+]
+],
+[
+"Cutpurse",
+[
+9,
+5
+]
+],
+[
+"Foot Soldier",
+[
+5,
+12
+]
+],
+[
+"Grenade",
+[
+4,
+11
+]
+],
+[
+"Red Marshmallow",
+[
+4,
+6
+]
+],
+[
+"Searcher",
+[
+6,
+7
+]
+]
+]
+}
+]
+},
+"Aquatic Cove/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Abhorrent One",
+"m": [
+[
+"Akhkhazu",
+[
+2,
+2
+]
+],
+[
+"Aqua Elemental",
+[
+4,
+9
+]
+],
+[
+"Killer Fish",
+[
+5,
+8
+]
+],
+[
+"Poison Toad",
+[
+0,
+1
+]
+],
+[
+"Sea Scorpion",
+[
+1,
+3
+]
+],
+[
+"Sleepy",
+[
+6,
+12
+]
+],
+[
+"Xiphactinus",
+[
+2,
+1
+]
+],
+[
+"Yellow Soul",
+[
+3,
+1
+]
+],
+[
+"Zombie",
+[
+4,
+3
+]
+]
+]
+}
+]
+},
+"Lake Dorr/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Flood Worm",
+"m": [
+[
+"Aqua Elemental",
+[
+5,
+6
+]
+],
+[
+"Bas-relief",
+[
+3,
+6
+]
+],
+[
+"Ghoul",
+[
+2,
+1
+]
+],
+[
+"Killer Fish",
+[
+2,
+0
+]
+],
+[
+"Objet d'Art",
+[
+4,
+9
+]
+],
+[
+"Sea Scorpion",
+[
+2,
+3
+]
+],
+[
+"Shark",
+[
+1,
+3
+]
+],
+[
+"Skuldier",
+[
+3,
+1
+]
+],
+[
+"Sleepy",
+[
+2,
+11
+]
+],
+[
+"Undine",
+[
+1,
+0
+]
+]
+]
+}
+]
+},
+"Ghost Ship/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Terror Knight",
+"m": [
+[
+"Aqua Elemental",
+[
+3,
+10
+]
+],
+[
+"Dead Head",
+[
+2,
+11
+]
+],
+[
+"Ghost",
+[
+3,
+2
+]
+],
+[
+"Ghoul",
+[
+3,
+3
+]
+],
+[
+"Green Soul",
+[
+3,
+2
+]
+],
+[
+"Sea Scorpion",
+[
+2,
+4
+]
+],
+[
+"Spritzer",
+[
+8,
+5
+]
+],
+[
+"Zombie Soldier",
+[
+3,
+2
+]
+]
+]
+}
+]
+},
+"Fire Shrine/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Wandering One",
+"m": [
+[
+"Abyssal",
+[
+0,
+1
+]
+],
+[
+"Cursed Bones",
+[
+3,
+5
+]
+],
+[
+"Ember",
+[
+8,
+6
+]
+],
+[
+"Fire Lizard",
+[
+2,
+3
+]
+],
+[
+"Geeta",
+[
+3,
+6
+]
+],
+[
+"Lavaburst",
+[
+3,
+4
+]
+],
+[
+"Red Elemental",
+[
+3,
+10
+]
+],
+[
+"Red Wisp",
+[
+4,
+5
+]
+]
+]
+}
+]
+},
+"Abandoned Orphanage/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Magitek Armor (3)",
+"m": [
+[
+"Dead Head",
+[
+4,
+6
+]
+],
+[
+"Gloom Widow",
+[
+3,
+4
+]
+],
+[
+"Poplium",
+[
+2,
+6
+]
+],
+[
+"Skuldier",
+[
+1,
+4
+]
+],
+[
+"Worgen",
+[
+3,
+5
+]
+],
+[
+"Yellow Soul",
+[
+4,
+5
+]
+],
+[
+"Zoldaad Soldier",
+[
+8,
+6
+]
+],
+[
+"Zombie",
+[
+3,
+4
+]
+]
+]
+}
+]
+},
+"Invincible Interior/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Io",
+"m": [
+[
+"Elytron",
+[
+2,
+3
+]
+],
+[
+"Foot Soldier",
+[
+11,
+12
+]
+],
+[
+"Magitek Armor",
+[
+2,
+4
+]
+],
+[
+"Security Eye",
+[
+9,
+15
+]
+],
+[
+"Sergeant",
+[
+7,
+5
+]
+],
+[
+"Tarvos",
+[
+1,
+3
+]
+]
+]
+}
+]
+},
+"Gronoa Shrine Entrance/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Dread Rider",
+"m": [
+[
+"Abyssal",
+[
+0,
+3
+]
+],
+[
+"Balloon",
+[
+4,
+14
+]
+],
+[
+"Cursed Slate",
+[
+2,
+11
+]
+],
+[
+"Gargoyle",
+[
+2,
+5
+]
+],
+[
+"Meteora",
+[
+3,
+4
+]
+],
+[
+"Mini Satana",
+[
+16,
+5
+]
+],
+[
+"Monster Effigy",
+[
+2,
+2
+]
+]
+]
+}
+]
+},
+"Gronoa Shrine Depths/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Mahadeva",
+"m": [
+[
+"Bloodbones",
+[
+4,
+8
+]
+],
+[
+"Dark Elemental",
+[
+5,
+7
+]
+],
+[
+"Demogorgon",
+[
+1,
+3
+]
+],
+[
+"Ignus Fatuus",
+[
+7,
+9
+]
+],
+[
+"Monster Effigy",
+[
+2,
+2
+]
+],
+[
+"Revenant",
+[
+7,
+6
+]
+],
+[
+"Spritzer",
+[
+1,
+5
+]
+],
+[
+"Vicious",
+[
+2,
+1
+]
+]
+]
+}
+]
+},
+"Foggy Thicket/Exploration": {
+"z": [
+[
+"Zone 1",
+"13"
+],
+[
+"Zone 2",
+"16"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Resentful Swordsman",
+"m": [
+[
+"Cassowary",
+[
+2,
+3
+]
+],
+[
+"Crazy Horse",
+[
+0,
+7
+]
+],
+[
+"Evil Bear",
+[
+6,
+4
+]
+],
+[
+"Fierce Leopard",
+[
+4,
+7
+]
+],
+[
+"Ninlil",
+[
+6,
+5
+]
+],
+[
+"Serrated Chick",
+[
+4,
+12
+]
+],
+[
+"St. Elmo",
+[
+4,
+4
+]
+]
+]
+}
+]
+},
+"Forgotten Walls/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Sand Worm",
+"m": [
+[
+"Basilisk",
+[
+0,
+6
+]
+],
+[
+"Bloody Head",
+[
+6,
+8
+]
+],
+[
+"Cursed Bones",
+[
+5,
+7
+]
+],
+[
+"Demogorgon",
+[
+2,
+6
+]
+],
+[
+"Meteora",
+[
+2,
+1
+]
+],
+[
+"Mini Satana",
+[
+5,
+2
+]
+],
+[
+"Monster Effigy",
+[
+2,
+4
+]
+],
+[
+"Revenant",
+[
+4,
+8
+]
+]
+]
+}
+]
+},
+"Clouds of Lasting Light/Exploration": {
+"z": [
+[
+"Zone 1",
+"13"
+],
+[
+"Zone 2",
+"16"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Simurgh",
+"m": [
+[
+"Dragon Junior",
+[
+2,
+8
+]
+],
+[
+"Floateye",
+[
+6,
+4
+]
+],
+[
+"Golden Eagle",
+[
+8,
+7
+]
+],
+[
+"Lesser Lopros",
+[
+1,
+4
+]
+],
+[
+"Mega Bat",
+[
+2,
+7
+]
+],
+[
+"St. Elmo",
+[
+3,
+5
+]
+],
+[
+"White Elemental",
+[
+5,
+6
+]
+],
+[
+"Zu",
+[
+1,
+3
+]
+]
+]
+}
+]
+},
+"Land of Darkness/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Gespenst",
+"m": [
+[
+"Azazel",
+[
+5,
+6
+]
+],
+[
+"Black Elemental",
+[
+5,
+6
+]
+],
+[
+"Demogorgon",
+[
+1,
+7
+]
+],
+[
+"Gluttony",
+[
+2,
+4
+]
+],
+[
+"Nott",
+[
+4,
+4
+]
+],
+[
+"Shiranui",
+[
+7,
+9
+]
+],
+[
+"Stheno",
+[
+1,
+4
+]
+],
+[
+"Teasing Eye",
+[
+3,
+2
+]
+]
+]
+}
+]
+},
+"Inside Labor Camp/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Aldore Jailer (4)",
+"m": [
+[
+"Aldore Assault Soldier",
+[
+10,
+6
+]
+],
+[
+"Aldore Bladed Soldier",
+[
+5,
+10
+]
+],
+[
+"Aldore Gunner",
+[
+3,
+7
+]
+],
+[
+"Aldore Jailer",
+[
+6,
+11
+]
+],
+[
+"Aldore Officer",
+[
+2,
+5
+]
+],
+[
+"Aldore Soldier",
+[
+4,
+2
+]
+]
+]
+}
+]
+},
+"Bright Forest": {
+"z": [
+[
+"Encounters",
+"66"
+],
+[
+"Shadow Bahamut",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "67",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Armored Beast",
+[]
+],
+[
+"Epicure",
+[]
+],
+[
+"Evil Tree",
+[]
+],
+[
+"Hivesguard",
+[]
+],
+[
+"Moogle Eater",
+[]
+],
+[
+"Moss Fungus",
+[]
+],
+[
+"Sea Scorpion",
+[]
+],
+[
+"Soul Aspirator",
+[]
+],
+[
+"Treasure Keeper",
+[]
+]
+]
+}
+]
+},
+"Cavern of Desolation": {
+"z": [
+[
+"Encounters",
+"66"
+],
+[
+"Shadow Bahamut",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "67",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Black Goblin",
+[]
+],
+[
+"Cruncher",
+[]
+],
+[
+"Domovoi",
+[]
+],
+[
+"Hivesguard",
+[]
+],
+[
+"Lesser Lopros",
+[]
+],
+[
+"Plesiosaurus",
+[]
+],
+[
+"Sea Scorpion",
+[]
+],
+[
+"Soul Aspirator",
+[]
+],
+[
+"Wild Saurian",
+[]
+]
+]
+}
+]
+},
+"Clear Reef": {
+"z": [],
+"i": [
+{
+"battle": "64",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Ancient Objet d'Art",
+[
+25
+]
+],
+[
+"Black Shark",
+[
+5
+]
+],
+[
+"Cetus",
+[
+40
+]
+],
+[
+"Cursed Slate",
+[
+25
+]
+],
+[
+"Fly Eye",
+[
+15
+]
+],
+[
+"Hecteyes",
+[
+20
+]
+],
+[
+"Iapetus",
+[
+15
+]
+],
+[
+"Medusa",
+[
+10
+]
+],
+[
+"Sahagin Prince",
+[
+20
+]
+],
+[
+"Vicious",
+[
+3
+]
+]
+]
+}
+]
+},
+"Fading Coast": {
+"z": [],
+"i": [
+{
+"battle": "67",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Ainsel",
+[
+3
+]
+],
+[
+"Black Shark",
+[
+9
+]
+],
+[
+"Cetus",
+[
+72
+]
+],
+[
+"Red Wisp",
+[
+45
+]
+],
+[
+"Sahagin Prince",
+[
+36
+]
+],
+[
+"Wandering One",
+[
+18
+]
+]
+]
+}
+]
+},
+"Endless Cliff": {
+"z": [],
+"i": [
+{
+"battle": "62",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Armored Beast",
+[
+12
+]
+],
+[
+"Golden Eagle",
+[
+18
+]
+],
+[
+"Lesser Lopros",
+[
+6
+]
+],
+[
+"Moogle Eater",
+[
+12
+]
+],
+[
+"Plesiosaurus",
+[
+6
+]
+],
+[
+"Rukh",
+[
+6
+]
+],
+[
+"Satanachia",
+[
+1
+]
+],
+[
+"Tot Aevis",
+[
+6
+]
+],
+[
+"Treasure Keeper",
+[
+30
+]
+],
+[
+"Wild Saurian",
+[
+18
+]
+]
+]
+}
+]
+},
+"Georl Barrier Station/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Aldore Heavy Soldier;Aldore Trooper (2)",
+"m": [
+[
+"Aldore Assault Soldier",
+[
+4,
+4
+]
+],
+[
+"Aldore Bladed Soldier",
+[
+7,
+4
+]
+],
+[
+"Aldore Gunner",
+[
+7,
+4
+]
+],
+[
+"Aldore Jaeger",
+[
+3,
+4
+]
+],
+[
+"Aldore Officer",
+[
+2,
+6
+]
+],
+[
+"Aldore Trooper",
+[
+3,
+8
+]
+],
+[
+"Deucalion",
+[
+0,
+10
+]
+],
+[
+"Magitek Armor A-type",
+[
+2,
+2
+]
+]
+]
+}
+]
+},
+"Energy Transfer Station/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Cyllarus;Dual Sickle;Thetis",
+"m": [
+[
+"Cyllarus",
+[
+4,
+8
+]
+],
+[
+"Dual Sickle",
+[
+5,
+8
+]
+],
+[
+"Moogletron",
+[
+3,
+12
+]
+],
+[
+"Thetis",
+[
+2,
+6
+]
+],
+[
+"Watcher",
+[
+14,
+8
+]
+]
+]
+}
+]
+},
+"Energy Extraction Station/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Aldore Guard (3)",
+"m": [
+[
+"Aldore Bladed Soldier",
+[
+4,
+6
+]
+],
+[
+"Aldore Guard",
+[
+4,
+2
+]
+],
+[
+"Aldore Heavy Gunner",
+[
+4,
+2
+]
+],
+[
+"Aldore Jaeger",
+[
+2,
+8
+]
+],
+[
+"Aldore Soldier",
+[
+7,
+0
+]
+],
+[
+"Aldore Trooper",
+[
+2,
+6
+]
+],
+[
+"A-Type Magitek Armor+",
+[
+2,
+6
+]
+],
+[
+"Watcher",
+[
+7,
+6
+]
+]
+]
+}
+]
+},
+"Ghastly Valley/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Tyrannosaur",
+"m": [
+[
+"Crimson Elemental",
+[
+9
+]
+],
+[
+"Dark Soul",
+[
+6
+]
+],
+[
+"Draghignazzo",
+[
+7
+]
+],
+[
+"Forgotten",
+[
+12
+]
+],
+[
+"Ignus Fatuus",
+[
+7
+]
+],
+[
+"Resheph",
+[
+8
+]
+],
+[
+"Sombra",
+[
+10
+]
+],
+[
+"Viridian Head",
+[
+11
+]
+]
+]
+}
+]
+},
+"Lezal Mountain Base/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Zwass",
+"m": [
+[
+"Big Bear",
+[]
+],
+[
+"Echo Rat",
+[]
+],
+[
+"Nemain",
+[]
+],
+[
+"Queen Wasp",
+[]
+],
+[
+"Shaguma",
+[]
+]
+]
+}
+]
+},
+"Grand Falls/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Crystallized Spider (3)",
+"m": [
+[
+"Dead Tree",
+[]
+],
+[
+"Nemain",
+[]
+],
+[
+"Phorusrhacos",
+[]
+]
+]
+}
+]
+},
+"Glistening Ice Caves/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Crystallized Bear (3)",
+"m": [
+[
+"Crystallized Bat",
+[]
+],
+[
+"Crystallized Bomb",
+[]
+],
+[
+"Crystallized Rat",
+[]
+],
+[
+"Gray Ooze",
+[]
+]
+]
+}
+]
+},
+"Aldore Tower (2)/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "A-Type Magitek Armor+",
+"m": [
+[
+"Coeurl Rider",
+[]
+],
+[
+"Flame Claw",
+[]
+],
+[
+"Pholus",
+[]
+]
+]
+}
+]
+},
+"Grandore Gravity Block/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Hygiea (3)",
+"m": [
+[
+"Crimson Elemental",
+[]
+],
+[
+"Ignis Fatuus",
+[]
+],
+[
+"Moogletron",
+[]
+],
+[
+"Nessus",
+[]
+],
+[
+"Yellow Elemental",
+[]
+]
+]
+}
+]
+},
+"East Side District Block A4": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Voa Berga, Diverti",
+"m": [
+[
+"Angry Jade",
+[]
+],
+[
+"Rishyasringa",
+[]
+],
+[
+"Soilmodar",
+[]
+],
+[
+"Treasure Keeper",
+[]
+]
+]
+},
+{
+"battle": "",
+"boss": "Jiweshinva",
+"m": [
+[
+"Angry Jade",
+[]
+],
+[
+"Rishyasringa",
+[]
+],
+[
+"Soilmodar",
+[]
+],
+[
+"Treasure Keeper",
+[]
+]
+]
+}
+]
+},
+"Phantom Forest/Exploration": {
+"z": [
+[
+"Zone",
+"26"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "27",
+"boss": "Chimera",
+"m": [
+[
+"Alraune",
+[
+14
+]
+],
+[
+"Black Widow",
+[
+18
+]
+],
+[
+"Fossil Dragon",
+[
+1
+]
+],
+[
+"Ghoul",
+[
+9
+]
+],
+[
+"Green Wisp",
+[
+11
+]
+],
+[
+"Poison Eagle",
+[
+15
+]
+]
+]
+}
+]
+},
+"Shrine of Decay/Exploration": {
+"z": [
+[
+"Zone 1",
+"13"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "29",
+"boss": "Lesser Lopros",
+"m": [
+[
+"Ghoul",
+[
+2,
+4
+]
+],
+[
+"Gladilith",
+[
+3,
+1
+]
+],
+[
+"Objet d'Art",
+[
+2,
+3
+]
+],
+[
+"Ogre",
+[
+1,
+4
+]
+],
+[
+"Scolopendra",
+[
+4,
+0
+]
+],
+[
+"Searcher",
+[
+4,
+7
+]
+],
+[
+"Skuldier",
+[
+4,
+6
+]
+],
+[
+"Ziggurat Gigas",
+[
+0,
+3
+]
+],
+[
+"Zombie",
+[
+2,
+2
+]
+]
+]
+}
+]
+},
+"Maranda Coast/Exploration": {
+"z": [
+[
+"Zone 1",
+"15"
+],
+[
+"Zone 2",
+"14"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Black Shark",
+"m": [
+[
+"Adamantoise",
+[
+3,
+0
+]
+],
+[
+"Anet",
+[
+5,
+9
+]
+],
+[
+"Aqua Elemental",
+[
+5,
+9
+]
+],
+[
+"Gigantoad",
+[
+4,
+7
+]
+],
+[
+"Green Slime",
+[
+4,
+5
+]
+],
+[
+"Sahagin",
+[
+4,
+0
+]
+],
+[
+"Sea Scorpion",
+[
+1,
+0
+]
+],
+[
+"Skadi",
+[
+1,
+12
+]
+],
+[
+"Undine",
+[
+1,
+0
+]
+]
+]
+}
+]
+},
+"Mobreeze Airship Factory/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"10"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "25",
+"boss": "Guardian",
+"m": [
+[
+"Centipede",
+[
+0,
+1
+]
+],
+[
+"Cursed Bones",
+[
+4,
+3
+]
+],
+[
+"Epimetheus",
+[
+0,
+1
+]
+],
+[
+"Foot Soldier",
+[
+3,
+3
+]
+],
+[
+"Ghost",
+[
+3,
+4
+]
+],
+[
+"Magitek Armor",
+[
+0,
+2
+]
+],
+[
+"Searcher",
+[
+4,
+1
+]
+],
+[
+"Security Eye",
+[
+6,
+8
+]
+],
+[
+"Sergeant",
+[
+2,
+0
+]
+],
+[
+"Sorcerer",
+[
+6,
+3
+]
+]
+]
+}
+]
+},
+"Wind Shrine/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Terror Knight",
+"m": [
+[
+"Dragon Junior",
+[
+6,
+4
+]
+],
+[
+"Green Soul",
+[
+2,
+4
+]
+],
+[
+"Medusa",
+[
+1,
+0
+]
+],
+[
+"Monster Effigy",
+[
+1,
+1
+]
+],
+[
+"Ninlil",
+[
+4,
+11
+]
+],
+[
+"Pawn",
+[
+4,
+7
+]
+],
+[
+"Treant",
+[
+3,
+3
+]
+],
+[
+"Vamplant",
+[
+3,
+11
+]
+],
+[
+"Ziggurat Gigas",
+[
+1,
+2
+]
+]
+]
+}
+]
+},
+"Mystic Woods/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "29",
+"boss": "Ochu;Microchu (3)",
+"m": [
+[
+"Alraune",
+[
+3,
+1
+]
+],
+[
+"Biora",
+[
+6,
+9
+]
+],
+[
+"Chick",
+[
+4,
+7
+]
+],
+[
+"Gloom Widow",
+[
+4,
+8
+]
+],
+[
+"Green Soul",
+[
+2,
+3
+]
+],
+[
+"Poplium",
+[
+2,
+2
+]
+],
+[
+"Scorpion",
+[
+1,
+10
+]
+],
+[
+"Treant",
+[
+3,
+1
+]
+]
+]
+}
+]
+},
+"Water Shrine/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Gespenst",
+"m": [
+[
+"Aqua Elemental",
+[
+3,
+13
+]
+],
+[
+"Merrow",
+[
+2,
+3
+]
+],
+[
+"Objet d'Art",
+[
+8,
+5
+]
+],
+[
+"Ogre Mage",
+[
+2,
+3
+]
+],
+[
+"Sea Ibis",
+[
+3,
+2
+]
+],
+[
+"Sea Scorpion",
+[
+4,
+4
+]
+],
+[
+"Undine",
+[
+2,
+1
+]
+],
+[
+"Wrigglewater",
+[
+1,
+2
+]
+]
+]
+}
+]
+},
+"Timber Tracks/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Lieutenant;Captain",
+"m": [
+[
+"Wild Nakk",
+[
+12,
+13
+]
+],
+[
+"Zoldaad Soldier",
+[
+24,
+23
+]
+]
+]
+}
+]
+},
+"Surging Volcano/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Wyvern (2)",
+"m": [
+[
+"Abyssal",
+[
+1,
+0
+]
+],
+[
+"Armored Beast",
+[
+3,
+1
+]
+],
+[
+"Bloody Eye",
+[
+1,
+0
+]
+],
+[
+"Fire Lizard",
+[
+1,
+1
+]
+],
+[
+"Geeta",
+[
+0,
+12
+]
+],
+[
+"Grenade",
+[
+3,
+11
+]
+],
+[
+"Lavaburst",
+[
+1,
+2
+]
+],
+[
+"Mini Dragon",
+[
+2,
+0
+]
+],
+[
+"Red Elemental",
+[
+3,
+1
+]
+],
+[
+"Red Marshmallow",
+[
+2,
+4
+]
+],
+[
+"Red Wisp",
+[
+8,
+4
+]
+],
+[
+"Tyrannosaur",
+[
+1,
+0
+]
+]
+]
+}
+]
+},
+"Snowy Woods/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"7"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "22",
+"boss": "Flickering Presence;St. Elmo (2)",
+"m": [
+[
+"Balaur",
+[
+3,
+0
+]
+],
+[
+"Bas-relief",
+[
+3,
+8
+]
+],
+[
+"Blue Elemental",
+[
+4,
+2
+]
+],
+[
+"Ice Sculpture",
+[
+3,
+4
+]
+],
+[
+"Mercury Bat",
+[
+8,
+0
+]
+],
+[
+"Ogre Mage",
+[
+2,
+1
+]
+],
+[
+"Skadi",
+[
+4,
+5
+]
+]
+]
+}
+]
+},
+"Magic Library/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Byblos",
+"m": [
+[
+"Bloody Eye",
+[
+2,
+2
+]
+],
+[
+"Bomb",
+[
+3,
+0
+]
+],
+[
+"Dark Wizard",
+[
+4,
+8
+]
+],
+[
+"Mage",
+[
+6,
+8
+]
+],
+[
+"Page 32",
+[
+3,
+3
+]
+],
+[
+"Page 64",
+[
+3,
+2
+]
+],
+[
+"Page 256",
+[
+3,
+4
+]
+],
+[
+"Pit Fiend",
+[
+3,
+13
+]
+]
+]
+}
+]
+},
+"Mysidia Underground/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Ribosome",
+"m": [
+[
+"Adamandelion",
+[
+2,
+1
+]
+],
+[
+"Cetus",
+[
+4,
+6
+]
+],
+[
+"Cobalt Frog",
+[
+3,
+13
+]
+],
+[
+"Gloom Widow",
+[
+2,
+0
+]
+],
+[
+"Killer Fish",
+[
+3,
+4
+]
+],
+[
+"Lab Rat",
+[
+3,
+5
+]
+],
+[
+"Mercury Bat",
+[
+3,
+0
+]
+],
+[
+"White Mousse",
+[
+7,
+7
+]
+]
+]
+}
+]
+},
+"Mysidia Tower/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Ice Gigas",
+"m": [
+[
+"Basilisk",
+[
+3,
+4
+]
+],
+[
+"Bomb",
+[
+3,
+1
+]
+],
+[
+"Heimdallr",
+[
+3,
+11
+]
+],
+[
+"Hill Gigas",
+[
+2,
+4
+]
+],
+[
+"Imp",
+[
+2,
+2
+]
+],
+[
+"Red Marshmallow",
+[
+0,
+3
+]
+],
+[
+"Revenant",
+[
+3,
+4
+]
+],
+[
+"St. Elmo",
+[
+8,
+2
+]
+],
+[
+"White Elemental",
+[
+3,
+8
+]
+]
+]
+}
+]
+},
+"Societal Ruins/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Medusa (3)",
+"m": [
+[
+"Ancient Objet d'Art",
+[
+12,
+16
+]
+],
+[
+"Dire Lizard",
+[
+4,
+1
+]
+],
+[
+"Floateye",
+[
+4,
+4
+]
+],
+[
+"Gremlin",
+[
+8,
+17
+]
+],
+[
+"Hunger",
+[
+0,
+2
+]
+],
+[
+"Medusa",
+[
+4,
+4
+]
+]
+]
+}
+]
+},
+"Ruggles Underground Pass/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Abyss Worm",
+"m": [
+[
+"Ankheg",
+[
+4,
+5
+]
+],
+[
+"Bloodbones",
+[
+5,
+7
+]
+],
+[
+"Cursed Slate",
+[
+2,
+7
+]
+],
+[
+"Death Stalker",
+[
+2,
+6
+]
+],
+[
+"Gigas Worm",
+[
+2,
+4
+]
+],
+[
+"Pawn",
+[
+2,
+3
+]
+],
+[
+"Poison Bat",
+[
+7,
+3
+]
+],
+[
+"Spritzer",
+[
+6,
+6
+]
+]
+]
+}
+]
+},
+"Sky Cave/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Plesiosaurus",
+"m": [
+[
+"Adenium",
+[
+4,
+0
+]
+],
+[
+"Ancient Objet d'Art",
+[
+8,
+8
+]
+],
+[
+"Argostoli",
+[
+2,
+5
+]
+],
+[
+"Cruncher",
+[
+2,
+3
+]
+],
+[
+"Death Stalker",
+[
+2,
+6
+]
+],
+[
+"Evil Eater",
+[
+2,
+2
+]
+],
+[
+"Mini Satana",
+[
+2,
+0
+]
+],
+[
+"Purobolos",
+[
+8,
+13
+]
+]
+]
+}
+]
+},
+"Roaring Volcano/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Wyvern (2)",
+"m": [
+[
+"Cuelebre",
+[
+1,
+5
+]
+],
+[
+"Ember",
+[
+3,
+5
+]
+],
+[
+"Geeta",
+[
+4,
+3
+]
+],
+[
+"Grenade",
+[
+4,
+6
+]
+],
+[
+"Lavaburst",
+[
+4,
+5
+]
+],
+[
+"Red Elemental",
+[
+2,
+3
+]
+],
+[
+"Red Marshmallow",
+[
+5,
+4
+]
+],
+[
+"Red Wisp",
+[
+5,
+9
+]
+]
+]
+}
+]
+},
+"Vesta Ruins/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Sliding Worm (3)",
+"m": [
+[
+"Dark Soul",
+[
+4,
+0
+]
+],
+[
+"Jumbo Rat",
+[
+4,
+0
+]
+],
+[
+"Moranensis",
+[
+6,
+2
+]
+],
+[
+"Queen Wasp",
+[
+8,
+6
+]
+],
+[
+"Red Claw",
+[
+4,
+12
+]
+],
+[
+"Scolopendra",
+[
+2,
+4
+]
+],
+[
+"Wolf Spider",
+[
+4,
+7
+]
+]
+]
+}
+]
+},
+"Peaceful Stream": {
+"z": [],
+"i": [
+{
+"battle": "57",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Black Shark",
+[
+7
+]
+],
+[
+"Cetus",
+[
+56
+]
+],
+[
+"Red Wisp",
+[
+35
+]
+],
+[
+"Sahagin Prince",
+[
+28
+]
+],
+[
+"Undine",
+[
+7
+]
+],
+[
+"Wandering One",
+[
+14
+]
+]
+]
+}
+]
+},
+"Pass of Trials": {
+"z": [
+[
+"Encounters",
+"66"
+],
+[
+"Shadow Bahamut",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "67",
+"boss": "Shadow Bahamut",
+"m": [
+[
+"Armored Beast",
+[]
+],
+[
+"Bomb",
+[]
+],
+[
+"Golden Eagle",
+[]
+],
+[
+"Moogle Eater",
+[]
+],
+[
+"Rukh",
+[]
+],
+[
+"Tot Aevis",
+[]
+],
+[
+"Treasure Keeper",
+[]
+]
+]
+}
+]
+},
+"Ruins of the Water God": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Leviathan",
+"m": [
+[
+"Adamanfold",
+[
+4,
+6
+]
+],
+[
+"Black Flan",
+[
+3,
+8
+]
+],
+[
+"Bolt Fish",
+[
+4,
+2
+]
+],
+[
+"Demon Sahagin",
+[
+6,
+10
+]
+],
+[
+"Fastitocalon",
+[
+6,
+4
+]
+],
+[
+"Merrow",
+[
+0,
+8
+]
+],
+[
+"Wood Toad",
+[
+3,
+4
+]
+]
+]
+}
+]
+},
+"Petra, Forest of Illusion/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Drosera (2)",
+"m": [
+[
+"Big Bear",
+[
+4,
+4
+]
+],
+[
+"Dead Tree",
+[
+4,
+2
+]
+],
+[
+"Fledgling Rukh",
+[
+2,
+0
+]
+],
+[
+"Spirit",
+[
+4,
+2
+]
+],
+[
+"Tsuchigumo",
+[
+4,
+4
+]
+],
+[
+"Tsukiyotake",
+[
+4,
+14
+]
+],
+[
+"Viridian Head",
+[
+10,
+5
+]
+]
+]
+}
+]
+},
+"Runferia Castle/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Flame Lizard (3)",
+"m": [
+[
+"Brutus",
+[
+2,
+6
+]
+],
+[
+"Flame Lizard",
+[
+4,
+4
+]
+],
+[
+"Oiseaurare",
+[
+3,
+4
+]
+],
+[
+"Gray Bomb",
+[
+1,
+6
+]
+],
+[
+"Shield Statue",
+[
+6,
+8
+]
+],
+[
+"Viridian Head",
+[
+6,
+6
+]
+],
+[
+"Wight",
+[
+4,
+4
+]
+]
+]
+}
+]
+},
+"Nirvana Woods/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Bathin",
+"m": [
+[
+"Daeva",
+[
+4
+]
+],
+[
+"Devil Bunny",
+[
+9
+]
+],
+[
+"Downer Bat",
+[
+15
+]
+],
+[
+"Evil Bear",
+[
+8
+]
+],
+[
+"Phorusrhacos",
+[
+12
+]
+],
+[
+"Rose Panther",
+[
+10
+]
+],
+[
+"Viridian Head",
+[
+10
+]
+]
+]
+}
+]
+},
+"Savage Ruins/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Jiweshinva",
+"m": [
+[
+"Ambitious Mage",
+[]
+],
+[
+"Angry Jade",
+[]
+],
+[
+"Boastful Swordsman",
+[]
+],
+[
+"Brutus",
+[]
+],
+[
+"Dark Statue",
+[]
+],
+[
+"Downer Bat",
+[]
+],
+[
+"Shibyra Beastman",
+[]
+],
+[
+"Skull Eater",
+[]
+],
+[
+"Strangler",
+[]
+]
+]
+}
+]
+},
+"Londell Road/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Greedy Mage (2);Skilled Swordsman (2)",
+"m": [
+[
+"Ambitious Mage",
+[
+16
+]
+],
+[
+"Boastful Swordsman",
+[
+16
+]
+],
+[
+"Greedy Mage",
+[
+18
+]
+],
+[
+"Skilled Swordsman",
+[
+19
+]
+]
+]
+}
+]
+},
+"Sandstorm Maze/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Sand Hider",
+"m": [
+[
+"Desert Baretta",
+[
+6
+]
+],
+[
+"Mad Tyrant",
+[
+5
+]
+],
+[
+"Red Claw",
+[
+8
+]
+],
+[
+"Scolopendra",
+[
+4
+]
+],
+[
+"Sliding Worm",
+[
+3
+]
+],
+[
+"Stone Mask",
+[
+19
+]
+],
+[
+"Tsuchigumo",
+[
+16
+]
+],
+[
+"Viruupaaksa",
+[
+3
+]
+]
+]
+}
+]
+},
+"Visectrum Underground Waterway/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Norandel",
+"m": [
+[
+"Admancagle",
+[
+20
+]
+],
+[
+"Black Flan",
+[
+9
+]
+],
+[
+"Downer Bat",
+[
+3
+]
+],
+[
+"Fastitocalon",
+[
+14
+]
+],
+[
+"Jumbo Rat",
+[
+3
+]
+],
+[
+"Piranha",
+[
+10
+]
+],
+[
+"Purple Seahorse",
+[
+8
+]
+],
+[
+"Wolf Spider",
+[
+2
+]
+]
+]
+}
+]
+},
+"Magitek Weapon Development Facility/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "30",
+"boss": "Urban OP Magitek Armor A-Type",
+"m": [
+[
+"Aldore Bladed Riot Soldier",
+[
+8
+]
+],
+[
+"Aldore Guard",
+[
+13
+]
+],
+[
+"Aldore Heavy Riot Gunner",
+[
+8
+]
+],
+[
+"Aldore Riot Soldier",
+[
+7
+]
+],
+[
+"Deucalion",
+[
+8
+]
+],
+[
+"Sentinel Magitek Armor A-Type",
+[
+10
+]
+],
+[
+"Moogletron",
+[
+8
+]
+],
+[
+"Terrible Eye",
+[
+6
+]
+]
+]
+}
+]
+},
+"The Deva Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Celestial Maiden",
+"m": [
+[
+"Allosaur",
+[]
+],
+[
+"Azraq",
+[]
+],
+[
+"Brutal Dragon",
+[]
+],
+[
+"Chilong",
+[]
+],
+[
+"Cuelebre",
+[]
+],
+[
+"Hexadragon",
+[]
+],
+[
+"Lesser Lopros",
+[]
+],
+[
+"Radiant Wings Gold Dragon",
+[]
+],
+[
+"Snowflake",
+[]
+]
+]
+}
+]
+},
+"The Asura Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Ittosai",
+"m": [
+[
+"Adar",
+[]
+],
+[
+"Damia",
+[]
+],
+[
+"Haurvatat",
+[]
+],
+[
+"Heimdallr",
+[]
+],
+[
+"Jupiter",
+[]
+],
+[
+"Ninlil",
+[]
+],
+[
+"Nott",
+[]
+],
+[
+"Skadi",
+[]
+]
+]
+}
+]
+},
+"The Manusya Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Heretical Maester",
+"m": [
+[
+"Greedy Mage",
+[]
+],
+[
+"Huemac",
+[]
+],
+[
+"Kumbhakarna",
+[]
+],
+[
+"Merciless Highwayman",
+[]
+],
+[
+"Powerful Swordsman",
+[]
+],
+[
+"Skilled Swordsman",
+[]
+],
+[
+"Wandering Martial Artist",
+[]
+]
+]
+}
+]
+},
+"The Preta Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "King of Preta",
+"m": [
+[
+"Ajna",
+[]
+],
+[
+"Azazel",
+[]
+],
+[
+"Compound Eyes",
+[]
+],
+[
+"Eyemoeba",
+[]
+],
+[
+"Ghost Squid",
+[]
+],
+[
+"Ice Lizard",
+[]
+],
+[
+"Oiseaurare",
+[]
+],
+[
+"Red Eyes",
+[]
+]
+]
+}
+]
+},
+"The Tiryagyoni Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Flesh Devourer",
+"m": [
+[
+"Cuerno",
+[]
+],
+[
+"Dhorme Chimera",
+[]
+],
+[
+"Hell Walker",
+[]
+],
+[
+"Leventre",
+[]
+],
+[
+"Mad Tyrant",
+[]
+],
+[
+"Unicorn of the Abyss",
+[]
+]
+]
+}
+]
+},
+"The Naraka Realm": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Asvasirsa, Gosirsa",
+"m": [
+[
+"Dark Soul",
+[]
+],
+[
+"Resheph",
+[]
+],
+[
+"Skeletal Horror",
+[]
+],
+[
+"Soul Collector",
+[]
+],
+[
+"Soul Screamer",
+[]
+],
+[
+"Viridian Head",
+[]
+]
+]
+}
+]
+},
+"Pearl Cavern/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "31",
+"boss": "Sword Master",
+"m": [
+[
+"Brutus",
+[]
+],
+[
+"El Baul",
+[]
+],
+[
+"Horned Devil",
+[]
+]
+]
+}
+]
+},
+"Smokey Caves/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Crystallized Statue (3)",
+"m": [
+[
+"Crystallized Bat",
+[]
+],
+[
+"Crystallized Rat",
+[]
+],
+[
+"Crystallized Spider",
+[]
+],
+[
+"Lepisma",
+[]
+]
+]
+}
+]
+},
+"River of Fire/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Crystallized Bomb (3)",
+"m": [
+[
+"Gungan Horse",
+[]
+]
+]
+}
+]
+},
+"North Side District Block A3/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Krokesia",
+"m": [
+[
+"Ancient Objet d'Art",
+[]
+],
+[
+"Iron Bat",
+[]
+],
+[
+"Nemain",
+[]
+],
+[
+"Satanachia",
+[]
+]
+]
+}
+]
+},
+"The Water Temple - Exploration/JP": {
+"z": [],
+"i": [
+{
+"battle": "",
+"boss": "Eurypterus;Shadow Bismarck",
+"m": [
+[
+"Mud Seahorse",
+[]
+],
+[
+"Sea Witch",
+[]
+],
+[
+"Sahagin",
+[]
+],
+[
+"Killer Shark",
+[]
+]
+]
+}
+]
+},
+"Zadehl Westersands/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Antlion",
+"m": [
+[
+"Basilisk",
+[
+16
+]
+],
+[
+"Cactuar",
+[
+4
+]
+],
+[
+"Crawler",
+[
+2
+]
+],
+[
+"Damia",
+[
+15
+]
+],
+[
+"Desert Sahagin",
+[
+10
+]
+],
+[
+"Scorpion",
+[
+12
+]
+],
+[
+"Primevil",
+[
+2
+]
+],
+[
+"Xiphactinus",
+[
+11
+]
+]
+]
+}
+]
+},
+"Wolfsfang Peak/Exploration": {
+"z": [],
+"i": [
+{
+"battle": "27",
+"boss": "Frost Dragon",
+"m": [
+[
+"Bas-relief",
+[
+7
+]
+],
+[
+"Black Widow",
+[
+10
+]
+],
+[
+"Ghoul",
+[
+15
+]
+],
+[
+"Gladilith",
+[
+4
+]
+],
+[
+"Ice Sculpture",
+[
+7
+]
+],
+[
+"Mercury Bat",
+[
+8
+]
+],
+[
+"Toadgre",
+[
+9
+]
+],
+[
+"Wizard",
+[
+9
+]
+],
+[
+"Mahadeva",
+[
+1
+]
+]
+]
+}
+]
+},
+"Windy Heights West/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"16"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "31",
+"boss": "Twinscythe",
+"m": [
+[
+"Coeurl",
+[
+2,
+4
+]
+],
+[
+"Floateye",
+[
+3,
+0
+]
+],
+[
+"Goblin Mage",
+[
+7,
+12
+]
+],
+[
+"Golden Eagle",
+[
+4,
+16
+]
+],
+[
+"Ninlil",
+[
+4,
+7
+]
+],
+[
+"Ogre",
+[
+2,
+1
+]
+],
+[
+"Sprinter",
+[
+2,
+6
+]
+],
+[
+"Vulture",
+[
+1
+]
+]
+]
+}
+]
+},
+"Zoldaad Castle Grounds/Exploration": {
+"z": [
+[
+"Zone 1",
+"14"
+],
+[
+"Zone 2",
+"15"
+],
+[
+"Boss",
+"1"
+],
+[
+"Dungeon Clear",
+""
+]
+],
+"i": [
+{
+"battle": "30",
+"boss": "Flamesblade;Zoldaad Soldier (2)",
+"m": [
+[
+"Captain",
+[
+11,
+7
+]
+],
+[
+"Elytron",
+[
+3,
+2
+]
+],
+[
+"Magitek Armor",
+[
+3,
+8
+]
+],
+[
+"Mindflayer",
+[
+2,
+12
+]
+],
+[
+"Monster Soldiers",
+[
+7,
+8
+]
+],
+[
+"Tarvos",
+[
+3,
+3
+]
+]
+]
+}
+]
+}
+},
+"events": [
+[
+"Orbonne Monastery Vaults",
+"Vault Exploration - BGN",
+"15",
+"Archer (2);Knight",
+[
+[
+"Archer",
+[]
+],
+[
+"Knight",
+[]
+]
+]
+],
+[
+"Orbonne Monastery Vaults",
+"Vault Exploration - INT",
+"26",
+"Knight (2);Lezalas",
+[
+[
+"Archer",
+[]
+],
+[
+"Black Mage",
+[]
+],
+[
+"Knight",
+[]
+]
+]
+],
+[
+"Orbonne Monastery Vaults",
+"Vault Exploration - ADV",
+"30",
+"Archer;Black Mage;Wiegraf",
+[
+[
+"Archer",
+[]
+],
+[
+"Black Mage",
+[]
+],
+[
+"Knight",
+[]
+]
+]
+],
+[
+"Memories from the Aquapolis",
+"Memories of the Aquapolis - BGN",
+"16",
+"Grief Witch",
+[
+[
+"Killer Fish",
+[
+10
+]
+],
+[
+"Aqua Elemental",
+[
+10
+]
+]
+]
+],
+[
+"Memories from the Aquapolis",
+"Memories of the Aquapolis - INT",
+"42",
+"Grief Witch;-;Ochu;Deadly Nightshade (3)",
+[
+[
+"Killer Fish",
+[
+4
+]
+],
+[
+"Aqua Elemental",
+[
+4
+]
+],
+[
+"Treant",
+[
+18
+]
+],
+[
+"Microchu",
+[
+20
+]
+],
+[
+"Alraune",
+[
+20
+]
+]
+]
+],
+[
+"Memories from the Aquapolis",
+"Memories of the Aquapolis - ADV",
+"53",
+"Grief Witch;-;Ochu;Deadly Nightshade (3);-;Soul Aspirator",
+[
+[
+"Aqua Elemental",
+[
+12
+]
+],
+[
+"Killer Fish",
+[
+12
+]
+],
+[
+"Alraune",
+[
+16
+]
+],
+[
+"Microchu",
+[
+16
+]
+],
+[
+"Treant",
+[
+16
+]
+],
+[
+"Bas-relief",
+[
+10
+]
+],
+[
+"Skuldier",
+[
+10
+]
+],
+[
+"Shark",
+[
+4
+]
+]
+]
+],
+[
+"Memories from the Aquapolis",
+"Memories of the Aquapolis - PRO",
+"82",
+"Grief Witch;-;Ochu;Deadly Nightshade (3);-;Soul Aspirator;-;Dark Fina",
+[
+[
+"Aqua Elemental",
+[
+18
+]
+],
+[
+"Killer Fish",
+[
+18
+]
+],
+[
+"Alraune",
+[
+27
+]
+],
+[
+"Microchu",
+[
+27
+]
+],
+[
+"Treant",
+[
+27
+]
+],
+[
+"Bas-relief",
+[
+24
+]
+],
+[
+"Shark",
+[
+6
+]
+],
+[
+"Skuldier",
+[
+21
+]
+],
+[
+"Sea Scorpion",
+[
+27
+]
+],
+[
+"Wrigglewater",
+[
+27
+]
+]
+]
+],
+[
+"Memories from the Aquapolis",
+"Memories of the Aquapolis - ELT",
+"97",
+"Grief Witch;-;Ochu;Deadly Nightshade (3);-;Soul Aspirator;-;Dark Fina",
+[
+[
+"Aqua Elemental",
+[
+18
+]
+],
+[
+"Killer Fish",
+[
+18
+]
+],
+[
+"Alraune",
+[
+27
+]
+],
+[
+"Microchu",
+[
+27
+]
+],
+[
+"Treant",
+[
+27
+]
+],
+[
+"Bas-relief",
+[
+21
+]
+],
+[
+"Shark",
+[
+3
+]
+],
+[
+"Skuldier",
+[
+24
+]
+],
+[
+"Sea Scorpion",
+[
+27
+]
+],
+[
+"Wrigglewater",
+[
+27
+]
+],
+[
+"Dire Lizard",
+[
+18
+]
+],
+[
+"Medusa",
+[
+18
+]
+]
+]
+],
+[
+"Shadow of the Empire",
+"Shadow of the Empire - BGN",
+"1-13",
+"Bloody Head, Zombie Warrior",
+[
+[
+"Dead Head",
+[
+4
+]
+],
+[
+"Geeta",
+[
+2
+]
+],
+[
+"Red Elemental",
+[
+2
+]
+],
+[
+"Red Marshmallow",
+[
+2
+]
+],
+[
+"Red Wisp",
+[
+2
+]
+],
+[
+"Zombie",
+[
+6
+]
+]
+]
+],
+[
+"Shadow of the Empire",
+"Shadow of the Empire - INT",
+"2-20",
+"Bloody Head, Zombie Warrior;Experiment No. 10",
+[
+[
+"Dead Head",
+[
+3,
+3
+]
+],
+[
+"Geeta",
+[
+1,
+1
+]
+],
+[
+"Red Elemental",
+[
+2,
+2
+]
+],
+[
+"Red Marshmallow",
+[
+2,
+2
+]
+],
+[
+"Red Wisp",
+[
+1,
+1
+]
+],
+[
+"Zombie",
+[
+4,
+4
+]
+]
+]
+],
+[
+"Shadow of the Empire",
+"Shadow of the Empire - ADV",
+"3-29",
+"Bloody Head, Zombie Warrior;Experiment No. 10;Captain, Zoldaad Soldier (2)",
+[
+[
+"Dead Head",
+[
+2,
+3,
+0
+]
+],
+[
+"Geeta",
+[
+2,
+2,
+0
+]
+],
+[
+"Lieutenant",
+[
+0,
+0,
+2
+]
+],
+[
+"Red Elemental",
+[
+2,
+2,
+0
+]
+],
+[
+"Red Marshmallow",
+[
+1,
+2,
+0
+]
+],
+[
+"Red Wisp",
+[
+1,
+1,
+0
+]
+],
+[
+"Sergeant",
+[
+0,
+0,
+1
+]
+],
+[
+"Zoldaad Soldier",
+[
+0,
+0,
+17
+]
+],
+[
+"Zombie",
+[
+3,
+4,
+0
+]
+]
+]
+],
+[
+"Shadow of the Empire",
+"Shadow of the Empire - PRO",
+"4-32",
+"Bloody Head, Zombie Warrior;Experiment No. 10;Captain, Zoldaad Soldier (2);Rododendro",
+[
+[
+"Abyssal",
+[
+0,
+0,
+0,
+2
+]
+],
+[
+"Cursed Bones",
+[
+0,
+0,
+0,
+2
+]
+],
+[
+"Dead Head",
+[
+2,
+3,
+0,
+0
+]
+],
+[
+"Ember",
+[
+0,
+0,
+0,
+6
+]
+],
+[
+"Fire Lizard",
+[
+0,
+0,
+0,
+4
+]
+],
+[
+"Geeta",
+[
+1,
+1,
+0,
+1
+]
+],
+[
+"Lavaburst",
+[
+0,
+0,
+0,
+1
+]
+],
+[
+"Lieutenant",
+[
+0,
+0,
+1,
+0
+]
+],
+[
+"Medusa",
+[
+0,
+0,
+0,
+1
+]
+],
+[
+"Red Elemental",
+[
+1,
+1,
+0,
+2
+]
+],
+[
+"Red Marshmallow",
+[
+1,
+2,
+0,
+0
+]
+],
+[
+"Red Wisp",
+[
+1,
+1,
+0,
+2
+]
+],
+[
+"Sergeant",
+[
+0,
+0,
+1,
+0
+]
+],
+[
+"Zoldaad Soldier",
+[
+0,
+0,
+11,
+0
+]
+],
+[
+"Zombie",
+[
+3,
+3,
+0,
+0
+]
+]
+]
+],
+[
+"Shadow of the Empire",
+"Shadow of the Empire - ELT",
+"5-42",
+"Bloody Head, Zombie Warrior;Experiment No. 10;Captain, Zoldaad Soldier (2);Rododendro;Flame Dragon",
+[
+[
+"Abyssal",
+[]
+],
+[
+"Cursed Bones",
+[]
+],
+[
+"Dead Head",
+[]
+],
+[
+"Ember",
+[]
+],
+[
+"Fire Lizard",
+[]
+],
+[
+"Geeta",
+[]
+],
+[
+"Lavaburst",
+[]
+],
+[
+"Lieutenant",
+[]
+],
+[
+"Medusa",
+[]
+],
+[
+"Red Elemental",
+[]
+],
+[
+"Red Marshmallow",
+[]
+],
+[
+"Red Wisp",
+[]
+],
+[
+"Sergeant",
+[]
+],
+[
+"Zoldaad Soldier",
+[]
+],
+[
+"Zombie",
+[]
+]
+]
+],
+[
+"Macalania Woods",
+"Macalania Woods - BGN",
+"14",
+"Blue Element",
+[
+[
+"Iguion",
+[]
+],
+[
+"Wasp",
+[
+18
+]
+]
+]
+],
+[
+"Macalania Woods",
+"Macalania Woods - INT",
+"16",
+"Murussu",
+[
+[
+"Blue Element",
+[
+6
+]
+],
+[
+"Wasp",
+[
+13
+]
+]
+]
+],
+[
+"Macalania Woods",
+"Macalania Woods - ADV",
+"21",
+"Xiphos",
+[
+[
+"Blue Element",
+[
+6
+]
+],
+[
+"Iguion",
+[
+2
+]
+],
+[
+"Murussu",
+[
+6
+]
+],
+[
+"Wasp",
+[
+12
+]
+]
+]
+],
+[
+"Macalania Woods",
+"Macalania Woods - PRO",
+"24",
+"Chimera",
+[
+[
+"Iguion",
+[
+3
+]
+],
+[
+"Murussu",
+[
+24
+]
+],
+[
+"Xiphos",
+[
+12
+]
+]
+]
+],
+[
+"Macalania Woods",
+"Macalania Woods - ELT",
+"32",
+"Spherimorph",
+[
+[
+"Chimera",
+[
+4
+]
+],
+[
+"Murussu",
+[
+24
+]
+],
+[
+"Xiphos",
+[
+32
+]
+],
+[
+"Red Butterfly encounter",
+[]
+],
+[
+"Mini-Boss Chimera",
+[
+2
+]
+],
+[
+"Iguion",
+[
+5
+]
+]
+]
+],
+[
+"Destroy the Reactor - Exploration",
+"Destroy the Reactor - Exploration (Easy)",
+"11",
+"Guard Scorpion",
+[
+[
+"Mono Drive",
+[
+6
+]
+],
+[
+"Sentry",
+[
+7
+]
+]
+]
+],
+[
+"Destroy the Reactor - Exploration",
+"Destroy the Reactor - Exploration (Hard)",
+"31",
+"Air Buster",
+[
+[
+"Blood Maw",
+[
+9
+]
+],
+[
+"Guard Hound",
+[
+9
+]
+],
+[
+"Rocket Launcher",
+[
+8
+]
+],
+[
+"Sentry",
+[
+20
+]
+],
+[
+"Sweeper",
+[
+5
+]
+]
+]
+],
+[
+"Fodina Caestino - Exploration",
+"Fodina Caestino - Exploration (Easy)",
+"",
+"Malboro",
+[
+[
+"Falxfang",
+[]
+],
+[
+"Snaga",
+[]
+]
+]
+],
+[
+"Fodina Caestino - Exploration",
+"Fodina Caestino - Exploration (Hard)",
+"",
+"Malboro",
+[
+[
+"Falxfang",
+[]
+],
+[
+"Gigantoad",
+[]
+],
+[
+"Gurangatch",
+[]
+],
+[
+"Snaga",
+[]
+]
+]
+],
+[
+"Nam-Yensa Sandsea - Exploration",
+"Nam-Yensa Sandsea - Exploration (EASY)",
+"16",
+"Urutan Eater",
+[
+[
+"Alraune",
+[
+12
+]
+],
+[
+"Speartongue",
+[
+12
+]
+]
+]
+],
+[
+"Nam-Yensa Sandsea - Exploration",
+"Nam-Yensa Sandsea - Exploration (HARD)",
+"31",
+"Urutan Eater",
+[
+[
+"Alraune",
+[
+19
+]
+],
+[
+"Speartongue",
+[
+27
+]
+],
+[
+"Wyvern",
+[
+6
+]
+],
+[
+"Yensa",
+[
+29
+]
+]
+]
+],
+[
+"Escape from Alexandria Castle",
+"Escape from Alexandria Castle (EASY)",
+"19",
+"Ralvuimago",
+[
+[
+"Black Mage Type B",
+[
+12
+]
+],
+[
+"Soldier",
+[
+12
+]
+]
+]
+],
+[
+"Escape from Alexandria Castle",
+"Escape from Alexandria Castle (HARD)",
+"31",
+"Ralvuimago",
+[
+[
+"Bandersnatch",
+[
+2
+]
+],
+[
+"Black Mage Type B",
+[
+12
+]
+],
+[
+"Black Mage Type C",
+[
+24
+]
+],
+[
+"Seeker Bat",
+[
+16
+]
+],
+[
+"Soldier",
+[
+20
+]
+]
+]
+],
+[
+"Big Bridge - Exploration",
+"Big Bridge - Exploration (Easy)",
+"",
+"Helldiver",
+[
+[
+"Imperial Trooper",
+[]
+],
+[
+"Militesi Coeurl",
+[]
+]
+]
+],
+[
+"Big Bridge - Exploration",
+"Big Bridge - Exploration (Hard)",
+"",
+"Gilgamesh",
+[
+[
+"Heavy Gunner",
+[]
+],
+[
+"Helldiver",
+[]
+],
+[
+"Imperial Trooper",
+[]
+],
+[
+"Militesi Coeurl",
+[]
+],
+[
+"Nymurod",
+[]
+]
+]
+],
+[
+"Mt. Gagazet - Exploration",
+"Mt. Gagazet (EASY)",
+"16",
+"Seymour Flux",
+[
+[
+"Grat",
+[
+12
+]
+],
+[
+"Mech Leader",
+[
+12
+]
+]
+]
+],
+[
+"Mt. Gagazet - Exploration",
+"Mt. Gagazet (HARD)",
+"31",
+"Seymour Flux",
+[
+[
+"Bandersnatch",
+[
+6
+]
+],
+[
+"Bashura",
+[
+10
+]
+],
+[
+"Grat",
+[
+16
+]
+],
+[
+"Mech Defender",
+[
+16
+]
+],
+[
+"Mech Leader",
+[
+33
+]
+]
+]
+],
+[
+"Mt. Nibel - Exploration",
+"Mt. Nibel - Exploration (EASY)",
+"11",
+"Materia Keeper",
+[
+[
+"Nibel Wolf",
+[
+25
+]
+]
+]
+],
+[
+"Mt. Nibel - Exploration",
+"Mt. Nibel - Exploration (HARD)",
+"21",
+"Materia Keeper",
+[
+[
+"Crown Lance",
+[
+13
+]
+],
+[
+"Dragon",
+[
+1
+]
+],
+[
+"Kyuvilduns",
+[
+20
+]
+],
+[
+"Nibel Wolf",
+[
+10
+]
+],
+[
+"Valron",
+[
+8
+]
+]
+]
+],
+[
+"Latius Woods - Past",
+"Latius Woods - Past (EASY)",
+"",
+"Microchu (3);Ochu",
+[
+[
+"Kaiser Wolf",
+[]
+],
+[
+"Wild Rat",
+[]
+]
+]
+],
+[
+"Latius Woods - Past",
+"Latius Woods - Past (HARD)",
+"",
+"Microchu (3);Ochu",
+[
+[
+"Darklegs",
+[]
+],
+[
+"Fledgling Rukh",
+[]
+],
+[
+"Hecteyes",
+[]
+],
+[
+"Kaiser Wolf",
+[]
+],
+[
+"Ojo",
+[]
+],
+[
+"Wild Rat",
+[]
+]
+]
+],
+[
+"Dollet - Exploration",
+"Dollet - Exploration (EASY)",
+"",
+"X-ATM092",
+[
+[
+"Elite Soldier",
+[]
+],
+[
+"G-Soldier",
+[]
+]
+]
+],
+[
+"Dollet - Exploration",
+"Dollet - Exploration (HARD)",
+"",
+"X-ATM092",
+[
+[
+"Anacondaur",
+[]
+],
+[
+"Elite Soldier",
+[]
+],
+[
+"Geezard",
+[]
+],
+[
+"G-Soldier",
+[]
+]
+]
+],
+[
+"Shrine of Ru'Avitau - Exploration",
+"Shrine of Ru'Avitau - Exploration (EASY)",
+"",
+"Kirin",
+[
+[
+"Evil Weapon",
+[]
+],
+[
+"Ullikummi",
+[]
+]
+]
+],
+[
+"Shrine of Ru'Avitau - Exploration",
+"Shrine of Ru'Avitau - Exploration (HARD)",
+"",
+"Kirin",
+[
+[
+"Evil Weapon",
+[]
+],
+[
+"Faust",
+[]
+],
+[
+"Mother Globe",
+[]
+],
+[
+"Olla Grande",
+[]
+],
+[
+"Ullikummi",
+[]
+]
+]
+],
+[
+"Gaea's Cliff - Exploration",
+"Gaea's Cliff - Exploration (Easy)",
+"",
+"Schizo",
+[
+[
+"Evilhead",
+[]
+],
+[
+"Zolokalter",
+[]
+]
+]
+],
+[
+"Gaea's Cliff - Exploration",
+"Gaea's Cliff - Exploration (Hard)",
+"",
+"Schizo",
+[
+[
+"Blue Dragon",
+[]
+],
+[
+"Coeurl",
+[]
+],
+[
+"Evilhead",
+[]
+],
+[
+"Headbomber",
+[]
+],
+[
+"Stilva",
+[]
+],
+[
+"Zolokalter",
+[]
+]
+]
+],
+[
+"King Mog's Lost Maps",
+"Megacrysts Map (Exploration)",
+"",
+"",
+[]
+],
+[
+"King Mog's Lost Maps",
+"Awakening Materials Map (Exploration)",
+"",
+"",
+[
+[
+"Green Slime",
+[]
+],
+[
+"Hornet",
+[]
+],
+[
+"Tarantula",
+[]
+]
+]
+],
+[
+"Dome - Exploration",
+"Dome - Exploration (Easy)",
+"",
+"Spectral Keeper",
+[
+[
+"Dark Flan",
+[]
+],
+[
+"Grendel",
+[]
+]
+]
+],
+[
+"Dome - Exploration",
+"Dome - Exploration (Hard)",
+"",
+"Spectral Keeper",
+[
+[
+"Ahriman",
+[]
+],
+[
+"Bashura",
+[]
+],
+[
+"Dark Flan",
+[]
+],
+[
+"Grendel",
+[]
+]
+]
+],
+[
+"Figaro Castle - Exploration",
+"Figaro Castle - Exploration (EASY)",
+"",
+"Tentacle",
+[
+[
+"Dropper",
+[]
+],
+[
+"Humpty",
+[]
+]
+]
+],
+[
+"Figaro Castle - Exploration",
+"Figaro Castle - Exploration (HARD)",
+"",
+"Tentacle",
+[
+[
+"Cruller",
+[]
+],
+[
+"Dropper",
+[]
+],
+[
+"Humpty",
+[]
+],
+[
+"Neck Hunter",
+[]
+]
+]
+],
+[
+"Chocobo Forest - Exploration",
+"Chocobo Forest - Exploration (EASY)",
+"",
+"Chocobo Eater",
+[
+[
+"Lucky Rabbit",
+[]
+],
+[
+"Nutkin",
+[]
+],
+[
+"Wild Nakk",
+[]
+]
+]
+],
+[
+"Chocobo Forest - Exploration",
+"Chocobo Forest - Exploration (HARD)",
+"",
+"Chocobo Eater",
+[
+[
+"Coeurl",
+[]
+],
+[
+"Wild Nakk",
+[]
+]
+]
+],
+[
+"Castle Exdeath - Exploration",
+"Castle Exdeath - Exploration (EASY)",
+"",
+"Gilgamesh (FFV)",
+[
+[
+"Adamantite Golem",
+[]
+],
+[
+"Blind Wolf",
+[]
+]
+]
+],
+[
+"Castle Exdeath - Exploration",
+"Castle Exdeath - Exploration (HARD)",
+"",
+"Gilgamesh (FFV)",
+[
+[
+"Adamantite Golem",
+[]
+],
+[
+"Blind Wolf",
+[]
+],
+[
+"Blue Dragon",
+[]
+],
+[
+"Hellraiser",
+[]
+],
+[
+"Magic Dragon",
+[]
+],
+[
+"Yellow Dragon",
+[]
+]
+]
+],
+[
+"Castle Palamecia - Exploration",
+"Castle Palamecia - Exploration (EASY)",
+"",
+"Black Knight",
+[
+[
+"Coeurl",
+[]
+],
+[
+"Stone Golem",
+[]
+]
+]
+],
+[
+"Castle Palamecia - Exploration",
+"Castle Palamecia - Exploration (HARD)",
+"",
+"Black Knight",
+[
+[
+"Coeurl",
+[]
+],
+[
+"Imperial Shadow",
+[]
+],
+[
+"Stone Golem",
+[]
+]
+]
+],
+[
+"Narshe - Exploration",
+"Narshe - Exploration (EASY)",
+"",
+"Valigarmanda",
+[
+[
+"Garm",
+[]
+],
+[
+"Lukhavi",
+[]
+]
+]
+],
+[
+"Narshe - Exploration",
+"Narshe - Exploration (HARD)",
+"",
+"Valigarmanda",
+[
+[
+"Garm",
+[]
+],
+[
+"Ice Dragon",
+[]
+],
+[
+"Lukhavi",
+[]
+],
+[
+"Magna Roader (Brown)",
+[]
+],
+[
+"Magna Roader (Yellow)",
+[]
+]
+]
+],
+[
+"Altissia, City on the Sea - Exploration",
+"Altissia, City on the Sea - Exploration (EASY)",
+"",
+"Leviathan",
+[
+[
+"Battery Soldier",
+[]
+],
+[
+"Magitek Axeman",
+[]
+]
+]
+],
+[
+"Altissia, City on the Sea - Exploration",
+"Altissia, City on the Sea - Exploration (HARD)",
+"",
+"Leviathan",
+[
+[
+"Battery Soldier",
+[]
+],
+[
+"Imperial Sniper",
+[]
+],
+[
+"Magitek Axeman",
+[]
+]
+]
+],
+[
+"Flying Fortress - Exploration",
+"Flying Fortress - Exploration (EASY)",
+"",
+"Tiamat",
+[
+[
+"Dark Fighter",
+[]
+],
+[
+"Death Knight",
+[]
+]
+]
+],
+[
+"Flying Fortress - Exploration",
+"Flying Fortress - Exploration (HARD)",
+"",
+"Tiamat",
+[
+[
+"Dark Fighter",
+[]
+],
+[
+"Death Knight",
+[]
+],
+[
+"Soldier",
+[]
+]
+]
+],
+[
+"Goldor Manor - Exploration",
+"Goldor Manor - Exploration (EASY)",
+"",
+"Goldor",
+[
+[
+"Gold Bear",
+[]
+],
+[
+"Gold Knight",
+[]
+],
+[
+"Gold Warrior",
+[]
+]
+]
+],
+[
+"Goldor Manor - Exploration",
+"Goldor Manor - Exploration (HARD)",
+"",
+"Goldor",
+[
+[
+"Gold Bear",
+[]
+],
+[
+"Gold Knight",
+[]
+],
+[
+"Gold Warrior",
+[]
+],
+[
+"Lost Gold",
+[]
+]
+]
+],
+[
+"Kilika Woods - Exploration",
+"Kilika Woods - Exploration 1",
+"",
+"YSLS-Zero",
+[
+[
+"Ironside",
+[]
+],
+[
+"Mini Mogcaptor",
+[
+1
+]
+],
+[
+"Red Elemental",
+[]
+],
+[
+"Stalwart",
+[]
+]
+]
+],
+[
+"Kilika Woods - Exploration",
+"Kilika Woods - Exploration 2",
+"",
+"YSLS-Zero",
+[
+[
+"Ironside",
+[]
+],
+[
+"Mini Mogcaptor",
+[
+1
+]
+],
+[
+"Red Elemental",
+[]
+],
+[
+"Stalwart",
+[]
+]
+]
+],
+[
+"Kilika Woods - Exploration",
+"Kilika Woods - Exploration 3",
+"",
+"YSLS-Zero",
+[
+[
+"Ironside",
+[]
+],
+[
+"Mini Mogcaptor",
+[
+1
+]
+],
+[
+"Red Elemental",
+[]
+],
+[
+"Stalwart",
+[]
+]
+]
+],
+[
+"Pandemonium - Exploration",
+"Pandemonium - Exploration (EASY)",
+"",
+"Malboro",
+[
+[
+"Abaddon",
+[]
+],
+[
+"Amdusias",
+[]
+]
+]
+],
+[
+"Pandemonium - Exploration",
+"Pandemonium - Exploration (HARD)",
+"",
+"Garland",
+[
+[
+"Abaddon",
+[]
+],
+[
+"Amdusias",
+[]
+],
+[
+"Malboro",
+[]
+]
+]
+],
+[
+"Academia -400 AF- Exploration",
+"Academia -400 AF- Exploration (EASY)",
+"",
+"Zenobia",
+[
+[
+"Fencer",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Taxim",
+[]
+]
+]
+],
+[
+"Academia -400 AF- Exploration",
+"Academia -400 AF- Exploration (HARD)",
+"",
+"Zenobia",
+[
+[
+"Fencer",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Taxim",
+[]
+]
+]
+],
+[
+"Lunatic Pandora - Exploration",
+"Lunatic Pandora - Exploration (EASY)",
+"",
+"Mobile Type 8;Left Probe;Right Probe",
+[
+[
+"Coeurl",
+[]
+],
+[
+"Elnoyle",
+[]
+],
+[
+"Garchimacera",
+[]
+],
+[
+"Behemoth",
+[]
+]
+]
+],
+[
+"Lunatic Pandora - Exploration",
+"Lunatic Pandora - Exploration (HARD)",
+"",
+"Mobile Type 8;Left Probe;Right Probe",
+[
+[
+"Coeurl",
+[]
+],
+[
+"Elnoyle",
+[]
+],
+[
+"Garchimacera",
+[]
+],
+[
+"Behemoth",
+[]
+]
+]
+],
+[
+"Memoria - Exploration",
+"Memoria - Exploration (EASY)",
+"",
+"Behemoth (FFIX)",
+[
+[
+"Ash",
+[]
+],
+[
+"Stilva",
+[]
+]
+]
+],
+[
+"Memoria - Exploration",
+"Memoria - Exploration (HARD)",
+"",
+"Hades",
+[
+[
+"Ash",
+[]
+],
+[
+"Stilva",
+[]
+]
+]
+],
+[
+"Shinra Building, 69th Floor - Exploration",
+"Battle Info",
+"",
+"The Arsenal",
+[
+[
+"Brain Pod",
+[]
+],
+[
+"Zenene",
+[]
+],
+[
+"M.O.T.H. Unit",
+[]
+]
+]
+],
+[
+"Mystic Den - Exploration",
+"Battle Info",
+"",
+"True Zeno",
+[
+[
+"Reginn",
+[]
+],
+[
+"Hexa Hydra",
+[]
+],
+[
+"Zmei",
+[]
+]
+]
+],
+[
+"Mysidian Tower - Exploration",
+"Battle Info",
+"",
+"Fire Gigas;Ice Gigas;Thunder Gigas",
+[
+[
+"Malboro Terra",
+[]
+],
+[
+"Vampire Girl",
+[]
+],
+[
+"Ghost",
+[]
+],
+[
+"White Dragon (chest)",
+[]
+]
+]
+],
+[
+"Esper Caves - Exploration",
+"Battle Info",
+"",
+"Ultros",
+[
+[
+"Adamankary",
+[]
+],
+[
+"Bonnacon",
+[]
+],
+[
+"Land Grillon",
+[]
+],
+[
+"Mandrake",
+[]
+],
+[
+"Venobennu",
+[]
+]
+]
+],
+[
+"Farplane Grotto - Exploration",
+"Battle Info",
+"5",
+"Dr. Lazarov;Zolulu & Delulu",
+[
+[
+"Aileen",
+[]
+],
+[
+"PNK-2",
+[]
+],
+[
+"Ayaka",
+[]
+],
+[
+"Roselia",
+[]
+],
+[
+"Yego",
+[]
+],
+[
+"Nalu",
+[]
+],
+[
+"Elena",
+[]
+],
+[
+"Ryuka",
+[]
+],
+[
+"Shatal",
+[]
+]
+]
+],
+[
+"Isaaru's Aeons",
+"Isaaru's Aeons Lvl. 1",
+"",
+"Grothia;Pterya;Spathi",
+[
+[
+"Aqua Flan",
+[]
+],
+[
+"Sahagin",
+[]
+]
+]
+],
+[
+"Isaaru's Aeons",
+"Isaaru's Aeons",
+"",
+"Grothia;Pterya;Spathi",
+[
+[
+"Aqua Flan",
+[]
+],
+[
+"Sahagin",
+[]
+]
+]
+],
+[
+"Daring Rescue at the Crumbling House",
+"Daring Rescue at the Crumbling House",
+"",
+"",
+[
+[
+"Scorpion",
+[]
+],
+[
+"Zokka",
+[]
+],
+[
+"Nightwalker",
+[]
+]
+]
+],
+[
+"Fight for Survival",
+"Fight for Survival",
+"",
+"Reno;Rude",
+[
+[
+"Elite Security Officer",
+[]
+],
+[
+"Elite Shock Trooper",
+[]
+],
+[
+"Helitrooper",
+[]
+]
+]
+],
+[
+"The Giant of Babel",
+"The Giant of Babel - BGN",
+"16",
+"Scarmiglione",
+[
+[
+"Beam Cannon",
+[
+12
+]
+],
+[
+"Clockwork Soldier",
+[
+12
+]
+]
+]
+],
+[
+"The Giant of Babel",
+"The Giant of Babel - INT",
+"20",
+"Scarmiglione;Rubicante",
+[
+[
+"Beam Cannon",
+[
+18
+]
+],
+[
+"Clockwork Soldier",
+[
+18
+]
+]
+]
+],
+[
+"The Giant of Babel",
+"The Giant of Babel - ADV",
+"23",
+"Scarmiglione;Rubicante;Cagnazzo",
+[
+[
+"Beam Cannon",
+[
+26
+]
+],
+[
+"Centaurion",
+[
+16
+]
+],
+[
+"Clockwork Soldier",
+[
+8
+]
+]
+]
+],
+[
+"The Giant of Babel",
+"The Giant of Babel - PRO",
+"29",
+"Scarmiglione;Rubicante;Cagnazzo;Barbariccia",
+[
+[
+"Beam Cannon",
+[
+27
+]
+],
+[
+"Centaurion",
+[
+15
+]
+],
+[
+"Clockwork Soldier",
+[
+24
+]
+]
+]
+],
+[
+"The Giant of Babel",
+"The Giant of Babel - ELT",
+"35",
+"Scarmiglione;Rubicante;Cagnazzo;Barbariccia;Golbez",
+[
+[
+"Beam Cannon",
+[
+35
+]
+],
+[
+"Centaurion",
+[
+18
+]
+],
+[
+"Clockwork Soldier",
+[
+27
+]
+]
+]
+],
+[
+"The Crystal Tower",
+"The Crystal Tower - BGN",
+"16",
+"Platinal",
+[
+[
+"Kum Kum",
+[
+23
+]
+]
+]
+],
+[
+"The Crystal Tower",
+"The Crystal Tower - INT",
+"19",
+"Azer",
+[
+[
+"Kum Kum",
+[
+18
+]
+],
+[
+"Platinal",
+[
+6
+]
+]
+]
+],
+[
+"The Crystal Tower",
+"The Crystal Tower - ADV",
+"21",
+"Dark General",
+[
+[
+"Kum Kum",
+[
+15
+]
+],
+[
+"Platinal",
+[
+5
+]
+],
+[
+"Azer",
+[
+5
+]
+]
+]
+],
+[
+"The Crystal Tower",
+"The Crystal Tower - PRO",
+"28",
+"Gomory (2)",
+[
+[
+"Kum Kum",
+[
+30
+]
+],
+[
+"Platinal",
+[
+5
+]
+],
+[
+"Azer",
+[
+15
+]
+],
+[
+"Dark General",
+[
+5
+]
+],
+[
+"Green Dragon",
+[
+2
+]
+]
+]
+],
+[
+"The Crystal Tower",
+"The Crystal Tower - ELT",
+"39",
+"Xande",
+[
+[
+"Kum Kum",
+[
+35
+]
+],
+[
+"Platinal",
+[
+6
+]
+],
+[
+"Azer",
+[
+16
+]
+],
+[
+"Dark General",
+[
+5
+]
+],
+[
+"Gomory",
+[
+10
+]
+],
+[
+"Yellow Dragon",
+[
+2
+]
+],
+[
+"Green Dragon",
+[
+2
+]
+],
+[
+"Red Dragon",
+[
+1
+]
+]
+]
+],
+[
+"The Big Bridge",
+"The Big Bridge - BGN",
+"13",
+"Gilgamesh",
+[
+[
+"Flying Killer",
+[
+9
+]
+],
+[
+"Little Chariot",
+[
+18
+]
+],
+[
+"Merrow",
+[
+7
+]
+],
+[
+"Neo Garula",
+[
+3
+]
+]
+]
+],
+[
+"The Big Bridge",
+"The Big Bridge - INT",
+"13",
+"Gilgamesh",
+[
+[
+"Flying Killer",
+[
+9
+]
+],
+[
+"Little Chariot",
+[
+18
+]
+],
+[
+"Merrow",
+[
+7
+]
+],
+[
+"Neo Garula",
+[
+3
+]
+]
+]
+],
+[
+"The Big Bridge",
+"The Big Bridge - ADV",
+"13",
+"Gilgamesh",
+[
+[
+"Flying Killer",
+[
+9
+]
+],
+[
+"Little Chariot",
+[
+18
+]
+],
+[
+"Merrow",
+[
+7
+]
+],
+[
+"Neo Garula",
+[
+3
+]
+]
+]
+],
+[
+"The Big Bridge",
+"The Big Bridge - PRO",
+"13",
+"Gilgamesh",
+[
+[
+"Flying Killer",
+[
+9
+]
+],
+[
+"Little Chariot",
+[
+18
+]
+],
+[
+"Merrow",
+[
+7
+]
+],
+[
+"Neo Garula",
+[
+3
+]
+]
+]
+],
+[
+"The Big Bridge",
+"The Big Bridge - ELT",
+"16",
+"(1) Gilgamesh;(2) Gilgamesh",
+[
+[
+"Flying Killer",
+[
+9
+]
+],
+[
+"Little Chariot",
+[
+18
+]
+],
+[
+"Merrow",
+[
+9
+]
+],
+[
+"Neo Garula",
+[
+5
+]
+]
+]
+],
+[
+"The Empire of Light and Dark",
+"The Empire of Light and Dark - BGN",
+"13",
+"Monochros",
+[
+[
+"Poplium",
+[
+4,
+4
+]
+],
+[
+"Skuldier",
+[
+4,
+4
+]
+],
+[
+"Worgen",
+[
+4,
+4
+]
+]
+]
+],
+[
+"The Empire of Light and Dark",
+"The Empire of Light and Dark - INT",
+"16",
+"Steadfast Swordsman",
+[
+[
+"Magitek Armor",
+[
+5,
+5
+]
+],
+[
+"Zoldaad Soldier",
+[
+13,
+12
+]
+]
+]
+],
+[
+"The Empire of Light and Dark",
+"The Empire of Light and Dark - ADV",
+"19",
+"Teasing Eye;Scoffing Eye",
+[
+[
+"Captain",
+[
+6,
+7
+]
+],
+[
+"Lieutenant",
+[
+6,
+5
+]
+],
+[
+"Wild Nakk",
+[
+12,
+12
+]
+]
+]
+],
+[
+"The Empire of Light and Dark",
+"The Empire of Light and Dark - PRO",
+"22",
+"Grace;Signalbot (2)",
+[
+[
+"Magitek Armor",
+[
+15,
+13
+]
+],
+[
+"Security Eye",
+[
+10,
+11
+]
+]
+]
+],
+[
+"The Empire of Light and Dark",
+"The Empire of Light and Dark - ELT",
+"25",
+"Special Forces Axeman;Special Forces Swordsman;Wilhelm",
+[
+[
+"Magitek Armor",
+[
+8,
+8
+]
+],
+[
+"Scolopendra",
+[
+4,
+4
+]
+],
+[
+"Special Forces Officer",
+[
+8,
+8
+]
+],
+[
+"Zoldaad Soldier",
+[
+8,
+8
+]
+]
+]
+],
+[
+"Ancient Ruins Level 1",
+"Ancient Ruins - Level 1",
+"",
+"Bennu",
+[
+[
+"Ancient Objet d'Art",
+[]
+],
+[
+"Bomb",
+[]
+],
+[
+"Brutus",
+[]
+],
+[
+"Flame Fowl",
+[]
+],
+[
+"Fledgling Rukh",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Lindbur Wolf",
+[]
+],
+[
+"Red Peak",
+[]
+],
+[
+"Treant",
+[]
+],
+[
+"Vamplant",
+[]
+]
+]
+],
+[
+"Ancient Ruins Level 2",
+"Ancient Ruins - Level 2",
+"",
+"Undine",
+[
+[
+"Abtu",
+[]
+],
+[
+"Adamandelion",
+[]
+],
+[
+"Argostoli",
+[]
+],
+[
+"Bolt Fish",
+[]
+],
+[
+"Cobalt Frog",
+[]
+],
+[
+"Gray Ooze",
+[]
+],
+[
+"Merrow",
+[]
+],
+[
+"Mindflayer",
+[]
+],
+[
+"Wrigglewater",
+[]
+]
+]
+],
+[
+"Ancient Ruins Level 3",
+"Ancient Ruins Level 3",
+"",
+"Delanbo",
+[
+[
+"Belmodar",
+[]
+],
+[
+"Haagenti",
+[]
+],
+[
+"Hitobosu",
+[]
+],
+[
+"Krokesia",
+[]
+],
+[
+"Marraco",
+[]
+],
+[
+"Polymyxa",
+[]
+],
+[
+"Shemhaza",
+[]
+],
+[
+"Stone Mask",
+[]
+]
+]
+],
+[
+"Ancient Ruins Level 4",
+"Ancient Ruins Level 4",
+"",
+"Microchu (3);Ochu",
+[
+[
+"Adenium",
+[]
+],
+[
+"Black Widow",
+[]
+],
+[
+"Drosera",
+[]
+],
+[
+"Green Elemental",
+[]
+],
+[
+"Hivesguard",
+[]
+],
+[
+"Ivy",
+[]
+],
+[
+"Microchu",
+[]
+],
+[
+"Moranensis",
+[]
+],
+[
+"Ninlil",
+[]
+],
+[
+"Woodwatcher",
+[]
+]
+]
+],
+[
+"Ancient Ruins Level 5",
+"Ancient Ruins Level 5",
+"",
+"Zilant",
+[
+[
+"Devil Bunny",
+[]
+],
+[
+"Ignus Fatuus",
+[]
+],
+[
+"Imp",
+[]
+],
+[
+"Joker",
+[]
+],
+[
+"Red Eyes",
+[]
+]
+]
+],
+[
+"To the Forgotten Capital - Exploration",
+"To the Forgotten Capital - Exploration (EASY)",
+"",
+"Jenova・LIFE",
+[
+[
+"Jemnezmy",
+[]
+],
+[
+"Toxic Frog",
+[]
+]
+]
+],
+[
+"To the Forgotten Capital - Exploration",
+"To the Forgotten Capital - Exploration (HARD)",
+"",
+"Jenova・LIFE",
+[
+[
+"8 Eye",
+[]
+],
+[
+"Doorbull",
+[]
+],
+[
+"Jemnezmy",
+[]
+],
+[
+"Toxic Frog",
+[]
+]
+]
+],
+[
+"Aldore Tower (2)/Exploration",
+"Aldore Tower - Exploration",
+"",
+"A-Type Magitek Armor+",
+[
+[
+"Coeurl Rider",
+[]
+],
+[
+"Flame Claw",
+[]
+],
+[
+"Pholus",
+[]
+]
+]
+],
+[
+"The Gapra Whitewood - Exploration",
+"The Gapra Whitewood - Exploration (EASY)",
+"",
+"Aster Protoflorian",
+[
+[
+"Alpha Behemoth",
+[]
+],
+[
+"Crawler",
+[]
+],
+[
+"Silver Lobo",
+[]
+]
+]
+],
+[
+"The Gapra Whitewood - Exploration",
+"The Gapra Whitewood - Exploration (HARD)",
+"",
+"Aster Protoflorian",
+[
+[
+"Alpha Behemoth",
+[]
+],
+[
+"Crawler",
+[]
+],
+[
+"Milvus Velocycle",
+[]
+],
+[
+"Silver Lobo",
+[]
+],
+[
+"Vespid",
+[]
+]
+]
+],
+[
+"Tower of Zot - Exploration",
+"Tower of Zot - Exploration (EASY)",
+"",
+"Cindy;Mindy;Sandy",
+[
+[
+"Centaur Knight",
+[]
+],
+[
+"Sorceress",
+[]
+]
+]
+],
+[
+"Tower of Zot - Exploration",
+"Tower of Zot - Exploration (HARD)",
+"",
+"Barbariccia",
+[
+[
+"Centaur Knight",
+[]
+],
+[
+"Cindy",
+[]
+],
+[
+"Mindy",
+[]
+],
+[
+"Purple Bavarois",
+[]
+],
+[
+"Sandy",
+[]
+],
+[
+"Sorceress",
+[]
+]
+]
+],
+[
+"Siren's Tower - Exploration",
+"Siren's Tower - Exploration (EASY)",
+"",
+"Siren",
+[
+[
+"Damia",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Soul",
+[]
+]
+]
+],
+[
+"Siren's Tower - Exploration",
+"Siren's Tower - Exploration (HARD 1)",
+"",
+"Mage (3)",
+[
+[
+"Damia",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Soul",
+[]
+]
+]
+],
+[
+"Siren's Tower - Exploration",
+"Siren's Tower - Exploration (HARD 2)",
+"",
+"Imp (3)",
+[
+[
+"Damia",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Soul",
+[]
+]
+]
+],
+[
+"Siren's Tower - Exploration",
+"Siren's Tower - Exploration (HARD 3)",
+"",
+"Sorcerer (3)",
+[
+[
+"Damia",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Soul",
+[]
+]
+]
+],
+[
+"Siren's Tower - Exploration",
+"Siren's Tower - Exploration (HARD 4)",
+"",
+"Rampaging Siren",
+[
+[
+"Damia",
+[]
+],
+[
+"Headstone",
+[]
+],
+[
+"Soul",
+[]
+]
+]
+],
+[
+"The Forgotten City - Exploration",
+"The Forgotten City - Exploration (EASY)",
+"",
+"Kadaj",
+[
+[
+"8 Eye",
+[]
+],
+[
+"Doorbull",
+[]
+],
+[
+"Jemnezmy",
+[]
+],
+[
+"Toxic Frog",
+[]
+]
+]
+],
+[
+"The Forgotten City - Exploration",
+"The Forgotten City - Exploration (HARD)",
+"",
+"Kadaj",
+[
+[
+"8 Eye",
+[]
+],
+[
+"Doorbull",
+[]
+],
+[
+"Jemnezmy",
+[]
+],
+[
+"Toxic Frog",
+[]
+]
+]
+],
+[
+"The Phon Coast - Exploration",
+"The Phon Coast - Exploration (EASY)",
+"",
+"Archaeosaur",
+[
+[
+"Mandragora",
+[]
+],
+[
+"Bangaa Pirate",
+[]
+],
+[
+"White Chocobo",
+[]
+]
+]
+],
+[
+"The Phon Coast - Exploration",
+"The Phon Coast - Exploration (HARD)",
+"",
+"Thalassinon",
+[
+[
+"Mandragora",
+[]
+],
+[
+"Bangaa Pirate",
+[]
+],
+[
+"White Chocobo",
+[]
+]
+]
+],
+[
+"The Patron's Palace - Exploration",
+"The Patron's Palace - Exploration",
+"",
+"Zaltys",
+[
+[
+"Meonekton",
+[]
+],
+[
+"Schrodinger",
+[]
+],
+[
+"Hoplite",
+[]
+]
+]
+],
+[
+"Zegnautus Keep - Exploration",
+"Zegnautus Keep - Exploration",
+"",
+"Foras",
+[
+[
+"Snaga",
+[]
+],
+[
+"Uttu",
+[]
+],
+[
+"Haywire Axeman",
+[]
+]
+]
+],
+[
+"The Young Acacia Dragoon",
+"The Young Acacia Dragoon Lvl. 1",
+"",
+"Marcy",
+[
+[
+"Roborg",
+[
+1
+]
+],
+[
+"Will O' Wisp",
+[]
+],
+[
+"Potty",
+[]
+]
+]
+],
+[
+"The Young Acacia Dragoon",
+"The Young Acacia Dragoon",
+"",
+"Marcy",
+[
+[
+"Roborg",
+[
+1
+]
+],
+[
+"Will O' Wisp",
+[]
+],
+[
+"Potty",
+[]
+]
+]
+],
+[
+"The Warlock's Castle",
+"The Warlock's Castle",
+"",
+"Gilgamesh (FFV)",
+[
+[
+"Black Warlock",
+[]
+],
+[
+"Blind Wolf",
+[]
+],
+[
+"Blue Dragon",
+[]
+],
+[
+"Magic Dragon",
+[]
+],
+[
+"Yellow Dragon",
+[]
+]
+]
+],
+[
+"The Big Bridge (Update)",
+"The Big Bridge",
+"12",
+"Gilgamesh",
+[
+[
+"Flying Killer",
+[]
+],
+[
+"Little Chariot",
+[]
+],
+[
+"Merrow",
+[]
+],
+[
+"Neo Garula",
+[]
+]
+]
+],
+[
+"Big Bridge - Exploration (Update)",
+"Big Bridge - Exploration",
+"",
+"Helldiver;Gilgamesh",
+[
+[
+"Heavy Gunner",
+[]
+],
+[
+"Imperial Trooper",
+[]
+],
+[
+"Militesi Coeurl",
+[]
+],
+[
+"Nymurod",
+[]
+]
+]
+],
+[
+"Pandemonium - Exploration (Update)",
+"Pandemonium - Exploration",
+"",
+"Garland",
+[
+[
+"Abaddon",
+[]
+],
+[
+"Amdusias",
+[]
+],
+[
+"Malboro",
+[]
+]
+]
+],
+[
+"The Gapra Whitewood - Exploration (Update)",
+"The Gapra Whitewood - Exploration",
+"",
+"Alpha Behemoth;Aster Protoflorian",
+[
+[
+"Barbed Specter",
+[]
+],
+[
+"Crawler",
+[]
+],
+[
+"Milvus Velocycle",
+[]
+],
+[
+"Silver Lobo",
+[]
+],
+[
+"Vespid",
+[]
+]
+]
+],
+[
+"The Crystal Tower - Exploration",
+"The Crystal Tower - Exploration (Easy)",
+"",
+"Xande",
+[
+[
+"Kum Kum",
+[]
+],
+[
+"Platinal",
+[]
+],
+[
+"Azer",
+[]
+],
+[
+"Dark General",
+[]
+],
+[
+"Gomory",
+[]
+]
+]
+],
+[
+"The Crystal Tower - Exploration",
+"The Crystal Tower - Exploration (Hard)",
+"",
+"Yellow Dragon;Green Dragon;Red Dragon;Xande",
+[
+[
+"Kum Kum",
+[]
+],
+[
+"Platinal",
+[]
+],
+[
+"Azer",
+[]
+],
+[
+"Dark General",
+[]
+],
+[
+"Gomory",
+[]
+]
+]
+],
+[
+"The Crystal Tower - Exploration",
+"The Crystal Tower - Exploration (EX)",
+"",
+"Yellow Dragon;Green Dragon;Red Dragon;Xande",
+[
+[
+"Kum Kum",
+[]
+],
+[
+"Platinal",
+[]
+],
+[
+"Azer",
+[]
+],
+[
+"Dark General",
+[]
+],
+[
+"Gomory",
+[]
+]
+]
+],
+[
+"The Web-Weaving Princess",
+"The Morphing Princess (EASY)",
+"30",
+"Ronin",
+[
+[
+"Flan",
+[
+33
+]
+],
+[
+"Imp",
+[
+33
+]
+]
+]
+],
+[
+"The Web-Weaving Princess",
+"The Web-Weaving Princesses (HARD)",
+"",
+"Ariadne,;Tarantula (2-6)",
+[
+[
+"Arachne",
+[]
+],
+[
+"Elder Coeurl",
+[]
+],
+[
+"Flan",
+[]
+],
+[
+"Imp",
+[]
+],
+[
+"Ronin",
+[]
+],
+[
+"Tarantula",
+[]
+],
+[
+"Yojimbo",
+[]
+]
+]
+],
+[
+"Pandæmonium - Exploration",
+"Pandæmonium - Exploration (EASY)",
+"",
+"Dark Eye",
+[
+[
+"Rursan Reaver (1)",
+[]
+],
+[
+"Rursan Reaver (2)",
+[]
+],
+[
+"Ice Flan",
+[]
+]
+]
+],
+[
+"Pandæmonium - Exploration",
+"Pandæmonium - Exploration (HARD)",
+"",
+"Unidentified MA",
+[
+[
+"Rursan Reaver (1)",
+[]
+],
+[
+"Rursan Reaver (2)",
+[]
+],
+[
+"Ice Flan",
+[]
+],
+[
+"Golem",
+[]
+]
+]
+],
+[
+"Barrier Tower - Exploration",
+"Barrier Tower - Exploration",
+"12",
+"Atomos",
+[
+[
+"Gobbledygook",
+[
+22
+]
+]
+]
+],
+[
+"The Enchanted Maze",
+"The Enchanted Maze - BGN",
+"7",
+"",
+[
+[
+"Mini Gil Snapper",
+[]
+],
+[
+"Gil Snapper",
+[]
+],
+[
+"King Gil Snapper",
+[]
+],
+[
+"Metal Minituar",
+[]
+],
+[
+"Metal Cactuar",
+[]
+],
+[
+"Metal Gigantuar",
+[]
+],
+[
+"Mini Burst Pot",
+[]
+],
+[
+"Minituar",
+[]
+]
+]
+],
+[
+"The Enchanted Maze",
+"The Enchanted Maze - INT",
+"7",
+"",
+[
+[
+"King Gil Snapper",
+[]
+],
+[
+"Metal Gigantuar",
+[]
+],
+[
+"Mini Burst Pot",
+[]
+],
+[
+"Burst Pot",
+[]
+],
+[
+"Minituar",
+[]
+]
+]
+],
+[
+"The Enchanted Maze",
+"The Enchanted Maze - ADV",
+"5",
+"",
+[
+[
+"Burst Pot",
+[]
+],
+[
+"Gil Snapper Family",
+[]
+],
+[
+"King Gil Snapper",
+[]
+],
+[
+"King Metal Minituar",
+[]
+],
+[
+"Metal Gigantuar",
+[]
+],
+[
+"Mini Burst Pot",
+[]
+],
+[
+"Mini Magi Pot",
+[]
+],
+[
+"Mini Tough Pot",
+[]
+],
+[
+"Minituar",
+[]
+]
+]
+],
+[
+"The Dreadnought",
+"The Dreadnought - INT",
+"22",
+"Captain",
+[
+[
+"Balloon",
+[]
+],
+[
+"Dire Rat",
+[]
+],
+[
+"Ghast",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Mine",
+[]
+],
+[
+"Shadow",
+[]
+],
+[
+"Stunner",
+[]
+],
+[
+"Werepanther",
+[]
+],
+[
+"Wraith",
+[]
+]
+]
+],
+[
+"The Dreadnought",
+"The Dreadnought - ADV",
+"26",
+"Captain",
+[
+[
+"Balloon",
+[]
+],
+[
+"Dire Rat",
+[]
+],
+[
+"Ghast",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Magician",
+[]
+],
+[
+"Mine",
+[]
+],
+[
+"Shadow",
+[]
+],
+[
+"Soldier",
+[]
+],
+[
+"Stunner",
+[]
+],
+[
+"Werepanther",
+[]
+],
+[
+"Wraith",
+[]
+]
+]
+],
+[
+"The Dreadnought",
+"The Dreadnought - PRO",
+"32",
+"Captain",
+[
+[
+"Balloon",
+[]
+],
+[
+"Dire Rat",
+[]
+],
+[
+"Dive Talon",
+[]
+],
+[
+"Ghast",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Magician",
+[]
+],
+[
+"Mine",
+[]
+],
+[
+"Shadow",
+[]
+],
+[
+"Soldier",
+[]
+],
+[
+"Stunner",
+[]
+],
+[
+"Werepanther",
+[]
+],
+[
+"Wraith",
+[]
+]
+]
+],
+[
+"The Dreadnought",
+"The Dreadnought - ELT",
+"35",
+"Captain",
+[
+[
+"Balloon",
+[]
+],
+[
+"Dire Rat",
+[]
+],
+[
+"Dive Talon",
+[]
+],
+[
+"Ghast",
+[]
+],
+[
+"Ghoul",
+[]
+],
+[
+"Magician",
+[]
+],
+[
+"Mine",
+[]
+],
+[
+"Shadow",
+[]
+],
+[
+"Soldier",
+[]
+],
+[
+"Stunner",
+[]
+],
+[
+"Werepanther",
+[]
+],
+[
+"Wraith",
+[]
+]
+]
+],
+[
+"Into the Abyss",
+"Expedition - Into the Abyss",
+"30",
+"Belmodar x3",
+[
+[
+"Ainsel",
+[]
+],
+[
+"Bomb",
+[]
+],
+[
+"Gloom Widow",
+[]
+],
+[
+"Goblin Mage",
+[]
+],
+[
+"Golden Bomb",
+[]
+],
+[
+"King Gil Snapper",
+[]
+],
+[
+"Mercury Bat",
+[]
+],
+[
+"Metal Gigantuar",
+[]
+],
+[
+"Peeper",
+[]
+],
+[
+"Scorpion",
+[]
+],
+[
+"Skuldier",
+[]
+],
+[
+"Wild Rat",
+[]
+]
+]
+]
+],
+"same_as": {
+"The Knight of Heart": "Grandshelt Catacombs/Exploration",
+"The Knight of Solice": "Zadehl Westersands/Exploration",
+"The Knight of Hardship": "Dwarves' Forge/Exploration"
+}
+}

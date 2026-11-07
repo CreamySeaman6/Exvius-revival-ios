@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!-- Unraid Docker template for the Exvius Offline iPhone server: the same container as docker-compose.yml
+     (one container "ffbe" with Tailscale inside), managed from the Docker tab. See README, "Unraid".
+     Copy to /boot/config/plugins/dockerMan/templates-user/my-ffbe.xml. Keep its settings in step with
+     docker-compose.yml when that file changes. -->
+<Container version="2">
+  <Name>ffbe</Name>
+  <Repository>ffbe-ios-server:local</Repository>
+  <Registry/>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support/>
+  <Project>https://github.com/CreamySeaman6/Exvius-revival-iOS</Project>
+  <Overview>Exvius Offline game server for the iPhone app, with Tailscale in the same container (it joins your tailnet as "ffbe"; no ports are opened on the server). The image is built locally from the repository: docker compose build in /mnt/user/appdata/ffbe/repo/ios-server.</Overview>
+  <Category>GameServers:</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon/>
+  <ExtraParams>--hostname=ffbe --cap-add=NET_ADMIN --restart=unless-stopped --log-opt max-size=20m --log-opt max-file=3</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="Game data" Target="/srv/ffbe/data" Default="/mnt/user/appdata/ffbe/data" Mode="rw" Description="Game data packs (about 15 GB). Re-downloadable with fetch-data." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/ffbe/data</Config>
+  <Config Name="Server folder" Target="/srv/ffbe/server-root" Default="/mnt/user/appdata/ffbe/server" Mode="rw" Description="Your save, certificates, request logs and client reports." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/ffbe/server</Config>
+  <Config Name="Tailscale state" Target="/var/lib/tailscale" Default="/mnt/user/appdata/ffbe/tailscale" Mode="rw" Description="Keeps this container signed in to your tailnet as &quot;ffbe&quot;." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/ffbe/tailscale</Config>
+  <Config Name="Tunnel device" Target="/dev/net/tun" Default="/dev/net/tun" Mode="" Description="Tailscale runs inside the container and needs the tunnel device." Type="Device" Display="advanced" Required="true" Mask="false">/dev/net/tun</Config>
+  <Config Name="TZ" Target="TZ" Default="America/New_York" Mode="" Description="" Type="Variable" Display="always" Required="false" Mask="false">America/New_York</Config>
+  <Config Name="TS_AUTHKEY" Target="TS_AUTHKEY" Default="" Mode="" Description="Only needed the first time; leave empty once the Tailscale state folder has signed in as &quot;ffbe&quot;." Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="TS_HOSTNAME" Target="TS_HOSTNAME" Default="ffbe" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">ffbe</Config>
+  <Config Name="FFBE_REQUEST_LOG_DAYS" Target="FFBE_REQUEST_LOG_DAYS" Default="3" Mode="" Description="Request records older than this many days are deleted (checked hourly)." Type="Variable" Display="advanced" Required="false" Mask="false">3</Config>
+  <Config Name="FFBE_REQUEST_LOG_MB" Target="FFBE_REQUEST_LOG_MB" Default="300" Mode="" Description="Request records are trimmed, oldest first, to stay under this many MB." Type="Variable" Display="advanced" Required="false" Mask="false">300</Config>
+  <Config Name="FFBE_CLIENT_REPORTS_KEEP" Target="FFBE_CLIENT_REPORTS_KEEP" Default="30" Mode="" Description="How many of the game's uploaded logs (client-reports) to keep, newest first." Type="Variable" Display="advanced" Required="false" Mask="false">30</Config>
+  <Config Name="EXVIUS_SUMMON_ROTATION" Target="EXVIUS_SUMMON_ROTATION" Default="1" Mode="" Description="Weekly summon rotation (see source/server/gacha_rotation.py). Set to 0 to show every banner." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_ROTATION_TZ" Target="EXVIUS_ROTATION_TZ" Default="America/New_York" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">America/New_York</Config>
+  <Config Name="EXVIUS_ROTATION_DAY" Target="EXVIUS_ROTATION_DAY" Default="6" Mode="" Description="0 = Monday ... 6 = Sunday" Type="Variable" Display="advanced" Required="false" Mask="false">6</Config>
+  <Config Name="EXVIUS_ROTATION_HOUR" Target="EXVIUS_ROTATION_HOUR" Default="22" Mode="" Description="10 PM" Type="Variable" Display="advanced" Required="false" Mask="false">22</Config>
+  <Config Name="EXVIUS_ROTATION_SPECIAL" Target="EXVIUS_ROTATION_SPECIAL" Default="1" Mode="" Description="sets with step-up / ticket / select banners each week" Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_ROTATION_FEATURED" Target="EXVIUS_ROTATION_FEATURED" Default="2" Mode="" Description="other featured sets each week" Type="Variable" Display="advanced" Required="false" Mask="false">2</Config>
+  <Config Name="EXVIUS_ROTATION_FIRST_WEEK" Target="EXVIUS_ROTATION_FIRST_WEEK" Default="2016-12-16" Mode="" Description="Without the replay: your first week opens with Noctis&#x27;s Dec 2016 banner; later weeks are random." Type="Variable" Display="advanced" Required="false" Mask="false">2016-12-16</Config>
+  <Config Name="EXVIUS_ROTATION_HOLIDAYS" Target="EXVIUS_ROTATION_HOLIDAYS" Default="1" Mode="" Description="Holiday sets (Christmas, Halloween, Valentine&#x27;s, Easter) only in the week before the holiday and the holiday&#x27;s own week, oldest first." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_REPLAY" Target="EXVIUS_REPLAY" Default="1" Mode="" Description="Historical replay (source/server/replay.py): summons, Vortex and shops follow Global&#x27;s own history, starting at EXVIUS_REPLAY_START and moving EXVIUS_REPLAY_PACE historical weeks per real week. Permanent summons only draw units released by then. &quot;0&quot; goes back to the random weekly rotation. Delete server/state/replay.json to restart the replay from EXVIUS_REPLAY_START." Type="Variable" Display="always" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_REPLAY_START" Target="EXVIUS_REPLAY_START" Default="2016-12-16" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">2016-12-16</Config>
+  <Config Name="EXVIUS_REPLAY_PACE" Target="EXVIUS_REPLAY_PACE" Default="3,2@2020-08-20" Mode="" Description="3 weeks per week, then 2 from the first Neo Vision banner" Type="Variable" Display="advanced" Required="false" Mask="false">3,2@2020-08-20</Config>
+  <Config Name="EXVIUS_REPLAY_NOTICES" Target="EXVIUS_REPLAY_NOTICES" Default="1" Mode="" Description="A &quot;This week&quot; notice on the News board for each replay week (&quot;0&quot; turns them off)." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_REPLAY_MARQUEE" Target="EXVIUS_REPLAY_MARQUEE" Default="1" Mode="" Description="Home screen banners: this replay week&#x27;s event banners (the original art, same as the Vortex tiles). MARQUEE_FLAG turns the home banner strip on; set it to &quot;0&quot; if the home screen misbehaves." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="MARQUEE_FLAG" Target="MARQUEE_FLAG" Default="1" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_VORTEX_ROTATION" Target="EXVIUS_VORTEX_ROTATION" Default="1" Mode="" Description="The Vortex follows the summons: permanent dungeons, the events that launched with this week&#x27;s sets, and EXVIUS_VORTEX_EXTRA undated recurring events. &quot;0&quot; opens every archived event at once." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_VORTEX_EXTRA" Target="EXVIUS_VORTEX_EXTRA" Default="2" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">2</Config>
+  <Config Name="EXVIUS_EARLY_RESOURCES" Target="EXVIUS_EARLY_RESOURCES" Default="resources_common.cpk,resources.cpk" Mode="" Description="Resource packs downloaded before the tutorial (the first battle needs them). &quot;all&quot; or &quot;0&quot; also work." Type="Variable" Display="advanced" Required="false" Mask="false">resources_common.cpk,resources.cpk</Config>
+  <Config Name="EXVIUS_IOS_HCA_PLAIN" Target="EXVIUS_IOS_HCA_PLAIN" Default="1" Mode="" Description="Sound banks for the iPhone: &quot;1&quot; removes the Android banks&#x27; HCA cipher, &quot;0&quot; serves them as shipped." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_IOS_SOUND_REFETCH" Target="EXVIUS_IOS_SOUND_REFETCH" Default="" Mode="" Description="Change this to any new value to make the phone download every sound bank again." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="ANNIVERSARY_TICKET" Target="ANNIVERSARY_TICKET" Default="0" Mode="" Description="&quot;1&quot; mails a free 8th-Anniversary 10+1 summon ticket every day; &quot;0&quot; turns it off." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="EXVIUS_PLAYERS" Target="EXVIUS_PLAYERS" Default="200" Mode="" Description="Other players (source/server/friend_players.py): made-up accounts you can add, borrow units from and remove. Each lends a different unit every week. EXVIUS_START_FRIENDS of them are your friends in a new save. &quot;0&quot; players turns the crowd off." Type="Variable" Display="advanced" Required="false" Mask="false">200</Config>
+  <Config Name="EXVIUS_START_FRIENDS" Target="EXVIUS_START_FRIENDS" Default="15" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">15</Config>
+  <Config Name="EXVIUS_PLAYER_SUGGESTIONS" Target="EXVIUS_PLAYER_SUGGESTIONS" Default="10" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">10</Config>
+  <Config Name="EXVIUS_ARENA_TOP" Target="EXVIUS_ARENA_TOP" Default="12000" Mode="" Description="Arena (source/server/arena_ladder.py): the other players&#x27; teams and a weekly leaderboard. The best of them ends the week near EXVIUS_ARENA_TOP points; your final rank pays that week&#x27;s ranking reward." Type="Variable" Display="advanced" Required="false" Mask="false">12000</Config>
+  <Config Name="EXVIUS_ARENA_RIVALS" Target="EXVIUS_ARENA_RIVALS" Default="5" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="EXVIUS_LAPIS_MULTIPLIER" Target="EXVIUS_LAPIS_MULTIPLIER" Default="5" Mode="" Description="every Lapis amount earned by playing Earned Lapis (source/server/lapis_economy.py). Shop purchases are never multiplied." Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="EXVIUS_DAILY_QUEST_LAPIS" Target="EXVIUS_DAILY_QUEST_LAPIS" Default="150" Mode="" Description="Lapis per daily quest (0 = the old gil/Lapis mix)" Type="Variable" Display="advanced" Required="false" Mask="false">150</Config>
+  <Config Name="EXVIUS_DAILY_ALL_BONUS" Target="EXVIUS_DAILY_ALL_BONUS" Default="200" Mode="" Description="extra Lapis for finishing all of a day&#x27;s dailies" Type="Variable" Display="advanced" Required="false" Mask="false">200</Config>
+  <Config Name="EXVIUS_DAILY_CUSTOM" Target="EXVIUS_DAILY_CUSTOM" Default="1" Mode="" Description="Custom daily quests with varying rewards (source/server/daily_quests_custom.json). 0 = only the original daily quests." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_DAILY_QUEST_COUNT" Target="EXVIUS_DAILY_QUEST_COUNT" Default="5" Mode="" Description="Daily quests a day while the custom ones are on." Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="EXVIUS_WEEKLY_GIFT" Target="EXVIUS_WEEKLY_GIFT" Default="23:50:10,23:70:1" Mode="" Description="mailed each week: 10 Rare Summon Tickets + a Guaranteed Ticket; &quot;&quot; = off" Type="Variable" Display="advanced" Required="false" Mask="false">23:50:10,23:70:1</Config>
+  <Config Name="EXVIUS_QUEST_TRUST" Target="EXVIUS_QUEST_TRUST" Default="1" Mode="" Description="Trust from clearing quests (source/server/quest_trust.py). 0 = off." Type="Variable" Display="advanced" Required="false" Mask="false">1</Config>
+  <Config Name="EXVIUS_QUEST_TRUST_CHANCE" Target="EXVIUS_QUEST_TRUST_CHANCE" Default="30" Mode="" Description="Percent chance per party unit per clear. Japan 30 (default), Global 10." Type="Variable" Display="advanced" Required="false" Mask="false">30</Config>
+  <Config Name="EXVIUS_QUEST_TRUST_POINTS" Target="EXVIUS_QUEST_TRUST_POINTS" Default="10" Mode="" Description="Trust per hit in tenths of a percent (1 = 0.1%, 10 = 1%). Japan 10 (default), Global 1." Type="Variable" Display="advanced" Required="false" Mask="false">10</Config>
+  <Config Name="EXVIUS_QUEST_TRUST_BIG_CHANCE" Target="EXVIUS_QUEST_TRUST_BIG_CHANCE" Default="5" Mode="" Description="Percent of trust hits that give EXVIUS_QUEST_TRUST_BIG_POINTS instead. 0 = none." Type="Variable" Display="advanced" Required="false" Mask="false">5</Config>
+  <Config Name="EXVIUS_QUEST_TRUST_BIG_POINTS" Target="EXVIUS_QUEST_TRUST_BIG_POINTS" Default="50" Mode="" Description="Trust on a big hit, in tenths of a percent (50 = 5%)." Type="Variable" Display="advanced" Required="false" Mask="false">50</Config>
+  <Config Name="EXVIUS_LAPIS_SHOP_EXCLUDE" Target="EXVIUS_LAPIS_SHOP_EXCLUDE" Default="10:900020401" Mode="" Description="Products kept out of the exchange shops that sell for Lapis (kind:id). Default: King Metal Minituar." Type="Variable" Display="advanced" Required="false" Mask="false">10:900020401</Config>
+</Container>
