@@ -15,7 +15,64 @@ It also adds a **historical replay**: summons, Vortex events and shops follow Gl
 - **The app on your iPhone.** FFBE is no longer in the App Store, but if your Apple account ever downloaded it, it's under **App Store → your account → Purchased**.
 - **A computer to run the server**, on whenever you want to play. The default below is a Windows, Mac or Linux PC with **Docker Desktop**. A NAS or home server works the same way (see [Other hosts](#other-hosts)).
 - **About 17 GB of free disk space** during setup, 15 GB afterwards.
-- **A free [Tailscale](https://tailscale.com) account.** Tailscale connects the phone to the server, at home or away, without opening anything on your router.
+- **A free [Tailscale](https://tailscale.com) account.** Tailscale connects the phone to the server, at home or away, without opening anything on your router. You install the Tailscale app **on your iPhone only**; the server brings its own copy.
+
+## Quick start
+
+The whole setup in order, one action per step. Each part links to the full instructions in [Setup](#setup) if you get stuck.
+
+**On the computer that will run the server**
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), open it, and leave it running.
+2. Make a folder called `exvius` and put this repository in it as `exvius/repo` ([details](#1-install-docker-and-get-the-files)).
+3. Open a terminal in `exvius/repo/ios-server`.
+   - **Windows:** open that folder in File Explorer, click the address bar, type `powershell` and press Enter.
+   - **macOS:** open **Terminal**, type `cd ` (with a space), drag the `ios-server` folder into the window, and press Enter.
+   - **Linux:** `cd` into the folder.
+
+**In Tailscale (on the website)**
+
+4. Create a free account at [tailscale.com](https://tailscale.com).
+5. In the [admin console](https://login.tailscale.com/admin), go to **Settings → Keys → Generate auth key** and copy the key ([details](#2-tailscale)).
+6. In the terminal, run `cp .env.example .env`, open `.env` in a text editor, paste the key after `TS_AUTHKEY=` and save.
+
+> **You don't install Tailscale on the computer.** The server's container runs its own copy and joins your Tailscale account by itself as a machine called `ffbe`. If the computer already has Tailscale, that's fine; the container shows up as a separate machine.
+
+**Back in the terminal**
+
+7. Run these one at a time, waiting for each to finish:
+
+   ```bash
+   docker compose build
+   ```
+
+   ```bash
+   docker compose run --rm server fetch-data
+   ```
+
+   ```bash
+   docker compose up -d
+   ```
+
+   The second one downloads about 14.6 GB and takes a while. If it stops, run it again; it picks up where it left off.
+8. Run `docker compose logs -f server` and wait for a line ending in `http://100.x.y.z/ca.mobileconfig`. Write down that `100.x.y.z` address, then press Ctrl+C. The server keeps running.
+
+**In the Tailscale admin console**
+
+9. **Machines → ffbe → ⋯ → Disable key expiry.**
+10. **DNS → Nameservers → Add nameserver → Custom.** Enter the `100.x.y.z` address, turn on **Restrict to domain**, enter `gumi.sg`, and save.
+11. Add one more nameserver the same way, with the same address, restricted to `exvius.com` ([details](#5-tailscale-admin-console)).
+
+**On your iPhone**
+
+12. Install **Tailscale** from the App Store, sign in with the same account, and turn it on.
+13. Install **FFBE** from **App Store → your account → Purchased**.
+14. In **Safari**, open `http://100.x.y.z/ca.mobileconfig` (your address) and tap **Allow**.
+15. **Settings → Profile Downloaded → Install.**
+16. **Settings → General → About → Certificate Trust Settings** → turn on **Exvius Offline Root**. The game won't connect without this ([details](#6-iphone-trust-the-certificate)).
+17. Open the game and let it download. After you've logged in once, close the game fully (swipe it away) and open it again ([why](#7-play)).
+
+**Every time you play:** the computer is on with Docker running, and Tailscale is turned on on the phone.
 
 ## How it works
 
@@ -62,16 +119,22 @@ All the remaining commands run from `exvius/repo/ios-server`.
 
 1. Create a Tailscale account, then install the **Tailscale** app on your iPhone and sign in with the same account.
 2. In the [Tailscale admin console](https://login.tailscale.com/admin), go to **Settings → Keys → Generate auth key**. Leave it **not** reusable and **not** ephemeral. Copy the key.
-3. Create the settings file and paste the key after `TS_AUTHKEY=`:
+3. Create the settings file (this works on Windows, macOS and Linux):
 
    ```bash
-   cp .env.example .env          # Windows PowerShell: copy .env.example .env
-   nano .env                     # Windows: notepad .env    macOS: open -e .env
+   cp .env.example .env
    ```
+
+4. Open `.env` in a text editor with the command for your system, paste the key after `TS_AUTHKEY=`, and save:
+   - Windows: `notepad .env`
+   - macOS: `open -e .env`
+   - Linux: `nano .env`
 
    Leave `FFBE_DIR=../..` as it is to keep the data in your `exvius` folder, or set any other path.
 
 The key is only used on the first start. It stays on your computer in `.env`, which git ignores, so it's never uploaded anywhere.
+
+You don't install Tailscale on the computer itself. The container runs its own copy and uses this key to join your Tailscale account as a machine called `ffbe`. If the computer already runs Tailscale, that's fine; the two don't interfere.
 
 ### 3. Build and download the game data
 
@@ -142,13 +205,13 @@ Started with `docker compose up`, the container shows in the Docker tab but Unra
 
    ```bash
    cd /mnt/user/appdata/ffbe/repo/ios-server
-   grep FFBE_DIR .env    # the template assumes /mnt/user/appdata/ffbe
+   grep FFBE_DIR .env
    docker compose build
    docker compose down
    cp unraid/my-ffbe.xml /boot/config/plugins/dockerMan/templates-user/my-ffbe.xml
    ```
 
-   If `FFBE_DIR` is something else, change the three folder paths in step 2.
+   The template assumes `FFBE_DIR` is `/mnt/user/appdata/ffbe` (the `grep` line shows yours). If `FFBE_DIR` is something else, change the three folder paths in step 2.
 2. **Docker** tab → **Add Container** → **Template** → under *User templates*, pick **ffbe**. Leave `TS_AUTHKEY` empty (the Tailscale folder is already signed in) and select **Apply**.
 3. Turn on **Autostart** for `ffbe`. It now starts after a reboot, and backup plugins stop and start it like any other container.
 4. Check it: the `ffbe` icon → **Logs** should show `Tailscale state: Running`, then the server starting.
@@ -366,7 +429,12 @@ The weekly summon rotation is in `source/server/gacha_rotation.py`, the historic
 
    ```bash
    docker compose down --rmi local
-   docker image rm tailscale/tailscale:stable   # skip if anything else uses this image
+   ```
+
+   Then, unless something else on this computer uses the official Tailscale image:
+
+   ```bash
+   docker image rm tailscale/tailscale:stable
    ```
 
    On Unraid with the template: remove `ffbe` in the Docker tab (icon → **Remove**), run `docker image rm ffbe-ios-server:local`, and delete `/boot/config/plugins/dockerMan/templates-user/my-ffbe.xml`.
