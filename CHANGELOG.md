@@ -2,6 +2,11 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-10 (third update)
+
+- Collection points in explorations now show up (the sparkling spots; Dalnakya Cavern has three) and give what they gave in Global: ore, Lumber, crysts or magicite, or the event's own items in event explorations.
+- What you collect shows on the result screen and lands in your bag when you leave the exploration.
+
 ## 2026-11-10 (second update)
 
 - Story units (Rain, Lasswell, Fina, Lid, Nichol, Sakura, Jake) and event reward units no longer show up in normal summons.

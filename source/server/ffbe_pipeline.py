@@ -157,6 +157,11 @@ PIPELINE: tuple = (
          "global", "LAST_DROPS", "rolls each mission's candidate drop list; claims the mission's own slot"),
     # The result screen reads its OWN channels, not the wave drop list, so mirror this battle's roll into
     # the drops channel of 09HRWXDf. (No-op for any reply without that tag.)
+    # Collection points (collection_points.py): an exploration's load reply lists its points and what each
+    # gives this run; kept on the attempt observe_load (just above) started. No-op for any other reply.
+    Step("serve_collection_points",
+         lambda c: __import__("collection_points").serve(c.spec, c.mid, c.is_battle_bundle),
+         "state", "State.player.exvius_repeat.attempt.collection", "an exploration's points and their rewards"),
     Step("apply_result_drops", lambda c: apply_result_drops(c.spec, mid=c.mid),
          "spec", "09HRWXDf", "mirrors THIS mission's roll into the result screen's drops channel"),
     # The summon's award is SERVER-AUTHORITATIVE: grant it into the roster (once) and serve the effect
@@ -208,6 +213,10 @@ PIPELINE: tuple = (
          "state", "State.player.switches", "the client grants switches to itself and reports them here"),
     Step("serve_field_treasures", lambda c: serve_field_treasures(c.spec, c.plaintext, c.reply_id),
          "state", "State.player.inventory", "restore native chest definitions and settle each treasure once"),
+    # ...and what the run collected at its points, once per run, listed on the result screen.
+    Step("pay_collection_points",
+         lambda c: __import__("collection_points").pay(c.spec, c.mid, c.plaintext),
+         "state", "State.player.inventory", "pays the collection points reported at the mission end, once"),
     # The DECK the player just edited, before the state is projected into this reply -- otherwise the
     # reply (and the next battle) serves the deck they did not choose. See apply_party_edit.
     Step("apply_party_edit", lambda c: (apply_party_edit(c.plaintext), c.spec)[1],
@@ -407,6 +416,14 @@ PIPELINE: tuple = (
          "spec", "an6TB4WS", "A/B strip; last, beside the other one, so the rule is in one place"),
 )
 PIPELINE_EDGES: tuple = (
+    Edge("roll_drops", "serve_collection_points", "State.player.exvius_repeat.attempt",
+         "observe_load starts the run the points' rewards are kept on"),
+    Edge("credit_mission_lapis", "pay_collection_points", "State.player.exvius_repeat.attempt",
+         "points are paid only on a completed run, which this step records"),
+    Edge("mission_end_echo", "pay_collection_points", "spec EWmQy52k",
+         "the echo drops an empty exploration's item slots; the paid list is written after it"),
+    Edge("pay_collection_points", "apply_to_reply", "State.player.inventory",
+         "the paid items are in the bag this reply projects"),
     Edge("roll_drops", "apply_result_drops", "LAST_DROPS",
          "the roll is written at mission LOAD and read at mission END -- two different requests, so it has "
          "to survive in between"),
