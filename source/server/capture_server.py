@@ -141,10 +141,11 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):  # silence the default stderr line; we log structurally
         pass
 
-    def _handle(self):
+    def _handle(self, raw=None, lock_wait_ms=0):
         started = time.monotonic()
         length = int(self.headers.get("Content-Length") or 0)
-        raw = self.rfile.read(length) if length else b""
+        if raw is None:
+            raw = self.rfile.read(length) if length else b""
         body_text = raw.decode("utf-8", errors="replace")
 
         envelope = None
@@ -174,6 +175,8 @@ class Handler(BaseHTTPRequestHandler):
         # (Audit 2026-09-17: variant<->outcome attribution was otherwise unprovable, because nothing
         # recorded the reply and the server log was truncated per run.)
         reply_id = header.get("z5hB3P01") or token
+        import client_reports
+        is_client_report = reply_id == client_reports.STORE_LOG_REQUEST
         # Per-mission dispatch. A battle bundle is content, keyed by MISSION, but responses.json is
         # keyed by requestID. So try `<reply_id>@<mission>` first, then fall back to `<reply_id>`. The
         # mission id comes from the request body: `DungeonResourceLoadMstListRequest` carries
@@ -290,7 +293,6 @@ class Handler(BaseHTTPRequestHandler):
             spec = reply_pipeline(spec, reply_id=reply_id, plaintext=plaintext,
                                   mid=None if menu_resource else mid, spec_key=spec_key)
         # Ask a stock client for its own error log, and keep what it uploads (client_reports.py).
-        import client_reports
         spec = client_reports.handle(spec, reply_id, plaintext)
         # NOTE: `json.dumps(None)` is the 4-char string "null" — an unconfigured endpoint must send NOTHING
         # (an empty body), not the literal null.
@@ -353,9 +355,9 @@ class Handler(BaseHTTPRequestHandler):
             "ciphertext_len": len(ciphertext) if ciphertext else 0,
             "endpoint": ep,
             "selected_by": how,
-            "plaintext": plaintext,
+            "plaintext": None if is_client_report else plaintext,
             "decrypt_error": decrypt_error,
-            "body_raw": body_text if not envelope else None,
+            "body_raw": body_text if not envelope and not is_client_report else None,
             "reply": {
                 "len": len(data),
                 "sha256_16": hashlib.sha256(data).hexdigest()[:16],
@@ -401,7 +403,7 @@ class Handler(BaseHTTPRequestHandler):
         replied += f" via {spec_key}" if spec_key else " via transform (no responses.json entry)"
         print(f"{flag}{self.command} {self.path}  class={cls} ({how})  key={enc_key}  "
               f"reqID={header.get('z5hB3P01')}  mission={mid or '-'}  from={spec_key or '-'}  "
-              f"body={len(raw)}B  {replied}  {took}  -> {os.path.relpath(fname, WORK)}",
+              f"body={len(raw)}B  {replied}  {took}  wait={lock_wait_ms:.0f}ms  -> {os.path.relpath(fname, WORK)}",
               flush=True)
         if plaintext:
             print("    plaintext: " + plaintext[:600].replace("\n", " "), flush=True)
@@ -428,7 +430,12 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == '/__exvius/new-game':
                 return self._offline_menu(reset=True)
             if '/actionSymbol/' in self.path:
-                self._handle()
+                length = int(self.headers.get("Content-Length") or 0)
+                raw = self.rfile.read(length) if length else b""
+                waiting = time.monotonic()
+                with STATE_LOCK:
+                    lock_wait_ms = (time.monotonic() - waiting) * 1000
+                    self._handle(raw, lock_wait_ms)
             else:
                 # Original web pages post device parameters when opening.
                 # Their content is a local resource, not an encrypted game action.

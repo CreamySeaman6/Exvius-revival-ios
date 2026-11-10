@@ -72,14 +72,17 @@ def _save(plaintext) -> str:
 
 
 def handle(spec, reply_id, plaintext):
-    """Add the report-back request to carrier replies, and answer and save a log upload."""
+    """Request reports only when enabled; acknowledge pending uploads even when discarding them."""
+    if reply_id == STORE_LOG_REQUEST:
+        size = len(plaintext or "")
+        if enabled():
+            path = _save(plaintext or "")
+            print(f"CLIENT REPORT: game uploaded its log ({size} chars) -> {path}", flush=True)
+        else:
+            print(f"CLIENT REPORT: discarded pending game log ({size} chars; collection disabled)", flush=True)
+        return {REPORT_STATE_GROUP: [{REPORT_STATE_VALUE: "0"}]}
     if not enabled():
         return spec
-    if reply_id == STORE_LOG_REQUEST:
-        path = _save(plaintext or "")
-        size = len(plaintext or "")
-        print(f"CLIENT REPORT: game uploaded its log ({size} chars) -> {path}", flush=True)
-        return {REPORT_STATE_GROUP: [{REPORT_STATE_VALUE: "0"}]}
     if reply_id in CARRIERS and isinstance(spec, dict):
         spec = dict(spec)
         # A time in the past: upload as soon as the report scheduler next runs.

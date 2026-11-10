@@ -16,6 +16,8 @@ COLLABORATIONS = (
 )
 GROUPS = (('standard', 'Standard'), ('season1', 'Season 1'), ('season2', 'Season 2'),
           ('season3', 'Season 3'), ('season4', 'Season 4'), ('collaborations', 'Collab'))
+COMMENT_GROUPS = {'0': 'rotation', '1': 'standard', '2': 'season1', '3': 'season2',
+                  '4': 'season3', '5': 'season4', '6': 'collaborations'}
 # Always-available summons, shown with every group (as on the live game).
 PERMANENT_NAMES = {'Standard Summon', 'Rare Summon', 'Premium 10+1 Summon', '5★ Guaranteed 10+1 Summon'}
 # Original GL9 tab of each GachaMst type code: GachaTopScene::setListLayout
@@ -225,6 +227,13 @@ def selected_group(player, groups):
     return next((group for group in groups if group['id'] == selected), groups[0])
 
 
+def _comment_selection(player):
+    """The private profile comment's exact digit selects rotation (0) or an archive group (1-6)."""
+    profile = (getattr(player, 'data', None) or {}).get('profile') or {}
+    message = profile.get('message')
+    return COMMENT_GROUPS.get(message.strip()) if isinstance(message, str) else None
+
+
 def held_ticket_ids(player, banners):
     """Ticket-only banners (paid with an item, e.g. the SP Summon tickets) whose ticket the player holds.
     With the weekly rotation on they would otherwise be hidden, and a bought ticket would have no banner."""
@@ -263,7 +272,15 @@ def used_up(player, banner) -> bool:
 
 def visible_banners(player, banners):
     from gacha_rotation import enabled, rotation_ids
-    if enabled():
+    selection = _comment_selection(player)
+    if selection is None and player:
+        selection = player.data.get('summon_archive')
+    if selection == 'rotation':
+        ids = rotation_ids(banners) + held_ticket_ids(player, banners)
+    elif selection in {key for key, _label in GROUPS}:
+        groups = catalogue(banners)
+        ids = next(group['ids'] for group in groups if group['id'] == selection)
+    elif enabled():
         ids = rotation_ids(banners) + held_ticket_ids(player, banners)
     else:
         ids = selected_group(player, catalogue(banners))['ids']
