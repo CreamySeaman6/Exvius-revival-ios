@@ -1205,13 +1205,18 @@ def expand_pool(banner: dict) -> list:
     if rate_up and tiers and not any(t.get("featured") for t in tiers):
         top = max(tiers, key=lambda t: int(t.get("rarity") or 0))
         tiers = [dict(t, featured=rate_up, featured_share=0.5) if t is top else t for t in tiers]
+    # Story, reward, Star Quartz and Raid Summon units never came from a rarity tier's draw on Global
+    # (summon_exclusions.py, operator 2026-11-10); a featured one is added back below.
+    import summon_exclusions
+    left_out = summon_exclusions.excluded()
     out: list = []
     for tier in tiers:
         rate = max(0.0, float(tier.get("rate", 0)))
         if rate <= 0:
             continue
         units = [str(u) for u in (tier.get("units") or [u for u in roots.get(str(tier.get("rarity")), [])
-                                                          if keep_materials or not u.startswith("9")])
+                                                          if (keep_materials or not u.startswith("9"))
+                                                          and u not in left_out])
                  if allowed(u)]
         # A featured unit drawn at its own rarity (an NV unit is not a base 5★ root) still belongs here.
         units += [u for u in (str(x) for x in (tier.get("featured") or [])) if u not in units]

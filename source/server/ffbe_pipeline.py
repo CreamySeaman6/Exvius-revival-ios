@@ -198,6 +198,10 @@ PIPELINE: tuple = (
          "state", "State.player.inventory", "an exchange event's currency, paid on each clear and listed"),
     Step("grant_cleared_mission", lambda c: grant_cleared_mission(c.spec, c.mid, c.plaintext),
          "state", "State.player.switches", "the completed mission grants its own open switch"),
+    # Story units join once their story point is cleared (story_units.py); a save already past it gets
+    # them at its next user-state reply. After the clear is recorded, before the roster is projected.
+    Step("grant_story_units", lambda c: __import__("story_units").grant(c.spec, c.reply_id),
+         "state", "State.player.roster", "Fina, Lid, Nichol, ... join after their story quest, once per save"),
     # The client grants switches to itself and REPORTS them here; the reply container replaces the whole
     # type, so dropping this does not just fail to grant -- it erases on the next sync.
     Step("record_pushed_switches", lambda c: (record_pushed_switches(c.plaintext), c.spec)[1],
@@ -424,6 +428,10 @@ PIPELINE_EDGES: tuple = (
          "first-clear Lapis is part of the balance the diamond group reports"),
     Edge("grant_cleared_mission", "serve_switches", "State.player.switches",
          "a mission's own open switch is granted here and the container is rebuilt from state after"),
+    Edge("grant_cleared_mission", "grant_story_units", "State.player.progress.cleared_missions",
+         "a story unit joins on the clear this request just recorded"),
+    Edge("grant_story_units", "apply_to_reply", "State.player.roster",
+         "the joined unit is in the roster this reply projects"),
     Edge("serve_actions", "serve_switches", "State.player.switches",
          "special-mode settlements grant their clear switches in the action handler"),
     Edge("credit_mission_rewards", "serve_diamonds", "State.player",

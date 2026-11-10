@@ -71,6 +71,7 @@ URL = ("F_URL_MST", "9wmd4iua", "UREmi85S")
 # first-clear reward the phone shows are what the server pays. Tokens/keys from libgame (v0.1.18).
 CHALLENGE = ("F_CHALLENGE_MST", "GL9t6cMF", "8Dx2QUZS")
 MISSION = ("F_MISSION_MST", "24Eka6wL", "naJ3P84b")
+UNIT = ("F_UNIT_MST", "SsidX62G", "UW0D8ouL")
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -226,6 +227,10 @@ def table_bump(spec, *roots) -> int:
         if not reward_overrides.enabled():
             return 0
         return 1000 + zlib.crc32((spec[0] + reward_overrides.signature()).encode()) % 1000
+    if spec == UNIT:
+        import summon_exclusions
+        prices = summon_exclusions.sell_prices()
+        return 1000 + zlib.crc32(json.dumps(prices, sort_keys=True).encode()) % 1000 if prices else 0
     return 0
 
 
@@ -233,7 +238,7 @@ def version_bumps() -> dict[str, int]:
     """Table name -> amount to add to its advertised version (only tables served patched)."""
     import ios_texts
     out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.bump()}
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION):
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -250,7 +255,7 @@ def wants(rel: str) -> bool:
 def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION):
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -333,6 +338,21 @@ def patch_first_clears(raw: bytes) -> tuple[bytes, int]:
             row.get("qo3PECw6")) else value
         if new != value:
             line = _encrypt(MISSION[2], dict(row, **{"1x4bG2J8": new}), double)
+            changed += 1
+        out.append(line)
+    return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
+def patch_unit_sell(raw: bytes) -> tuple[bytes, int]:
+    """`F_UNIT_MST` with the story units' sell prices (`u18nfD7p`, summon_exclusions.sell_prices): the client
+    offers Sell only for a unit whose price is above 0 (UnitMst::canSellUnit)."""
+    import summon_exclusions
+    prices = summon_exclusions.sell_prices()
+    out, changed = [], 0
+    for line, row, double in _rows(raw, UNIT[2]):
+        price = prices.get(str(row.get("3HriTp6B")))
+        if price and str(row.get("u18nfD7p") or "0") == "0":
+            line = _encrypt(UNIT[2], dict(row, u18nfD7p=str(price)), double)
             changed += 1
         out.append(line)
     return ("\n".join(out) + "\n").encode("ascii"), changed
@@ -429,6 +449,9 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == MISSION:
             data, changed = patch_first_clears(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} first-clear reward(s) from the wiki"
+        if spec == UNIT:
+            data, changed = patch_unit_sell(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} story-unit row(s) given a sell price"
         if spec == URL:
             data, changed = fix_web_urls(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, Drop Rates address set ({changed} row)"
