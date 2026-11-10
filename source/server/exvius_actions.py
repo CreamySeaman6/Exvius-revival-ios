@@ -129,9 +129,8 @@ def unit_equip(spec, req):
                         if any(item != "0" and count > owned.get(item, 0) for item, count in counts.items()):
                             raise ValueError("unowned equipment or materia")
                     if field in ("vision_card", "shift_vision_card") and values and values not in cards:
-                        # Native vision-card strings carry the master id as well as the instance id.
-                        if not cards.intersection(values.split("-")):
-                            raise ValueError("unowned vision card")
+                        # _wire_loadouts reduces the phone's "0-<user_vc_id>" to the user_vc_id.
+                        raise ValueError("unowned vision card")
                 if str(row.get("xBi3L6yR", "1")) == "1":
                     loadouts.setdefault(iid, {}).update(fields)
     except (AttributeError, TypeError, ValueError):

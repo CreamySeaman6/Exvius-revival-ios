@@ -235,7 +235,8 @@ def weekly_events(rows=None, now=None):
     holiday_areas = {area for areas in HOLIDAY_EVENTS.values() for area in areas}
     dated.sort(key=lambda r: (str(r['area']) in holiday_areas, str(r.get('release') or ''), int(r['area'])),
                reverse=True)
-    return only_existing_quests(dated + ranked + permanent, win)
+    return only_existing_quests([row for row in dated + ranked + permanent
+                                 if str(row.get('area')) not in hidden_areas()], win)
 
 
 
@@ -250,6 +251,23 @@ def weekly_events(rows=None, now=None):
 # quest is not opened. The quests held back are listed in `held_back` (the Vortex drops shipped rows for
 # them). EXVIUS_EVENT_RUN_QUESTS=0 serves every quest, as before.
 _QUEST_DATES = None
+
+
+# Events kept out of the Vortex because they can't be played as Global ran them (operator, 2026-11-10).
+# Memories from the Aquapolis (711): its five stage files (each stage's limits, boss trigger, end and chests,
+# laid over the shared map) are lost from Global's tables, our data and the Japanese archive, so every stage
+# played the bare map with no chests and no proper end (HANDOFF, "Memories from the Aquapolis"). Hidden from the
+# Vortex, the News notices and the home banners (all use weekly_events). EXVIUS_HIDDEN_EVENTS lists the areas
+# (comma-separated); 0 or empty hides nothing.
+HIDDEN_EVENTS_DEFAULT = '711'
+
+
+def hidden_areas():
+    import os
+    raw = str(os.environ.get('EXVIUS_HIDDEN_EVENTS', HIDDEN_EVENTS_DEFAULT)).strip()
+    if raw.lower() in ('', '0', 'off', 'none', 'no'):
+        return set()
+    return {part.strip() for part in raw.split(',') if part.strip()}
 
 
 def run_quests_enabled():

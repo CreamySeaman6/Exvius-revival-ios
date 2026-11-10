@@ -388,23 +388,54 @@ def vision_card_mst(vc_id) -> dict | None:
     return _load_ndjson("F_VISION_CARD_MST.ndjson", VISION_CARD_KEY).get(str(vc_id))
 
 
-_NV_CARDS = None
-# The card the JP wiki lists for an NV with no personal card (Runda/JP, Kelger/JP, ...): Metal Gigantuar.
-NV_DEFAULT_VISION_CARD = "900020101"
+_NV_RANDOM_CARDS = None
+NV_LAUNCH = "2020-08-20"     # Global's Neo Vision launch (Update Schedule, Ver 5.0.0)
 
 
-def nv_vision_card(unit_id) -> str:
-    """The Vision Card a summoned NV unit came with (`nv_vision_cards.json`, built from the wiki's /JP unit
-    pages by `source/exvius/build_nv_vision_cards.py`); the default card for an NV the table does not list."""
-    global _NV_CARDS
-    if _NV_CARDS is None:
+def nv_random_vision_cards(day: str | None = None) -> list:
+    """The random cards a summoned NV unit could come with on Global by `day` (ISO; None = every dated card).
+
+    On Global a summoned NV came with one random card (wiki "Vision Cards": "Obtained randomly by summoning Neo
+    Vision units"; its own card came from EX awakening, F_NV_EX_CLASS_UP_MST). Each card joins on the date it
+    joined Global's pool (`content/nv_random_vision_cards.json`, operator 2026-11-10). Before the NV launch (an NV
+    summoned out of history's order, e.g. with a held ticket) the launch pool applies."""
+    global _NV_RANDOM_CARDS
+    if _NV_RANDOM_CARDS is None:
         try:
-            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nv_vision_cards.json"),
+            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "content", "nv_random_vision_cards.json"),
                       encoding="utf-8") as fh:
-                _NV_CARDS = {k: v["vision_card"] for k, v in json.load(fh)["units"].items()}
+                _NV_RANDOM_CARDS = [(str(c["id"]), str(c["joined"])) for c in json.load(fh)["cards"]]
         except (OSError, ValueError, KeyError):
-            _NV_CARDS = {}
-    return _NV_CARDS.get(str(unit_id), NV_DEFAULT_VISION_CARD)
+            _NV_RANDOM_CARDS = []
+    cutoff = max(str(day), NV_LAUNCH) if day else None
+    return [cid for cid, joined in _NV_RANDOM_CARDS
+            if (cutoff is None or joined <= cutoff) and vision_card_mst(cid) is not None]
+
+
+def nv_summon_vision_card() -> str | None:
+    """The card a Neo Vision unit summoned now comes with: one at random from the pool as of the replay's date."""
+    day = None
+    try:
+        import replay
+        if replay.enabled():
+            day = replay.window()["to"].isoformat()
+    except Exception:  # noqa: BLE001 -- no replay: every dated card
+        day = None
+    pool = nv_random_vision_cards(day)
+    return random.choice(pool) if pool else None
+
+
+def vision_card_key(value) -> str:
+    """The owned card's user_vc_id (`4hPYneL3` `gXb32xzQ`) from a unit's card string, '' for none.
+
+    The phone sends `<unit>:0-<user_vc_id>` (`UnitEquipUtil::convertEquipInfo` 0x1aa7a74, "0-0" = none) and
+    reads a reply's `nQ1iAGf3` by splitting on '-' and keeping only element [1]
+    (`UnitEquipResponse::readParam` 0x1971034). One card per unit: there is no second-form card on the wire.
+    Accepts the bare id and the older stored "0-<id>" form; a '|' tail from older replies is dropped."""
+    card = str(value or '').split('|', 1)[0]
+    if '-' in card:
+        card = card.split('-')[1]
+    return '' if card in ('', '0') else card
 
 
 # F_ITEM_MST — the bag catalogue. Key token `tL6G9egd` is the SAME itemId token the bag reply carries
@@ -4437,10 +4468,11 @@ class PlayerState:
             granted.append({"unit_id": str(a["unit_id"]), "granted_rarity": a.get("rarity"),
                             "instance_id": (unit or {}).get("instance_id"),
                             "level": int((unit or {}).get("level") or 1)})
-            # A summoned Neo Vision unit comes with its Vision Card (GachaExeResponse eb2ANT1m).
+            # A summoned Neo Vision unit comes with a random Vision Card from Global's pool as of the replay's date
+            # (GachaExeResponse eb2ANT1m); its own card comes from EX awakening (unit_ex_class_up).
             if str((unit_mst(a["unit_id"]) or {}).get("9fW0TePj")) == "7":
-                vc_id = nv_vision_card(a["unit_id"])
-                if vision_card_mst(vc_id) is not None:
+                vc_id = nv_summon_vision_card()
+                if vc_id and vision_card_mst(vc_id) is not None:
                     key = str((unit or {}).get("instance_id") or f"{vc_id}{len(nv_cards)}")
                     self.data.setdefault("vision_cards", []).append({"user_vc_id": key, "vc_id": vc_id, "level": 1})
                     rarity = min(6, max(1, int((vision_card_mst(vc_id) or {}).get("9fW0TePj") or 1)))
@@ -4959,7 +4991,7 @@ class PlayerState:
         rows = []
         for u in self.data["roster"]:
             equip = u.get("equipment") or {}
-            has_shift = bool(u.get('shift_equipment') or u.get('shift_materia') or u.get('shift_vision_card'))
+            has_shift = bool(u.get('shift_equipment') or u.get('shift_materia'))
             slots = "@".join(f"{slot}-{equip.get(str(slot), equip.get(slot, '0'))}"
                              for slot in range(1, 7))
             if has_shift:
@@ -4969,9 +5001,10 @@ class PlayerState:
             mat = "@".join(f"{i + 1}-{m}" for i, m in enumerate(materia))
             if has_shift:
                 mat += '|' + '@'.join(f'{n + 1}-{m}' for n, m in enumerate(u.get('shift_materia') or ['0'] * 4))
-            card = u.get('vision_card', '')
-            if has_shift:
-                card = (card or '0-0') + '|' + (u.get('shift_vision_card') or '0-0')
+            # One card per unit, both forms: a '|' second form here became the key "<id>|0" on the
+            # phone, so an NV unit's card never matched its owned card (vision_card_key).
+            card = vision_card_key(u.get('vision_card'))
+            card = f'0-{card}' if card else ''
             rows.append({"og2GHy49": str(u["instance_id"]),
                          "r21y0YzS": str(party["active_deck"]),
                          "93Y6evuT": slots, "80NUYFMJ": mat,

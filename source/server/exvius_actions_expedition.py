@@ -23,7 +23,7 @@ import time
 from exvius_actions import UNIT_GROUP, _node, _refresh, _mst, _parse_rewards
 from ffbe_state import State, _note
 from ffbe_battle import _switch_container
-from player_state import GRANT_BAG_PROJECTED, STORAGE_CURRENCY, switch_position, unit_mst
+from player_state import GRANT_BAG_PROJECTED, STORAGE_CURRENCY, switch_position, unit_mst, vision_card_key
 
 DAY_ANCHOR = 14400                       # The offline daily reset (04:00 UTC), as for attempt limits.
 OFFERS_VERSION = 2                       # Saves offered under the older sequential scheme are re-dealt once.
@@ -1006,7 +1006,8 @@ def _wire_loadouts(slot, members, slots=5):
         if iid not in members or len(forms) > 2 or any(not re.fullmatch(r'[0-9-]+', v) for v in forms):
             raise ValueError('invalid saved vision card')
         for field, card in zip(('vision_card', 'shift_vision_card'), forms):
-            loadouts.setdefault(iid, {})[field] = '' if card in ('0', '0-0') else card
+            # Store the owned card's user_vc_id; the wire carries it as "0-<id>" ("0-0" = none).
+            loadouts.setdefault(iid, {})[field] = vision_card_key(card)
     espers = [0] * slots
     for entry in filter(None, str(slot.get('XZ4Kh7Ic') or '').split(',')):
         position, value = entry.split(':', 1)
@@ -1150,7 +1151,7 @@ def party_load(spec, req):
                     materia_left[item] -= extra
                     used_materia[item] += extra
         for field in ('vision_card', 'shift_vision_card'):
-            card = str(unit.get(field) or '')
+            card = vision_card_key(unit.get(field))   # also older saves' "0-<id>" values
             unit[field] = card if card in cards_left or card in used_cards else ''
             if unit[field]:
                 cards_left.discard(card)
