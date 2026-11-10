@@ -202,6 +202,12 @@ def deal_banners() -> list:
     if not GACHA_DEALS_ON:
         return []
     return _banner_doc(GACHA_DEALS, note="no deal banners")
+def raid_banners() -> list:
+    """The RAID summons (`gacha_raids.json`): each Global raid's coin-paid Raid Summon or Box Summon, on the raid's
+    run date. Off with `GACHA_RAIDS=0`."""
+    if not GACHA_RAIDS_ON or not os.path.exists(GACHA_RAIDS):
+        return []
+    return _banner_doc(GACHA_RAIDS, note="no raid summons")
 def standard_banners() -> list:
     """The STANDARD families (SW-75) from `gacha_standard.json` -- the static, never-campaign-tied FREE-tab
     summons. Authored (`source: standard-authored`); the ids/titles are shipped. Off unless `GACHA_STANDARD=1`."""
@@ -275,6 +281,8 @@ def all_banners() -> list:
     for b in authored_banners():
         by_id[str(b["id"])] = b
     for b in deal_banners():
+        by_id[str(b["id"])] = b
+    for b in raid_banners():
         by_id[str(b["id"])] = b
     # Archive identity merging shows a replacement and its calendar alias once.
     # Keep both IDs resolvable for requests already issued by an older client.

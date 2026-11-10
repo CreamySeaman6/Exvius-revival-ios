@@ -605,6 +605,7 @@ def _credit_mission_rewards(plaintext: str | None, spec=None):
                   f"(bonus {bonus} lapis served as GfQmi4h5)", flush=True)
     return spec
 _CHALLENGE_TABLE: dict | None = None
+_CHALLENGE_SIG: str | None = None
 def challenge_table() -> dict:
     """mission id -> {challenge id: (lapis amount, condition spec, display order)} from the SHIPPED table.
 
@@ -623,19 +624,25 @@ def challenge_table() -> dict:
     (`qdhWF7z9`) holds the 8-digit `V36ygRYs` **ids**, not these orders -- resolved statically in SW-31(c);
     an earlier "orders" reading was wrong and is not what `serve_challenge_clear` serves.
     """
-    global _CHALLENGE_TABLE
-    if _CHALLENGE_TABLE is not None:
+    global _CHALLENGE_TABLE, _CHALLENGE_SIG
+    import reward_overrides
+    sig = reward_overrides.signature()     # rebuilt when a first-run-only wiki reward switches (2026-11-10)
+    if _CHALLENGE_TABLE is not None and _CHALLENGE_SIG == sig:
         return _CHALLENGE_TABLE
+    _CHALLENGE_SIG = sig
     out: dict = {}
     clash = {mid for mid, row in _load_ndjson('F_MISSION_MST.ndjson', 'qo3PECw6').items()
              if str(row.get('gQR24kST')) == '50'}
+    def _file_rows(fh):
+        for line in fh:
+            try:
+                yield json.loads(line)
+            except Exception:  # noqa: BLE001
+                continue
+    import reward_overrides          # wiki rewards and restored challenges (2026-11-10)
     try:
         with open(CHALLENGE_MST, encoding="utf-8") as fh:
-            for line in fh:
-                try:
-                    row = json.loads(line)
-                except Exception:  # noqa: BLE001
-                    continue
+            for row in reward_overrides.challenge_rows(_file_rows(fh)):
                 mid, cid = row.get("qo3PECw6"), row.get("V36ygRYs")
                 rew, spec = row.get("dX6cor8j") or "", row.get("Pzn5h0Ga") or ""
                 # CoW reuses IDs whose client challenge rows still describe

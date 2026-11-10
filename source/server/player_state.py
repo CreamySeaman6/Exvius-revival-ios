@@ -3772,8 +3772,10 @@ class PlayerState:
                 continue
             if int(m.get("receive_type", 0) or 0) == 2:
                 return []
-            rows = [{"kind": int(it.get("item_type", 0) or 0), "id": int(it.get("item_id", 0) or 0),
-                     "count": int(it.get("count", 0) or 0)} for it in m.get("items") or []]
+            # `meta`: reward metadata a mail item can carry (a Trust Moogle's target; first_clear.py back-pay).
+            rows = [dict(it.get("meta") or {}, kind=int(it.get("item_type", 0) or 0),
+                         id=int(it.get("item_id", 0) or 0), count=int(it.get("count", 0) or 0))
+                    for it in m.get("items") or []]
             bad = [r for r in rows if not self._can_credit(r)]
             if bad:
                 print("mail %s: NOT received -- no projection for %s, so nothing was credited"

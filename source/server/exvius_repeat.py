@@ -190,9 +190,9 @@ def repeat_challenge_rewards(spec, mid, plaintext):
     challenges = {}
     allowed = challenge_table().get(str(mid), {})
     try:
+        import reward_overrides          # wiki rewards and restored challenges (2026-11-10)
         with open(CHALLENGE_MST, encoding='utf-8') as source:
-            for line in source:
-                row = json.loads(line)
+            for row in reward_overrides.challenge_rows(json.loads(line) for line in source):
                 if (str(row.get('qo3PECw6')) == str(mid) and row.get('Pzn5h0Ga')
                         and str(row.get('V36ygRYs')) in allowed):
                     challenges[str(row['V36ygRYs'])] = {'id': row['V36ygRYs'], 'condition': row['Pzn5h0Ga'],

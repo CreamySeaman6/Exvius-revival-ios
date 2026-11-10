@@ -1,0 +1,150 @@
+"""Enemy drop lists from Global's record (the FFBE wiki), swapped into a battle reply before its drop roll.
+
+`content/global_drops.json` (built by ios-server/devtools/build_global_drops.py; method and counts in
+ios-server/research/DROP_CHECK.md) holds, for each quest whose drops change under the operator's rules of
+2026-11-10, every monster's (part id's) drop list: Japan's entries as they were plus the wiki's items Japan
+lacks; for a quest that dropped nothing, the wiki's items. A wiki-only entry has three fields
+(`kind:id:count`) and gets the `EXVIUS_WIKI_DROP_RATE` percent here.
+
+`apply` rebuilds each wave's drop row (`y35YvQjZ` `9BetM2Ds`) from the monsters of the group that wave
+serves (after `battle_content.roll_lottery`), the same union `battle_content.derive_mission` makes. A wave
+whose monsters aren't all listed keeps its row. `EXVIUS_GLOBAL_DROPS=0` leaves every reply as it was.
+
+EVENT CURRENCY AS ENEMY DROPS (operator, 2026-11-10): `currency` in the same file gives each event quest's
+currency, Global's per-clear amount (the wiki's quest box, or Japan's own where only Japan's enemies carry it)
+and the enemies that carry it. `_add_currency` puts that amount x `multiplier` on the waves holding those
+enemies. Areas listed in `currency_areas` get no per-clear lump from event_currency.py.
+"""
+from __future__ import annotations
+
+import json
+import os
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PATH = os.path.join(HERE, "content", "global_drops.json")
+
+
+def enabled() -> bool:
+    return str(os.environ.get("EXVIUS_GLOBAL_DROPS", "1")).strip().lower() not in ("0", "off", "false", "no")
+
+
+def wiki_rate() -> int:
+    """`EXVIUS_WIKI_DROP_RATE`: percent chance for each item only the wiki lists (default 30; 0 leaves them out)."""
+    try:
+        return max(0, min(100, int(float(os.environ.get("EXVIUS_WIKI_DROP_RATE", "30")))))
+    except ValueError:
+        return 30
+
+
+_DOC: dict | None = None
+
+
+def _doc() -> dict:
+    global _DOC
+    if _DOC is None:
+        try:
+            with open(PATH, encoding="utf-8") as fh:
+                _DOC = json.load(fh)
+        except (OSError, ValueError) as exc:
+            print(f"global drops: {PATH} not loadable ({exc!r}); serving the original drop lists", flush=True)
+            _DOC = {}
+    return _DOC
+
+
+def missions() -> dict:
+    return _doc().get("missions") or {}
+
+
+def currency_for(mid) -> list:
+    """The quest's event currency drops: [{item, base, carriers, placed_by}] (empty when it has none)."""
+    return (_doc().get("currency") or {}).get(str(mid)) or [] if enabled() else []
+
+
+def covered_areas() -> dict:
+    """Event area -> currencies its enemies now drop; event_currency.py pays no per-clear lump for those."""
+    return (_doc().get("currency_areas") or {}) if enabled() else {}
+
+
+def multiplier(item: str, area: str) -> float:
+    """EXVIUS_EVENT_CURRENCY_RUNS as a multiplier on Global's currency drops, sized as before: the event's own
+    gear, materia, units and tickets (the shop's `need`) take about that many clears of its top quest.
+    Never below 1 (Global's own amounts); 1 when the runs setting is 0 or the currency has no shop to size."""
+    from event_currency import runs
+    n = runs()
+    for ex in (_doc().get("currency_exchanges") or {}).values():
+        if ex.get("currency") == item and str(area) in ex.get("areas", []):
+            if n > 0 and ex.get("top") and ex.get("need"):
+                return max(1.0, ex["need"] / (n * ex["top"]))
+            return 1.0
+    return 1.0
+
+
+def apply(spec, mid):
+    """A copy of `spec` with each wave's drop list from the Global lists, or `spec` itself if none apply."""
+    if not enabled() or not isinstance(spec, dict) or mid is None:
+        return spec
+    lists = missions().get(str(mid)) or {}
+    coins = currency_for(mid)
+    rows = spec.get("y35YvQjZ")
+    if not (lists or coins) or not isinstance(rows, list):
+        return spec
+    group_of = {str(r.get("6v7y3QcJ")): str(r.get("2fY1IomW")) for r in spec.get("an6TB4WS") or []
+                if isinstance(r, dict)}
+    slots: dict[str, list[str]] = {}
+    for g in spec.get("Bi6hVv34") or []:
+        if isinstance(g, dict):
+            slots.setdefault(str(g.get("2fY1IomW")), []).append(str(g.get("xqartN26")))
+    rate = wiki_rate()
+    out, changed = [], 0
+    for row in rows:
+        parts = slots.get(group_of.get(str(row.get("6v7y3QcJ")))) if isinstance(row, dict) else None
+        if not lists or not parts or any(p not in lists for p in parts) or "9BetM2Ds" not in row:
+            out.append(row)
+            continue
+        drops: list[str] = []
+        for p in parts:
+            for entry in lists[p].split(","):
+                if not entry:
+                    continue
+                if entry.count(":") == 2:          # wiki-only: kind:id:count
+                    if rate <= 0:
+                        continue
+                    entry = f"{entry}:{rate}"
+                if entry not in drops:
+                    drops.append(entry)
+        out.append(dict(row, **{"9BetM2Ds": ",".join(drops)}))
+        changed += 1
+    if coins:
+        out = _add_currency(out, coins, mid, group_of, slots)
+        changed += 1
+    if not changed:
+        return spec
+    spec = dict(spec)
+    spec["y35YvQjZ"] = out
+    return spec
+
+
+def _add_currency(rows: list, coins: list, mid, group_of: dict, slots: dict) -> list:
+    """Each currency's per-clear amount (Global's base x the multiplier, +/-10%) as drops at 100% on the waves
+    whose served group holds one of its carriers, split evenly; the last wave when the rolled groups hold none.
+    Any entry of that currency already in a list (Japan's own) is replaced, so it never drops twice."""
+    import random
+    from player_state import mission_row
+    area = str((mission_row(str(mid)) or {}).get("uv60hgDW") or "")
+    rows = [dict(r) if isinstance(r, dict) else r for r in rows]
+    waves = [i for i, r in enumerate(rows) if isinstance(r, dict) and "9BetM2Ds" in r]
+    for coin in coins:
+        item = coin["item"]
+        for i in waves:
+            rows[i]["9BetM2Ds"] = ",".join(e for e in rows[i]["9BetM2Ds"].split(",")
+                                           if e and ":".join(e.split(":")[:2]) != item)
+        carriers = set(coin.get("carriers") or [])
+        hit = [i for i in waves if carriers & set(slots.get(group_of.get(str(rows[i].get("6v7y3QcJ"))), []))]
+        hit = hit or waves[-1:]
+        total = max(1, round(coin["base"] * multiplier(item, area) * random.uniform(0.9, 1.1)))
+        for n, i in enumerate(hit):
+            count = total // len(hit) + (total % len(hit) if n == len(hit) - 1 else 0)
+            if count > 0:
+                entry = f"{item}:{count}:100"
+                rows[i]["9BetM2Ds"] = rows[i]["9BetM2Ds"] + ("," if rows[i]["9BetM2Ds"] else "") + entry
+    return rows

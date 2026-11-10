@@ -2,6 +2,37 @@
 from player_state import unit_mst
 
 
+def _recipe_or_item(reward):
+    """A recipe whose recipe-book row is missing can't be granted or crafted; pay the item it crafted instead
+    (content/recipe_substitutes.json, operator's request 2026-11-09). Usable recipes are left as they are."""
+    from player_state import _load_ndjson
+    book = _load_ndjson('F_RECIPE_BOOK_MST.ndjson', 'staFu8U1').get(str(reward['id']))
+    if book and str(book.get('gJf3zp8a', '')).isdigit():
+        return reward
+    sub = _substitutes().get(str(reward['id']))
+    if not sub:
+        return reward
+    kind, iid = sub.split(':')[:2]
+    return {'kind': int(kind), 'id': int(iid), 'count': reward['count']}
+
+
+_SUBSTITUTES = None
+
+
+def _substitutes():
+    global _SUBSTITUTES
+    if _SUBSTITUTES is None:
+        import json
+        from pathlib import Path
+        try:
+            doc = json.loads(Path(__file__).with_name('content').joinpath('recipe_substitutes.json')
+                             .read_text(encoding='utf-8'))
+            _SUBSTITUTES = {k: v['reward'] for k, v in doc.get('recipes', {}).items()}
+        except (OSError, ValueError, KeyError):
+            _SUBSTITUTES = {}
+    return _SUBSTITUTES
+
+
 def parse(raw):
     result = []
     for entry in filter(None, str(raw or '').split(',')):
@@ -12,6 +43,8 @@ def parse(raw):
         if count <= 0 or (len(fields) > 3 and fields[3] != '100'):
             raise ValueError('invalid native reward quantity or rate')
         reward = {'kind': kind, 'id': iid, 'count': count}
+        if kind == 60:
+            reward = _recipe_or_item(reward)    # a lost recipe pays the item it crafted
         if kind == 10:
             if len(fields) >= 5:
                 reward['level'] = max(1, int(fields[4]))

@@ -21,12 +21,14 @@ PNG = b'\x89PNG\r\n\x1a\n'
 
 def _targets() -> list[tuple[str, str, str, tuple]]:
     """[(file name, url or "", title, size)] for every deal banner image."""
-    from ffbe_config import GACHA_DEALS
-    try:
-        with open(GACHA_DEALS, encoding='utf-8') as fh:
-            banners = json.load(fh).get('banners', [])
-    except (OSError, ValueError):
-        return []
+    from ffbe_config import GACHA_DEALS, GACHA_RAIDS
+    banners = []
+    for path in (GACHA_DEALS, GACHA_RAIDS):     # the raid summons' titled stand-ins too (2026-11-10)
+        try:
+            with open(path, encoding='utf-8') as fh:
+                banners += json.load(fh).get('banners', [])
+        except (OSError, ValueError):
+            pass
     out = []
     for banner in banners:
         art = banner.get('art') or {}

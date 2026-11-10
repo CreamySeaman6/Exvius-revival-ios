@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import threading
 import unicodedata
 
@@ -247,6 +248,89 @@ def resolve_pool(lottery: list[dict], pool: str) -> tuple[str, list[dict]] | Non
     return cands[0]["2fY1IomW"], cands
 
 
+# PER-BATTLE GROUP ROLL (2026-11-10). A lottery phase with several weighted groups used to serve
+# `resolve_pool`'s pick every time, so e.g. Chamber of Awakening 5* (2110394, lottery 211039405, 7 groups)
+# was always group 211039413 and only ever dropped Hard Rock and Fury Seed. The server path now derives
+# every candidate group (`derive_mission(roll_all=True)`), keeps the choices under LOTTERY_KEY (server
+# side only, never sent), and `roll_lottery` picks one group per phase each time the battle is served.
+LOTTERY_KEY = "_lottery"
+
+
+def lottery_roll_enabled() -> bool:
+    """`EXVIUS_BATTLE_LOTTERY`: 1 (default) rolls each wave's enemy group per battle; 0 always serves the
+    most likely group, as before 2026-11-10."""
+    return str(os.environ.get("EXVIUS_BATTLE_LOTTERY", "1")).strip().lower() not in ("0", "off", "false", "no")
+
+
+def roll_lottery(bundle, rng=None):
+    """A served copy of `bundle` with one group rolled per lottery phase (weighted, `ixDq7yJ8`).
+
+    The phase row's `2fY1IomW` and its `y35YvQjZ` drop row follow the rolled group, and the groups that were
+    not rolled are taken out together with any monster, parts, break and skill rows only they used, so the
+    reply has the same shape as a single-group derivation. A bundle without LOTTERY_KEY (authored, cached
+    before this change, a rebuilt Global event) is returned as is.
+    """
+    if not isinstance(bundle, dict) or LOTTERY_KEY not in bundle:
+        return bundle
+    meta = bundle.get(LOTTERY_KEY) or {}
+    out = {k: v for k, v in bundle.items() if k != LOTTERY_KEY}
+    phases = meta.get("phases") or {}
+    if not phases:
+        return out
+    rng = rng or random
+    roll = lottery_roll_enabled()
+    default = {str(r.get("6v7y3QcJ")): str(r.get("2fY1IomW")) for r in bundle.get("an6TB4WS") or []
+               if isinstance(r, dict)}
+    chosen: dict[str, dict] = {}
+    for phase, members in phases.items():
+        members = [m for m in members if int(m.get("weight") or 0) > 0]
+        if not members:
+            continue
+        if roll:
+            chosen[str(phase)] = rng.choices(members, weights=[int(m["weight"]) for m in members])[0]
+        else:       # switched off: the derived default (the most likely group), pruned the same way
+            chosen[str(phase)] = next((m for m in members if m["group"] == default.get(str(phase))),
+                                      members[0])
+    out["an6TB4WS"] = [dict(r, **{"2fY1IomW": chosen[str(r.get("6v7y3QcJ"))]["group"]})
+                       if isinstance(r, dict) and str(r.get("6v7y3QcJ")) in chosen else r
+                       for r in bundle.get("an6TB4WS") or []]
+    if isinstance(bundle.get("y35YvQjZ"), list):
+        out["y35YvQjZ"] = [dict(r, **{"xqartN26": chosen[str(r.get("6v7y3QcJ"))]["monster"],
+                                      "9BetM2Ds": chosen[str(r.get("6v7y3QcJ"))]["drops"]})
+                           if isinstance(r, dict) and str(r.get("6v7y3QcJ")) in chosen else r
+                           for r in bundle["y35YvQjZ"]]
+    # Prune what only the unrolled groups needed.
+    used = {str(r.get("2fY1IomW")) for r in out["an6TB4WS"] if isinstance(r, dict)}
+    unused = {m["group"] for ms in phases.values() for m in ms} - used
+    groups = bundle.get("Bi6hVv34") or []
+    kept_groups = [r for r in groups if str(r.get("2fY1IomW")) not in unused]
+    keep_parts = {str(r.get("xqartN26")) for r in kept_groups}
+    gone_parts = {str(r.get("xqartN26")) for r in groups if str(r.get("2fY1IomW")) in unused} - keep_parts
+    out["Bi6hVv34"] = kept_groups
+    for tag in ("wbet57nF", "bV34YIJQ"):
+        if isinstance(bundle.get(tag), list):
+            out[tag] = [r for r in bundle[tag] if str(r.get("xqartN26")) not in gone_parts]
+    parts = out.get("bV34YIJQ") or []
+    kept_breaks = {str(r.get("e56NZY42")) for r in parts}
+    gone_breaks = {str(r.get("e56NZY42")) for r in bundle.get("bV34YIJQ") or []
+                   if str(r.get("xqartN26")) in gone_parts} - kept_breaks
+    for tag in (BREAK_TAG, EXT_STATUS_TAG):
+        if isinstance(bundle.get(tag), list):
+            out[tag] = [r for r in bundle[tag] if str(r.get("e56NZY42")) not in gone_breaks]
+            if not out[tag]:
+                del out[tag]
+    skills = meta.get("skills") or {}
+    if skills and isinstance(bundle.get(SKILL_TAG), list):
+        # The kept parts' skills, in the order `derive_mission` lists them for a single-group bundle.
+        by_id = {str(r.get("6E5u1xrs")): r for r in bundle[SKILL_TAG]}
+        order: dict[str, None] = {}
+        for r in parts:
+            for sid in skills.get(str(r.get("xqartN26")), []):
+                order.setdefault(sid)
+        out[SKILL_TAG] = [by_id[sid] for sid in order if sid in by_id]
+    return out
+
+
 def load_break_status(path: str) -> dict[str, dict]:
     """The community break dataset: part id -> {break_hp, break_hp_after_first, turns, broken{atk,def,mag,spr}}.
 
@@ -382,7 +466,13 @@ def as_source(source: "Source | str") -> Source:
 
 
 def derive_mission(mission: int, source: Source | str, break_status: dict[str, dict] | None = None,
-                   field_groups: set[str] | None = None) -> dict:
+                   field_groups: set[str] | None = None, roll_all: bool = False) -> dict:
+    """The mission's battle bundle. Each lottery phase gets `resolve_pool`'s most likely group.
+
+    `roll_all` (the server's path): also carry every other usable group of each lottery phase, with the
+    choices under LOTTERY_KEY for `roll_lottery`. A candidate group whose monsters can't all be served is
+    left out of the roll (logged) rather than failing the mission.
+    """
     source = as_source(source)
     break_status = load_break_status(BREAK_STATUS_DEFAULT) if break_status is None else break_status
     phases = source.load("F_MISSION_PHASE_MST")
@@ -413,7 +503,48 @@ def derive_mission(mission: int, source: Source | str, break_status: dict[str, d
     if not mission_phases and field_groups is None:
         raise SystemExit(f"mission {mission}: no F_MISSION_PHASE_MST rows")
 
+    slots_by_group: dict[str, list] = {}
+    for g in groups:
+        slots_by_group.setdefault(str(g.get("2fY1IomW")), []).append(g)
+    for rows in slots_by_group.values():
+        rows.sort(key=lambda g: int(g["Z0EN6jSh"]))
+
+    def group_drops(slot_rows: list[dict]) -> str:
+        drops: list[str] = []
+        for s in slot_rows:
+            # Every part of the monster contributes drops, not just the body (PartsNum 1).
+            for pr in parts_all.get(str(s["xqartN26"]), []):
+                for it in (pr.get("9BetM2Ds") or "").split(","):
+                    if it and it not in drops:
+                        drops.append(it)
+        return ",".join(drops)
+
+    set_by_id = skill_by_id = None
+    if roll_all:
+        set_by_id = {r["A5x02C6a"]: r for r in source.load("F_MONSTER_SKILL_SET_MST") if "A5x02C6a" in r}
+        skill_by_id = {r["6E5u1xrs"]: r for r in source.load("F_MONSTER_SKILL_MST") if "6E5u1xrs" in r}
+
+    def candidate_ok(group: str) -> bool:
+        """Every row the chain below would demand for this group exists (else it would abort the mission)."""
+        slot_rows = slots_by_group.get(group)
+        if not slot_rows:
+            return False
+        for s in slot_rows:
+            pid = str(s["xqartN26"])
+            if pid not in mon_by_part or not parts_all.get(pid):
+                return False
+            for pr in parts_all[pid]:
+                ssid = str(pr.get("A5x02C6a") or "").strip()
+                if ssid in ("", "0"):
+                    continue
+                ss = set_by_id.get(ssid)
+                if ss is None or any(sid.strip() and sid.strip() not in skill_by_id
+                                     for sid in (ss.get("7qxLC5hP") or "").split(",")):
+                    return False
+        return True
+
     phase_rows, group_ids, part_ids, drop_rows = [], {}, set(), []
+    lottery_phases: dict[str, list[dict]] = {}
     for p in mission_phases:
         target = p.get("6uIYE15X", "")
         resolved = resolve_pool(lottery, target) if p.get("gou39JeI") == "2" else None
@@ -426,25 +557,33 @@ def derive_mission(mission: int, source: Source | str, break_status: dict[str, d
         phase_rows.append(row)
         if not resolved:
             continue
-        slot_rows = sorted((g for g in groups if g.get("2fY1IomW") == group), key=lambda g: int(g["Z0EN6jSh"]))
+        slot_rows = slots_by_group.get(group)
         if not slot_rows:
             raise SystemExit(f"mission {mission} phase {p['6v7y3QcJ']}: group {group} has no slots")
         group_ids.setdefault(group, slot_rows)
-        drops: list[str] = []
-        for s in slot_rows:
-            pid = str(s["xqartN26"])
-            part_ids.add(pid)
-            # Every part of the monster contributes drops, not just the body (PartsNum 1).
-            for pr in parts_all.get(pid, []):
-                for it in (pr.get("9BetM2Ds") or "").split(","):
-                    if it and it not in drops:
-                        drops.append(it)
+        part_ids.update(str(s["xqartN26"]) for s in slot_rows)
+        drops = group_drops(slot_rows)
         drop_rows.append({
             "qo3PECw6": str(mission), "6v7y3QcJ": p["6v7y3QcJ"], "pIHCrf40": "1", "2fY1IomW": "1",
             "xqartN26": slot_rows[0]["xqartN26"], "Z0EN6jSh": "1", "6Yc4RkdM": "1",
-            "9BetM2Ds": ",".join(drops), "MZn8LC6H": "", "g4voc2Aw": "", "3frn4ILX": "",
+            "9BetM2Ds": drops, "MZn8LC6H": "", "g4voc2Aw": "", "3frn4ILX": "",
             "IRf10dwx": "", "ATM35pjf": "", "e5xoiC84": "", "Vf5DGw07": "",
         })
+        if roll_all and len(resolved[1]) > 1:
+            members = []
+            for cand in resolved[1]:
+                g = str(cand["2fY1IomW"])
+                if g != group and not candidate_ok(g):
+                    print(f"    lottery: mission {mission} phase {p['6v7y3QcJ']}: group {g} left out of the "
+                          f"roll (a monster, parts or skill row is missing)", flush=True)
+                    continue
+                rows = slots_by_group[g]
+                group_ids.setdefault(g, rows)
+                part_ids.update(str(s["xqartN26"]) for s in rows)
+                members.append({"group": g, "weight": int(cand["ixDq7yJ8"]),
+                                "monster": rows[0]["xqartN26"], "drops": group_drops(rows)})
+            if len(members) > 1:
+                lottery_phases[str(p["6v7y3QcJ"])] = members
 
     if field_groups is not None:
         for group in sorted(field_groups):
@@ -536,6 +675,7 @@ def derive_mission(mission: int, source: Source | str, break_status: dict[str, d
     set_by_id = {r["A5x02C6a"]: r for r in source.load("F_MONSTER_SKILL_SET_MST") if "A5x02C6a" in r}
     skill_by_id = {r["6E5u1xrs"]: r for r in source.load("F_MONSTER_SKILL_MST") if "6E5u1xrs" in r}
     want: list[str] = []
+    part_skills: dict[str, list[str]] = {}
     for row in parts_rows:
         ssid = str(row.get("A5x02C6a") or "").strip()
         # `0` is the "no skill set" sentinel, NOT a missing row: 2415 of the oracle's parts carry it and it
@@ -549,6 +689,8 @@ def derive_mission(mission: int, source: Source | str, break_status: dict[str, d
         for sid in (ss.get("7qxLC5hP") or "").split(","):
             if sid.strip() and sid.strip() not in want:
                 want.append(sid.strip())
+            if sid.strip():
+                part_skills.setdefault(str(row.get("xqartN26")), []).append(sid.strip())
     skill_rows = []
     for sid in want:
         sr = skill_by_id.get(sid)
@@ -562,6 +704,11 @@ def derive_mission(mission: int, source: Source | str, break_status: dict[str, d
     if break_rows:
         bundle[BREAK_TAG] = break_rows
         bundle[EXT_STATUS_TAG] = ext_status_rows
+    if roll_all:
+        # Present even when empty: it marks a bundle derived with every candidate (see `assemble`'s cache).
+        bundle[LOTTERY_KEY] = {"phases": lottery_phases,
+                               "skills": {pid: list(dict.fromkeys(s)) for pid, s in part_skills.items()}
+                               if lottery_phases else {}}
     return bundle
 
 
@@ -925,14 +1072,16 @@ def assemble(mission: int | str, *, authored: dict | None = None, mode: str | No
     path = os.path.join(cache_root, area + ".json")
     with _CACHE_LOCK:
         cached = _read_cache(path) if mode != "on" else {}
-        if mid in cached:
+        # An entry without LOTTERY_KEY was cached before the per-battle group roll (2026-11-10) and holds
+        # one fixed group per phase: derive it again (once) so it carries every candidate.
+        if isinstance(cached.get(mid), dict) and LOTTERY_KEY in cached[mid]:
             if origin is not None:
                 origin["where"] = "cache"
                 origin["path"] = path
             log(f"battle: mission {mid} served from cache {os.path.relpath(path, WORK)} (BATTLE_DERIVE={mode})")
-            return cached[mid]
+            return roll_lottery(cached[mid])
         try:
-            bundle = derive_mission(mid, src)
+            bundle = derive_mission(mid, src, roll_all=True)
         except (SystemExit, Exception) as exc:  # a mission the oracle cannot resolve falls back, never 500s
             log(f"battle: mission {mid}: NOT derivable from the index ({exc}); "
                 f"falling back to the bare key")
@@ -955,4 +1104,4 @@ def assemble(mission: int | str, *, authored: dict | None = None, mode: str | No
             origin["path"] = path
         log(f"battle: mission {mid} derived from the index -> {os.path.relpath(path, WORK)} "
             f"({len(bundle)} groups, BATTLE_DERIVE={mode})")
-        return bundle
+        return roll_lottery(bundle)

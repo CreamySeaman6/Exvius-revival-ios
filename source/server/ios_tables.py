@@ -67,6 +67,10 @@ RESOURCE_CHECKSUM = ("F_RESOURCE_CHECKSUM_MST", "9Hwur83G", "92SkMNAx")
 QUEST = ("F_QUEST_MST", "2Px75LpY", "20mEeKo3")
 QUEST_REWARD_FIELD = "dX6cor8j"
 URL = ("F_URL_MST", "9wmd4iua", "UREmi85S")
+# Wiki rewards and restored challenges (reward_overrides.py, 2026-11-10): served so the challenge list and the
+# first-clear reward the phone shows are what the server pays. Tokens/keys from libgame (v0.1.18).
+CHALLENGE = ("F_CHALLENGE_MST", "GL9t6cMF", "8Dx2QUZS")
+MISSION = ("F_MISSION_MST", "24Eka6wL", "naJ3P84b")
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -217,6 +221,11 @@ def table_bump(spec, *roots) -> int:
         return 1000 if quest_rewards_shown() else 0
     if spec == URL:
         return 1001     # 1000: first build (v900 address); raise it whenever the served rows change
+    if spec in (CHALLENGE, MISSION):
+        import reward_overrides
+        if not reward_overrides.enabled():
+            return 0
+        return 1000 + zlib.crc32((spec[0] + reward_overrides.signature()).encode()) % 1000
     return 0
 
 
@@ -224,7 +233,7 @@ def version_bumps() -> dict[str, int]:
     """Table name -> amount to add to its advertised version (only tables served patched)."""
     import ios_texts
     out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.bump()}
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL):
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -241,7 +250,7 @@ def wants(rel: str) -> bool:
 def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL):
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -288,6 +297,45 @@ def _encrypt(key_text: str, row: dict, double: bool) -> str:
     from ffbe_crypto import cbc_encrypt, key16
     return cbc_encrypt(key16(key_text), json.dumps(row, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
                        double_pad=double)
+
+
+def patch_challenges(raw: bytes) -> tuple[bytes, int]:
+    """`F_CHALLENGE_MST` with the active wiki rewards and the restored challenges (modelled on a real row)."""
+    import reward_overrides
+    out, changed, template = [], 0, None
+    for line, row, double in _rows(raw, CHALLENGE[2]):
+        new = next(reward_overrides.challenge_rows([row]))
+        template = template or (row, double)
+        if new.get("dX6cor8j") != row.get("dX6cor8j"):
+            line = _encrypt(CHALLENGE[2], dict(row, dX6cor8j=new["dX6cor8j"]), double)
+            changed += 1
+        out.append(line)
+    if template:
+        shipped = {str(r.get("V36ygRYs")) for _, r, _ in _rows(raw, CHALLENGE[2])}
+        for extra in reward_overrides.added_challenges():
+            if str(extra["V36ygRYs"]) in shipped:
+                continue
+            row = {k: ("" if not str(v).isdigit() else "0") for k, v in template[0].items()}
+            row.update({k: str(extra[k]) for k in ("qo3PECw6", "V36ygRYs", "Z0EN6jSh", "Pzn5h0Ga", "dX6cor8j")})
+            row["G4L0YIB2"] = str(extra.get("name", ""))
+            out.append(_encrypt(CHALLENGE[2], row, template[1]))
+            changed += 1
+    return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
+def patch_first_clears(raw: bytes) -> tuple[bytes, int]:
+    """`F_MISSION_MST` with the active wiki first-clear rewards (`1x4bG2J8`)."""
+    import reward_overrides
+    out, changed = [], 0
+    for line, row, double in _rows(raw, MISSION[2]):
+        value = str(row.get("1x4bG2J8") or "")
+        new = reward_overrides.first_clear(row.get("qo3PECw6"), value) if reward_overrides.for_mission(
+            row.get("qo3PECw6")) else value
+        if new != value:
+            line = _encrypt(MISSION[2], dict(row, **{"1x4bG2J8": new}), double)
+            changed += 1
+        out.append(line)
+    return ("\n".join(out) + "\n").encode("ascii"), changed
 
 
 def unversioned_ids(raw: bytes) -> set[str]:
@@ -375,6 +423,12 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == QUEST:
             data, changed = show_quest_rewards(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} hidden quest reward(s) shown"
+        if spec == CHALLENGE:
+            data, changed = patch_challenges(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} challenge row(s) from the wiki"
+        if spec == MISSION:
+            data, changed = patch_first_clears(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} first-clear reward(s) from the wiki"
         if spec == URL:
             data, changed = fix_web_urls(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, Drop Rates address set ({changed} row)"

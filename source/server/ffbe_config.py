@@ -302,6 +302,10 @@ GACHA_NAMED_ON = os.environ.get("GACHA_NAMED", "1") == "1"
 # families, built from the archived news pages (`gacha_deals.json`, ids 95xxxxx). Off with `GACHA_DEALS=0`.
 GACHA_DEALS = os.path.join(HERE, "gacha_deals.json")
 GACHA_DEALS_ON = os.environ.get("GACHA_DEALS", "1") == "1"
+# RAID SUMMONS (2026-11-10): the coin-paid Raid Summons and Box Summons of Global's raids, dated to each raid's
+# run (`gacha_raids.json`, ids 96xxxxx, built by ios-server/devtools/build_raid_banners.py). Off with `GACHA_RAIDS=0`.
+GACHA_RAIDS = os.path.join(HERE, "gacha_raids.json")
+GACHA_RAIDS_ON = os.environ.get("GACHA_RAIDS", "1") == "1"
 # A CAMPAIGN-SCOPED view (`harness/gen_gacha_campaigns.py` -> `server/gacha_campaigns.json`): serve the
 # evergreen STANDARD set + ONE campaign period's banners instead of all 649 -- which the in-game listing
 # cannot present readably. `GACHA_CAMPAIGN=<key>` (e.g. `2019-07`, the 3rd-anniversary month); **UNSET means
@@ -1453,6 +1457,8 @@ __all__ = [
     "GACHA_NAMED",
     "GACHA_NAMED_ON",
     "GACHA_DEALS",
+    "GACHA_RAIDS",
+    "GACHA_RAIDS_ON",
     "GACHA_DEALS_ON",
     "GACHA_COMMUNITY_LIMIT",
     "GACHA_CAMPAIGN_FILE",

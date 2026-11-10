@@ -152,7 +152,49 @@ def _catalogue(cutoff=None):
             product(950000000 + index * 1000 + position, did, row['reward'], row['price'],
                     row['limit'], (kind, str(currency)))
         EVENT_SHOPS[str(did)] = ([str(area) for area in shop.get('event_areas', [])], kind, str(currency))
+    # The event exchanges the client ships but this server never opened (King Mog and similar; Candy for
+    # Mana Mystery, 2026-11-09): content/event_exchanges.json, built by ios-server/devtools/
+    # build_event_exchanges.py. Stock, prices and limits are the client's own F_MEDAL_EXCHANGE_MST rows.
+    # Same visibility rule as event_shops.json, plus EXCHANGE_RUNS for a currency several runs share.
+    path = Path(__file__).with_name('content').joinpath('event_exchanges.json')
+    exchanges = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'exchanges': []}
+    medals = {str(row['S21FT3L8']): row for row in _rows('F_MEDAL_EXCHANGE_MST')}
+    for index, shop in enumerate(exchanges['exchanges']):
+        did = 850004000 + index
+        currency = str(shop['currency'])
+        rows = [medals[r] for r in shop['rows'] if r in medals and _exchange_ok(medals[r]['7iJpH5zZ'])]
+        if not rows:
+            continue
+        detail(did, shop['name'], 20, currency, 4)
+        for row in rows:
+            limit = int(row['x0NDnEC9']) if row['kR4n5DxP'] == '1' else 2147483647
+            product(960000000 + int(row['S21FT3L8']), did, row['7iJpH5zZ'], row['Qy5EvcK1'],
+                    limit, (20, currency))
+        EVENT_SHOPS[str(did)] = ([str(area) for area in shop['event_areas']], 20, currency)
+        EXCHANGE_RUNS[str(did)] = str(shop.get('first_run') or '')
     return details, products, offers
+
+
+# Event exchange detail id -> first Global run of its events (event_exchanges.json), to choose among
+# exchanges that share a currency.
+EXCHANGE_RUNS = {}
+
+
+def _exchange_ok(reward) -> bool:
+    """Whether every reward of an exchange row can be granted here (leaves out lost recipes and units)."""
+    from exvius_actions_shops import _rewards
+    from player_state import _load_ndjson
+    try:
+        rows = parse(reward)
+        for row in rows:
+            if row['kind'] == 60:
+                book = _load_ndjson('F_RECIPE_BOOK_MST.ndjson', 'staFu8U1').get(str(row['id']))
+                if not (book and str(book.get('gJf3zp8a', '')).isdigit()):
+                    return False
+        _rewards([row for row in rows if row['kind'] != 60])
+    except Exception:  # noqa: BLE001 -- unknown kind or master row
+        return False
+    return bool(rows)
 
 
 def hidden_details():
@@ -169,12 +211,29 @@ def hidden_details():
         open_areas = {str(row['area']) for row in event_archive.weekly_events()}
     except Exception:  # noqa: BLE001 -- without the rotation, every event exchange shows
         return hidden
+    # Operator (2026-11-09): an event's exchange shows while its event is up, or while the player holds its
+    # currency. A currency several runs share (Candy: Mana Mystery, Dark Castle) shows one exchange: the open
+    # one, else the latest whose event has already run in the replay.
+    try:
+        import replay
+        now = replay.window()['to'].isoformat() if replay.enabled() else None
+    except Exception:  # noqa: BLE001
+        now = None
+    shared = defaultdict(list)
     for did, (areas, kind, currency) in EVENT_SHOPS.items():
-        if open_areas.intersection(areas):
+        shared[kind, currency].append(did)
+    for (kind, currency), dids in shared.items():
+        opened = [did for did in dids if open_areas.intersection(EVENT_SHOPS[did][0])]
+        if opened:
+            hidden.update(did for did in dids if did not in opened)
             continue
         held = State.player.item_count(kind, currency) if State.player is not None else 0
         if not held:
-            hidden.add(did)
+            hidden.update(dids)
+            continue
+        ran = [did for did in dids if not now or EXCHANGE_RUNS.get(did, '') < now]
+        keep = max(ran or dids[:1], key=lambda did: EXCHANGE_RUNS.get(did, ''))
+        hidden.update(did for did in dids if did != keep)
     return hidden
 
 

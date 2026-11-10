@@ -1,0 +1,4 @@
+# Shell scripts run inside the Linux container: keep LF endings even on a Windows checkout
+# (Git for Windows otherwise turns them into CRLF, and the container reports
+# "exec /app/entrypoint.sh: no such file or directory").
+*.sh text eol=lf

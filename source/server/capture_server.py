@@ -142,6 +142,7 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
     def _handle(self):
+        started = time.monotonic()
         length = int(self.headers.get("Content-Length") or 0)
         raw = self.rfile.read(length) if length else b""
         body_text = raw.decode("utf-8", errors="replace")
@@ -378,8 +379,12 @@ class Handler(BaseHTTPRequestHandler):
             # Which layer answered a derived battle bundle (index vs cache) -- `from_key` alone cannot say,
             # because a derived bundle keeps the per-mission key for the pipeline gate.
             rec["reply"]["bundle_source"] = bundle_source
+        built = time.monotonic()
         with open(fname, "w", encoding="utf-8") as fh:
             json.dump(rec, fh, indent=1)
+        # Server time per request (2026-11-09, to see where login time goes): building the reply, then
+        # writing the request record above. Time between log lines that isn't in these is the phone's.
+        took = f"took={(built - started) * 1000:.0f}ms+rec{(time.monotonic() - built) * 1000:.0f}ms"
 
         flag = "OK " if plaintext else "?? "
         cls = ep["class"] if ep else "-"
@@ -396,7 +401,7 @@ class Handler(BaseHTTPRequestHandler):
         replied += f" via {spec_key}" if spec_key else " via transform (no responses.json entry)"
         print(f"{flag}{self.command} {self.path}  class={cls} ({how})  key={enc_key}  "
               f"reqID={header.get('z5hB3P01')}  mission={mid or '-'}  from={spec_key or '-'}  "
-              f"body={len(raw)}B  {replied}  -> {os.path.relpath(fname, WORK)}",
+              f"body={len(raw)}B  {replied}  {took}  -> {os.path.relpath(fname, WORK)}",
               flush=True)
         if plaintext:
             print("    plaintext: " + plaintext[:600].replace("\n", " "), flush=True)

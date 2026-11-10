@@ -53,7 +53,10 @@ def roll(player, banner, requested_detail, repeats=1):
     if not 1 <= repeats <= maximum:
         return None
     if index >= len(banner['boxes']):
-        offer = dict(banner, draws=repeats, cost=dict(banner['cost'], amount=banner['cost']['amount'] * repeats))
+        # After the last box: the raid's standard summon, at its own price where Global's differed
+        # (`after_cost`, e.g. 100 coins against 200 a box pull; 2026-11-10).
+        cost = dict(banner['cost'], **(banner.get('after_cost') or {}))
+        offer = dict(banner, draws=repeats, cost=dict(cost, amount=int(cost['amount']) * repeats))
         result = player.roll_gacha(offer, repeats)
         if result:
             result['detail_id'] = detail_id(player, banner)

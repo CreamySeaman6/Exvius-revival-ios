@@ -16,7 +16,8 @@ WORKDIR /app
 COPY source/server /app/server
 COPY data/latest.json /app/latest.json
 COPY ios-server/serve.py ios-server/certs.py ios-server/fetch_data.py ios-server/ffbe.py ios-server/entrypoint.sh /app/
-RUN chmod +x /app/entrypoint.sh
+# Strip Windows line endings in case the repo was cloned on Windows before .gitattributes existed.
+RUN sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

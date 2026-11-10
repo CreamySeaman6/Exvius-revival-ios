@@ -60,6 +60,7 @@ TABLES = {
     "F_TEXT_NV_SHOP_PRODUCT_LONG_DES": ("jhDV9jT6", "uaCuMXaq"),
     "F_TEXT_DAILY_QUEST_NAME": ("FBBD8vv6", "BhDl8FWG"),
     "F_TEXT_DAILY_QUEST_DETAIL": ("gCfFcx75", "xpLyjA9A"),
+    "F_TEXT_CHALLENGE_NAME": ("4bQbA2FH", "SFaS7rXZ"),     # restored challenges (reward_overrides.py)
 }
 # Per reward kind: (name table, prefix), (short table, prefix), (long table, prefix).
 ITEM_TEXT = {
@@ -101,8 +102,9 @@ TICKET_LONG = " The summon appears on the Summon screen while you hold this tick
 # version went UP, and the checksum part alone can go down. 1 = bundles/tickets/banners (2026-11-05),
 # 2 = item descriptions and the Android hook texts (2026-11-05), 3 = exchange shop product names (2026-11-07),
 # 4 = Bonus Present Ticket and Hill of Fortune bundles (2026-11-07), 5 = NV Unit Select exchanges (2026-11-07),
-# 6 = custom daily quests' names and descriptions (2026-11-07, daily_custom.py).
-GENERATION = 6
+# 6 = custom daily quests' names and descriptions (2026-11-07, daily_custom.py),
+# 7 = event exchanges' product names (2026-11-09, content/event_exchanges.json).
+GENERATION = 7
 
 _CACHE: dict = {}
 _JAPANESE = re.compile("[\u3040-\u30ff\u3400-\u9fff]")
@@ -170,6 +172,12 @@ def additions() -> dict[str, dict[str, tuple[str, bool]]]:
             TICKET_DESCRIPTIONS[iid] + TICKET_LONG, False)
     _hook_texts(out)
     _daily_quests(out)
+    try:                     # the challenges restored from the wiki (2026-11-10)
+        import reward_overrides
+        for row in reward_overrides.added_challenges():
+            out["F_TEXT_CHALLENGE_NAME"]["MST_CHALLENGE_NAME_" + str(row["V36ygRYs"])] = (_clean(row["name"]), False)
+    except Exception as exc:  # noqa: BLE001 -- the other texts still go out
+        print(f"[ios-texts] restored challenge names skipped ({exc})", flush=True)
     _reachable_items(out)
     _shop_products(out)
     try:

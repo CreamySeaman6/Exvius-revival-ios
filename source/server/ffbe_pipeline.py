@@ -16,6 +16,8 @@ from exvius_actions import serve_actions
 from exvius_actions_shops import serve_feature_state
 from exvius_field_treasures import serve as serve_field_treasures
 from exvius_repeat import observe_load, repeat_challenge_rewards
+from first_clear import pay as pay_first_clear
+import global_drops
 
 
 from ffbe_config import *          # noqa: F401,F403 -- constants; the table has no behaviour
@@ -149,8 +151,9 @@ PIPELINE: tuple = (
     Step("serve_lapis_shop", lambda c: serve_lapis_shop(c.spec, c.reply_id, c.plaintext),
          "state", "State.player", "native bundle prices and purchases use local Lapis"),
     # Drops are server-authoritative and per-battle: roll the candidate list now. (A no-op for every reply
-    # that carries no drop rows.) See roll_drops for why this cannot live in the payload.
-    Step("roll_drops", lambda c: observe_load(roll_drops(c.spec, mid=c.mid, is_battle_bundle=c.is_battle_bundle), c.mid, c.is_battle_bundle, c.plaintext),
+    # that carries no drop rows.) See roll_drops for why this cannot live in the payload. The mission's own
+    # bundle first gets Global's drop lists where they apply (global_drops.py, 2026-11-10).
+    Step("roll_drops", lambda c: observe_load(roll_drops(global_drops.apply(c.spec, c.mid) if c.is_battle_bundle else c.spec, mid=c.mid, is_battle_bundle=c.is_battle_bundle), c.mid, c.is_battle_bundle, c.plaintext),
          "global", "LAST_DROPS", "rolls each mission's candidate drop list; claims the mission's own slot"),
     # The result screen reads its OWN channels, not the wave drop list, so mirror this battle's roll into
     # the drops channel of 09HRWXDf. (No-op for any reply without that tag.)
@@ -186,6 +189,13 @@ PIPELINE: tuple = (
          "state", "State.player.cleared_challenges", "repeat Lapis only; other first-clear rewards once lifetime"),
     # The ending cutscene's gate reads the switch container, so the completed mission must grant its OWN
     # flag here -- a static container never could, which is why the shrine's map event never fired.
+    # First-clear rewards (F_MISSION_MST.1x4bG2J8), once per mission, listed in the result screen's own
+    # first-clear section (p1K5NecV). Before grant_cleared_mission: it decides against the pre-battle clears.
+    Step("pay_first_clear", lambda c: pay_first_clear(c.spec, c.mid, c.plaintext),
+         "state", "State.player.first_clear", "a mission's first-clear reward, paid once and listed"),
+    # Event currency on every clear (event_currency.py): the battle drops Global's exchange events paid.
+    Step("pay_event_currency", lambda c: __import__("event_currency").pay(c.spec, c.mid, c.plaintext),
+         "state", "State.player.inventory", "an exchange event's currency, paid on each clear and listed"),
     Step("grant_cleared_mission", lambda c: grant_cleared_mission(c.spec, c.mid, c.plaintext),
          "state", "State.player.switches", "the completed mission grants its own open switch"),
     # The client grants switches to itself and REPORTS them here; the reply container replaces the whole
@@ -242,6 +252,8 @@ PIPELINE: tuple = (
          "state", "State.player.mailbox", "one 8th-anniversary ticket per day, by mail"),
     Step("deliver_weekly_gift", lambda c: __import__("lapis_economy").deliver_weekly_gift(c.spec, c.reply_id),
          "state", "State.player.mailbox", "one summon gift per rotation week, by mail (lapis_economy.py)"),
+    Step("deliver_first_clear_backpay", lambda c: __import__("first_clear").deliver_backpay(c.spec, c.reply_id),
+         "state", "State.player.mailbox", "old clears' first-clear rewards, once per save, by mail (first_clear.py)"),
     Step("deliver_replay_mails", lambda c: __import__("replay_mails").deliver(c.spec, c.reply_id),
          "state", "State.player.mailbox", "Global's dated all-player mails, once history reaches them (replay_mails.py)"),
     Step("serve_login_bonus", lambda c: serve_login_bonus(c.spec, c.reply_id),
@@ -406,6 +418,10 @@ PIPELINE_EDGES: tuple = (
          "against the state the award already changed (D3)"),
     Edge("credit_mission_lapis", "serve_challenge_clear", "ctx.prior",
          "and the reader needs both: the pre-battle set AND the ids this request credited"),
+    Edge("pay_first_clear", "grant_cleared_mission", "State.player.progress.cleared_missions",
+         "a first clear is judged before this mission joins the cleared list"),
+    Edge("pay_first_clear", "serve_diamonds", "State.player",
+         "first-clear Lapis is part of the balance the diamond group reports"),
     Edge("grant_cleared_mission", "serve_switches", "State.player.switches",
          "a mission's own open switch is granted here and the container is rebuilt from state after"),
     Edge("serve_actions", "serve_switches", "State.player.switches",

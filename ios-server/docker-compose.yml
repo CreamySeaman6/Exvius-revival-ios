@@ -92,6 +92,10 @@ services:
       EXVIUS_DAILY_CUSTOM: "1"            # custom daily quests (source/server/daily_quests_custom.json); 0 = shipped only
       EXVIUS_DAILY_QUEST_COUNT: "5"       # daily quests a day while the custom ones are on
       EXVIUS_WEEKLY_GIFT: "23:50:10,23:70:1"   # mailed each week: 10 Rare Summon Tickets + a Guaranteed Ticket; "" = off
+      EXVIUS_FIRST_CLEAR: "1"             # pay each quest's first-clear reward once (source/server/first_clear.py); 0 = off
+      EXVIUS_FIRST_CLEAR_BACKPAY: "1"     # one mail with the first-clear rewards of quests cleared before that; 0 = off
+      EXVIUS_EVENT_CURRENCY_RUNS: "30"    # event currency drops x multiplier: the event's gear/materia/units in ~30 top-quest runs; 0 = Global's amounts
+      EXVIUS_WIKI_DROP_RATE: "30"        # % chance for enemy drops only the FFBE wiki lists (Global); 0 = leave them out
       # Trust from clearing quests (source/server/quest_trust.py). Japan's rule: each of your party's units has a
       # 30% chance of +1% trust per clear. Global's rule: CHANCE "10", POINTS "1" (10% chance of +0.1%).
       EXVIUS_QUEST_TRUST: "1"             # 0 = off
