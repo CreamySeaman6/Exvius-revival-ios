@@ -27,7 +27,8 @@ every unit.
 
 A unit's release date is the first Global banner that featured it (unit_release.json, written by
 `python3 replay.py --write-units`). Units no banner featured get the date of the next dated unit of the
-same game series, so a reward unit is never early.
+same game series, so a reward unit is never early. Where Global's own update history (the FFBE wiki) dates
+a unit earlier than that, its date wins (global_release_fixes, 2026-11-10).
 
 The replay's week 0 is stored in state/replay.json. Delete that file to start over from EXVIUS_REPLAY_START.
 
@@ -139,6 +140,19 @@ def window(now: datetime | None = None, record: bool = False, anchor: int | None
 
 # ---- unit release dates -------------------------------------------------------------------------------
 
+def global_release_fixes() -> dict[str, str]:
+    """Unit -> Global's release date, for the units unit_release.json dates later than Global did (player report,
+    2026-11-10: Gilgamesh (FFV) dated 2019-08-30, out on Global on 2016-11-24). content/unit_release_global.json,
+    built by ios-server/devtools/build_unit_release_check.py from the FFBE wiki's Global update history."""
+    if 'fixes' not in _CACHE:
+        try:
+            with open(os.path.join(_HERE, 'content', 'unit_release_global.json'), encoding='utf-8') as fh:
+                _CACHE['fixes'] = {str(u): str(v['global']) for u, v in json.load(fh)['later'].items()}
+        except (OSError, ValueError, KeyError):
+            _CACHE['fixes'] = {}
+    return _CACHE['fixes']
+
+
 def unit_dates() -> dict[str, str]:
     if 'units' not in _CACHE:
         try:
@@ -146,6 +160,9 @@ def unit_dates() -> dict[str, str]:
                 _CACHE['units'] = {str(k): str(v) for k, v in json.load(fh)['units'].items()}
         except (OSError, ValueError, KeyError):
             _CACHE['units'] = {}
+        for unit, day in global_release_fixes().items():
+            if unit in _CACHE['units'] and day < _CACHE['units'][unit]:
+                _CACHE['units'][unit] = day
     return _CACHE['units']
 
 
@@ -249,6 +266,10 @@ def build_unit_dates(banners: list) -> dict[str, str]:
         series.setdefault(unit[:3], []).append((unit[3:7], day))
     for rows in series.values():
         rows.sort()
+    # Global's own release date where our banner records feature a unit later (global_release_fixes).
+    for unit, day in global_release_fixes().items():
+        if unit in dated and day < dated[unit]:
+            dated[unit] = day
     out = dict(dated)
     for unit in roots:
         if unit in out or len(unit) < 9:

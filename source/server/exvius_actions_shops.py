@@ -498,14 +498,151 @@ def shop_exchange_unit(spec, req):
 @_action
 def variable_store_check(spec, req):
     # GL9 EventStoreTopScene matches the base merchant, then opens za2xsDj5.
-    # CommonUtils::convertToTime parses calendar dates, not Unix timestamps.
-    # Use preserved catalogues unchanged. The current Minister NPC's base
-    # merchant 900122 has no products; 900105 has his original Auracite stock.
-    stores = _table("F_TOWN_STORE_MST", "Z20mNDvL")
+    # CommonUtils::convertToTime parses calendar dates (UTC), not Unix timestamps.
     out = _reply(spec)
-    out["3VS1Bhmf"] = [
+    out["3VS1Bhmf"] = store_schedules()
+    return out
+
+
+# --- What King Mog, the Mog Minister and the summon-screen exchanges open (operator's report, 2026-11-10) ----
+# The client sends VariableStoreCheckRequest when King Mog's or the Minister's counter, the summon-coin exchange
+# list or the Vortex opens, and shows, per base store, the in-period row with the lowest priority
+# (VariableStoreScheduleInfoList::getCurrentStoreInfo 0x1db5f14); with none, the counter's own empty base store.
+# On Global both counters only ever ran the exchange of an event (wiki "Farplane", Item Exchange: King Mog and
+# Mog Minister, "Event Examples / Currency / Claim Period"). The Minister's Auracite stock (900105) was
+# Orbonne Monastery Vaults' exchange (wiki "Auracite Shard"), and the Star Quartz unit exchanges (7000456-58)
+# came to the Shop's permanent exchanges on 2023-01-05 (Global news 2023-01-03 "Introducing Star Quartz
+# Exchange Shops! Starting 1/5"). So, following the replay:
+#   * a counter opens the exchange of an event in this week's Vortex whose store is that counter's
+#     (F_TOWN_STORE_MST name), until the week ends; with several, the one whose run is latest;
+#   * else the exchange of a currency the player holds whose event has already run, latest run first
+#     (Global's claim period after an event; the Shop's exchange list applies the same rule);
+#   * the summon-screen exchanges (archived_store_schedules) open while a quest that pays their currency is
+#     served this week, or while the player holds it; the Star Quartz ones from replay date 2023-01-05.
+# EXVIUS_EXCHANGE_SCHEDULE=0 serves the old fixed schedule (Star Quartz, Auracite, every exchange always open).
+COUNTERS = {'\u30e2\u30fc\u30b0\u30ea\u738b': ('900104', 'king'),            # King Mog
+            '\u30e2\u30fc\u30b0\u30ea\u5927\u81e3': ('900122', 'minister')}  # Mog Minister
+STAR_QUARTZ_STORES = ('7000456', '7000457', '7000458')
+STAR_QUARTZ_FROM = '2023-01-05'
+ALWAYS = ('2020-01-01 00:00:00', '2099-12-31 23:59:59')
+
+
+def exchange_schedule_enabled() -> bool:
+    import os
+    return str(os.environ.get('EXVIUS_EXCHANGE_SCHEDULE', '1')).strip().lower() not in ('0', 'off', 'false', 'no')
+
+
+@lru_cache(maxsize=1)
+def _event_exchanges():
+    path = Path(__file__).with_name('content').joinpath('event_exchanges.json')
+    return json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'exchanges': []}
+
+
+@lru_cache(maxsize=1)
+def _area_runs():
+    import event_archive
+    return {str(ev['area']): sorted(str(r) for r in ev.get('runs') or [] if r)
+            for ev in event_archive.document()['events']}
+
+
+def _replay_week(now=None):
+    """(open area -> its run that opened it, history date reached (exclusive, ISO), week start, week end,
+    the quests served this week)."""
+    from datetime import datetime, timezone
+    import gacha_rotation
+    _, start, end = gacha_rotation.week(now)
+    opened, history, served = {}, (now or datetime.now(timezone.utc)).date().isoformat(), set()
+    try:
+        import event_archive
+        import replay
+        rows = event_archive.weekly_events(now=now)
+        opened = {str(row['area']): str(row.get('release') or '') for row in rows}
+        served = {str(m) for row in rows for m in row.get('missions') or []}
+        if replay.enabled():
+            history = replay.window(now)['to'].isoformat()
+    except Exception as exc:  # noqa: BLE001 -- without the rotation no event is open; held currency still counts
+        _note(f'exchange schedule: weekly events unavailable ({exc!r})')
+    return opened, history, start, end, served
+
+
+def _utc(moment):
+    from datetime import timezone
+    return moment.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+
+
+def _held() -> dict:
+    player = State.player
+    if player is None:
+        return {}
+    return {str(it.get('item_id')): int(it.get('count', 0)) for it in player._items()
+            if str(it.get('item_type')) == '20' and int(it.get('count', 0) or 0) > 0}
+
+
+def _counter_texts(who, currency):
+    if who == 'king':
+        return (f'Trade {currency} for something rare, kupo?', f'Come back with more {currency}, kupo!')
+    return (f'I would gladly exchange items from my collection for {currency}, kupo!',
+            f'Come back and see me once you have collected some {currency}, kupo!')
+
+
+def counter_schedules(now=None, week=None):
+    """King Mog's and the Mog Minister's row: this week's event exchange, else a held currency's."""
+    opened, history, start, end = (week or _replay_week(now))[:4]
+    held = _held()
+    towns = _table('F_TOWN_STORE_MST', 'Z20mNDvL')
+    best = {}
+    for ex in _event_exchanges()['exchanges']:
+        town = towns.get(str(ex['store'])) or {}
+        if town.get('kaG4xf3I') != '5' or town.get('G4L0YIB2') not in COUNTERS:
+            continue
+        base, who = COUNTERS[town['G4L0YIB2']]
+        live = [opened[a] for a in ex['event_areas'] if a in opened]
+        if live:
+            rank, period = (1, max(live)), (_utc(start), _utc(end))
+        elif held.get(str(ex['currency'])):
+            ran = [r for a in ex['event_areas'] for r in _area_runs().get(str(a), []) if r < history]
+            if not ran:
+                continue
+            rank, period = (0, max(ran)), ALWAYS
+        else:
+            continue
+        if base in best and best[base][0] >= rank:
+            continue
+        welcome, farewell = _counter_texts(who, ex.get('currency_name') or 'event items')
+        best[base] = (rank, {'Z20mNDvL': base, 'za2xsDj5': str(ex['store']), 'w7VR6ypY': '0',
+                             'VjJQ51uG': period[0], 'm8ivD4NX': period[1], 'suR36Jpm': '20:' + str(ex['currency']),
+                             '89YmCAzo': welcome, '0euar5mZ': farewell})
+    return [row for _, row in best.values()]
+
+
+def summon_screen_schedules(now=None, week=None):
+    """The summon-screen exchanges open now: their event's week, a held currency, Star Quartz from 2023-01-05."""
+    opened, history, start, end, served = week or _replay_week(now)
+    held = _held()
+    # The quests that pay the currency, when one of them is served this week (a later run's quests are held
+    # back, event_archive.only_existing_quests); else the events paying it.
+    paid = {str(e['store']): e for e in _event_exchanges().get('summon_screen', [])}
+    out = []
+    for row in archived_store_schedules():
+        store, currency = row['za2xsDj5'], row['suR36Jpm'].split(':', 1)[1]
+        if store in STAR_QUARTZ_STORES:
+            period = ALWAYS if history > STAR_QUARTZ_FROM else None
+        elif store in paid and (served.intersection(paid[store].get('missions') or []) if 'missions' in paid[store]
+                                else any(a in opened for a in paid[store]['event_areas'])):
+            period = (_utc(start), _utc(end))
+        else:
+            period = ALWAYS if held.get(currency) else None
+        if period:
+            out.append(dict(row, VjJQ51uG=period[0], m8ivD4NX=period[1]))
+    return out
+
+
+def legacy_store_schedules():
+    """The fixed schedule served before 2026-11-10 (EXVIUS_EXCHANGE_SCHEDULE=0)."""
+    stores = _table("F_TOWN_STORE_MST", "Z20mNDvL")
+    rows = [
         {"Z20mNDvL": base, "za2xsDj5": iid, "w7VR6ypY": "0",
-         "VjJQ51uG": "2020-01-01 00:00:00", "m8ivD4NX": "2099-12-31 23:59:59",
+         "VjJQ51uG": ALWAYS[0], "m8ivD4NX": ALWAYS[1],
          "suR36Jpm": "20:" + currency, "89YmCAzo": welcome, "0euar5mZ": farewell}
         for base, iid, currency, welcome, farewell in (
             ("900104", "7000458", "106200100", "Trade star quartz for an item?",
@@ -514,8 +651,39 @@ def variable_store_check(spec, req):
              "I would gladly exchange items from my collection for auracite shards, kupo!",
              "Come back and see me once you have collected some auracite shards, kupo!"))
         if stores.get(iid, {}).get("kaG4xf3I") == "5"]
-    out['3VS1Bhmf'].extend(dict(row) for row in archived_store_schedules())
-    return out
+    return rows + [dict(row) for row in archived_store_schedules()]
+
+
+def captain_schedules():
+    """A row for each store in the Moogle Guard Captain's menu (captain_menu.py), carrying its own currency.
+
+    The store screen takes its currency (the header's icon and the one beside every price) from the opened
+    store's schedule row, `suR36Jpm`: `EventStoreTopScene::updateEvent` (0x229e350) passes the row's currency to
+    `StoreSceneFactory::createStoreScene`, and 0/0 when the store has none, which drew a Star Quartz-like crystal
+    on the Captain's stores (operator, 2026-11-10: The Hanging Edge, priced in Trochoid Gear). King Mog's and the
+    Minister's stores already had theirs through `counter_schedules`. Same list as the menu the phone has this
+    session (`captain_menu.state`); empty greetings, so each store keeps its own."""
+    try:
+        import captain_menu
+        st = captain_menu.state()
+    except Exception:  # noqa: BLE001
+        return []
+    if st.get('sig', 'off') == 'off':
+        return []
+    return [{'Z20mNDvL': str(e['store']), 'za2xsDj5': str(e['store']), 'w7VR6ypY': '0',
+             'VjJQ51uG': ALWAYS[0], 'm8ivD4NX': ALWAYS[1], 'suR36Jpm': '20:' + str(e['currency']),
+             '89YmCAzo': '', '0euar5mZ': ''} for e in st.get('entries') or []]
+
+
+def store_schedules(now=None):
+    """Every store schedule row for VariableStoreCheck and the login reply."""
+    if not exchange_schedule_enabled():
+        rows = legacy_store_schedules()
+    else:
+        week = _replay_week(now)
+        rows = counter_schedules(week=week) + summon_screen_schedules(week=week)
+    have = {row['Z20mNDvL'] for row in rows}
+    return rows + [row for row in captain_schedules() if row['Z20mNDvL'] not in have]
 
 
 @lru_cache(maxsize=1)
@@ -553,6 +721,9 @@ def medal_exchange(spec, req):
     masters = _table("F_MEDAL_EXCHANGE_MST", "S21FT3L8")
     saved = deepcopy(_feature("medal_exchange"))
     counts = saved.setdefault("counts", {})
+    # One stock with the Shop's exchange list (operator, 2026-11-10): what it sold of a row counts here too.
+    from exvius_shop_catalogue import shared_medal_counts
+    shared = shared_medal_counts()
     costs, rewards, seen = [], [], set()
     for entry in str(n.get("L2gHC5ta") or "").split(","):
         pair = entry.split(":")
@@ -566,7 +737,7 @@ def medal_exchange(spec, req):
         _require(mode in (1, 2), "unknown medal limit type")
         # GL9's parser at 0x1ca84d4: type 1 uses x0NDnEC9, type 2
         # becomes StoreExchangeItem::EXCHANGE_CNT_UNLIMITED (-1).
-        bought = _int(counts.get(iid, 0))
+        bought = _int(shared.get(iid, 0))
         if mode == 1:
             _require(bought + quantity <= _int(row["x0NDnEC9"]), "medal purchase limit exceeded")
         currency = _int(row["ak2dhKm3"], 1)
@@ -576,7 +747,7 @@ def medal_exchange(spec, req):
         for reward in parse(row.get('7iJpH5zZ')):
             reward['count'] *= quantity
             rewards.append(reward)
-        counts[iid] = bought + quantity
+        counts[iid] = _int(counts.get(iid, 0)) + quantity
     _require(seen and rewards, "empty medal purchase")
     _rewards(rewards)
     player = State.player

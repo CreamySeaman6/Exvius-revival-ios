@@ -13,7 +13,9 @@ whose monsters aren't all listed keeps its row. `EXVIUS_GLOBAL_DROPS=0` leaves e
 EVENT CURRENCY AS ENEMY DROPS (operator, 2026-11-10): `currency` in the same file gives each event quest's
 currency, Global's per-clear amount (the wiki's quest box, or Japan's own where only Japan's enemies carry it)
 and the enemies that carry it. `_add_currency` puts that amount x `multiplier` on the waves holding those
-enemies. Areas listed in `currency_areas` get no per-clear lump from event_currency.py.
+enemies. Areas listed in `currency_areas` get no per-clear lump from event_currency.py. An exploration's entry
+(`explore`, Orbonne Monastery Vaults' Auracite) goes on its random encounter rows instead
+(`_add_encounter_currency`).
 """
 from __future__ import annotations
 
@@ -85,6 +87,10 @@ def apply(spec, mid):
         return spec
     lists = missions().get(str(mid)) or {}
     coins = currency_for(mid)
+    explore = [c for c in coins if c.get("explore")]
+    if explore and isinstance(spec.get("6v0LPiRe"), list):
+        spec = _add_encounter_currency(spec, explore, mid)
+    coins = [c for c in coins if not c.get("explore")]
     rows = spec.get("y35YvQjZ")
     if not (lists or coins) or not isinstance(rows, list):
         return spec
@@ -121,6 +127,33 @@ def apply(spec, mid):
         return spec
     spec = dict(spec)
     spec["y35YvQjZ"] = out
+    return spec
+
+
+def _add_encounter_currency(spec: dict, coins: list, mid) -> dict:
+    """An exploration's currency (build_global_drops.SIZED_CURRENCY: Orbonne Monastery Vaults' Auracite) on its
+    random encounters: the run's amount (base x multiplier) spread over the run's planned battles
+    (battle_content.exploration_plans). Each encounter row drops the share rounded down or up at random (at 100%,
+    so ffbe_battle._roll_items' "never empty" pick of the last entry can't add to it); the run's total holds."""
+    import random
+    import battle_content as bc
+    from player_state import mission_row
+    plan = bc.exploration_plans().get("missions", {}).get(str(mid))
+    battles = sum(len(z.get("battles") or []) for z in (plan or {}).get("zones") or [])
+    if not battles:
+        return spec
+    area = str((mission_row(str(mid)) or {}).get("uv60hgDW") or "")
+    shares = [(coin["item"], coin["base"] * multiplier(coin["item"], area) / battles) for coin in coins]
+
+    def with_currency(row):
+        entries = []
+        for item, per in shares:
+            count = int(per) + (1 if random.random() < per - int(per) else 0)
+            if count > 0:
+                entries.append(f"{item}:{count}:100")
+        return dict(row, **{"9BetM2Ds": ",".join(x for x in entries + [row.get("9BetM2Ds") or ""] if x)})
+    spec = dict(spec)
+    spec["6v0LPiRe"] = [with_currency(r) if isinstance(r, dict) else r for r in spec["6v0LPiRe"]]
     return spec
 
 

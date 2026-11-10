@@ -103,6 +103,10 @@ def start_engine():
         sys.exit(3)
     capture_server.State.cdn_root = str(DATA / 'native')
     capture_server.State.cdn_overlay = str(DATA / 'native')
+    # Unit pictures for the Drop Rates and News pages, copied out of the unit packs in the background
+    # (source/server/unit_art.py; EXVIUS_NOTICE_ART=0 turns it off).
+    import unit_art
+    unit_art.start(capture_server.State.cdn_overlay, capture_server.State.cdn_root)
     # Index the native image folders the way the Android app does.
     from ffbe_gacha import BANNER_ART_ROOTS, _BANNER_ART_INDEX
     for relative in ('homeMarquee', 'en/sd/static_banner', 'common_lang/sd/static_banner'):

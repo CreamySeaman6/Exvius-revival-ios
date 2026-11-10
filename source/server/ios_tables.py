@@ -49,6 +49,11 @@ freezes or closes the iPhone app on the quest screen. `F_QUEST_MST` is served wi
 
 8. DROP RATES ADDRESS (2026-11-07). `F_URL_MST` is served with `GACHA_RATE_URL` as a full address on this server
 (`fix_web_urls`), so the summon Drop Rates button posts its banner id to the page `gacha_rates.py` builds.
+
+9. THE MOOGLE GUARD CAPTAIN'S MENU (2026-11-10). `captain_menu.py` rebuilds the Farplane pack (`211020100.cpk`)
+with his menu worked out at login; `F_RESOURCE_MAP_VERSION_MST_LOCALIZE` gives it a new version whenever the list
+changes, `F_RESOURCE_MAP_CHECKSUM_MST` the size of the pack served (else the phone downloads it on every visit),
+and this module serves it.
 """
 from __future__ import annotations
 
@@ -72,6 +77,12 @@ URL = ("F_URL_MST", "9wmd4iua", "UREmi85S")
 CHALLENGE = ("F_CHALLENGE_MST", "GL9t6cMF", "8Dx2QUZS")
 MISSION = ("F_MISSION_MST", "24Eka6wL", "naJ3P84b")
 UNIT = ("F_UNIT_MST", "SsidX62G", "UW0D8ouL")
+# The Vortex tile order (vortex_order.py, 2026-11-10): the client sorts event areas by `Z0EN6jSh`.
+AREA = ("F_AREA_MST", "Fvix6V0n", "pR2DHS6i")
+# Map pack sizes (`JwbkKrjA`, the common_lang file; ResourceSizeMst). The Farplane pack's row gets the size of
+# the pack actually served, or the phone downloads it again on every visit (captain_menu.served_size, 2026-11-10).
+# The second column (`mYtcPkQQ`) is never read by the game (the name isn't in libgame).
+MAP_CHECKSUM = ("F_RESOURCE_MAP_CHECKSUM_MST", "2RZ4uDoK", "29Rd7ra0")
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -213,9 +224,10 @@ def table_bump(spec, *roots) -> int:
         art_sig = _art_signature(*roots)
         return sound_bump() + (2000 + zlib.crc32(art_sig.encode()) % 1000 if art_sig else 0)
     if spec == RESOURCE_MAP_VERSION:
-        import story_text
+        import story_text, captain_menu
         # Kept above the sound-only bump (1000-1999) and the story-fix bumps that phones may already hold.
-        return sound_bump() + story_text.table_offset()
+        # The Captain's menu adds its revision, which only ever goes up (captain_menu.refresh).
+        return sound_bump() + story_text.table_offset() + captain_menu.table_bump()
     if spec == RESOURCE_CHECKSUM:
         return _bump(_art_signature(*roots))
     if spec == QUEST:
@@ -231,14 +243,22 @@ def table_bump(spec, *roots) -> int:
         import summon_exclusions
         prices = summon_exclusions.sell_prices()
         return 1000 + zlib.crc32(json.dumps(prices, sort_keys=True).encode()) % 1000 if prices else 0
+    if spec == MAP_CHECKSUM:
+        import captain_menu
+        return 1000 + captain_menu.table_bump()   # the menu's revision changes with the pack, and only goes up
+    if spec == AREA:
+        import vortex_order
+        order = vortex_order.priorities()
+        return 1000 + zlib.crc32(json.dumps(order, sort_keys=True).encode()) % 1000 if order else 0
     return 0
 
 
 def version_bumps() -> dict[str, int]:
     """Table name -> amount to add to its advertised version (only tables served patched)."""
     import ios_texts
-    out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.bump()}
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT):
+    out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.index_bump()}
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
+                 MAP_CHECKSUM):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -248,14 +268,16 @@ def _path(token: str):
 
 
 def wants(rel: str) -> bool:
-    import ios_texts, ios_art, story_text
-    return _which(rel) is not None or ios_texts.wants(rel) or ios_art.wants(rel) or story_text.wants(rel)
+    import ios_texts, ios_art, story_text, captain_menu
+    return (_which(rel) is not None or ios_texts.wants(rel) or ios_art.wants(rel) or story_text.wants(rel)
+            or captain_menu.wants(rel))
 
 
 def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
-    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT):
+    for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
+                 MAP_CHECKSUM):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -358,6 +380,20 @@ def patch_unit_sell(raw: bytes) -> tuple[bytes, int]:
     return ("\n".join(out) + "\n").encode("ascii"), changed
 
 
+def patch_area_order(raw: bytes) -> tuple[bytes, int]:
+    """`F_AREA_MST` with the Vortex's event areas' priorities (`Z0EN6jSh`) from vortex_order.priorities."""
+    import vortex_order
+    order = vortex_order.priorities()
+    out, changed = [], 0
+    for line, row, double in _rows(raw, AREA[2]):
+        prio = order.get(str(row.get("uv60hgDW")))
+        if prio is not None and str(row.get("Z0EN6jSh")) != str(prio):
+            line = _encrypt(AREA[2], dict(row, Z0EN6jSh=str(prio)), double)
+            changed += 1
+        out.append(line)
+    return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
 def unversioned_ids(raw: bytes) -> set[str]:
     """Ids of `F_RESOURCE_VERSION_MST_LOCALIZE` rows with no version in the base or English column."""
     return {str(row.get("9ZCEWn0z")) for _, row, _ in _rows(raw, RESOURCE_VERSION[2])
@@ -413,11 +449,17 @@ def patch_versions(raw: bytes, spec, ids: set[str], bump: int, sets=None,
 
 def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
     """(table bytes, CDN log note) when `rel` is one of the tables served patched, else (None, None)."""
-    import ios_texts, ios_art, story_text
+    import ios_texts, ios_art, story_text, captain_menu
     if ios_texts.wants(rel):
         return ios_texts.serve(rel, *roots)
     if story_text.wants(rel):
         return story_text.serve(rel, *roots)
+    if captain_menu.wants(rel):
+        try:
+            return captain_menu.serve(rel, *roots)
+        except Exception as exc:  # noqa: BLE001 -- the phone keeps asking; the shipped menu is better than none
+            print(f"[captain-menu] pack not built ({exc!r})", flush=True)
+            return None, None
     if ios_art.wants(rel):
         built = art(*roots)
         m = re.search(r"Ver(\d+)_", os.path.basename(rel))
@@ -452,6 +494,15 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == UNIT:
             data, changed = patch_unit_sell(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} story-unit row(s) given a sell price"
+        if spec == AREA:
+            data, changed = patch_area_order(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} Vortex area(s) given their tile order"
+        if spec == MAP_CHECKSUM:
+            import captain_menu
+            size = captain_menu.served_size(*roots)
+            sets = {captain_menu.RESOURCE_ID: {"JwbkKrjA": size}} if size else {}
+            data, changed = patch_versions(open(src, "rb").read(), spec, set(), 0, sets, id_field="Nnb20keZ")
+            return data, f"{os.path.basename(src)}, Farplane pack size set to {size} ({changed} row)"
         if spec == URL:
             data, changed = fix_web_urls(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, Drop Rates address set ({changed} row)"
@@ -471,6 +522,8 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
             shipped = {str(row.get("Nnb20keZ")): str(row.get(VERSION_FIELD, "")) for _, row, _ in
                        _rows(raw, spec[2]) if str(row.get("Nnb20keZ")) in wanted} if wanted else {}
             sets.update(story_text.version_sets(shipped))
+            import captain_menu
+            sets.update(captain_menu.version_sets(*roots))
         base, id_field = _VERSIONS[spec]
         base_src = source_table(*roots, token=base[1])
         if not base_src:
@@ -481,7 +534,7 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         art_note = spec == RESOURCE_VERSION and built
         return data, (f"{os.path.basename(src)}, {changed} row(s): sound versions +{bump}"
                       + (f", Vortex banner pack -> Ver{built[1]}" if art_note else "")
-                      + (f", {len(sets)} story pack(s) with missing lines" if spec == RESOURCE_MAP_VERSION and sets
-                         else ""))
+                      + (f", {len(sets)} story/Farplane pack(s) with new versions" if spec == RESOURCE_MAP_VERSION
+                         and sets else ""))
     except Exception as exc:  # noqa: BLE001 -- fall back to the shipped table
         return None, f"{spec[0]} patch failed ({exc})"

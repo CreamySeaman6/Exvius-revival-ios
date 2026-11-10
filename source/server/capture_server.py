@@ -526,10 +526,11 @@ class Handler(BaseHTTPRequestHandler):
         notice_page = re.fullmatch(r'/exvius/notices/(\d+)\.html', path)
         notice_art = re.fullmatch(r'/exvius/notice-art/unit/(\d+)\.png', path)
         if notice_art:
-            from replay_notices import unit_sprite
-            image = unit_sprite(notice_art.group(1))
+            # The unit's picture from the game's own unit packs (unit_art.py), not the wiki.
+            from unit_art import picture
+            image = picture(notice_art.group(1))
             if image is None:
-                self.send_error(404, 'No sprite for this unit')
+                self.send_error(404, 'No picture for this unit')
                 return
             self.send_response(200)
             self.send_header('Content-Type', 'image/png')

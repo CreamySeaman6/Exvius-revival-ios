@@ -147,6 +147,23 @@ def limited_unit_ids() -> set:
                 day = dates.get(str(uid))
                 if day and day <= '2019-08-31' and str(uid) not in permanent and not str(uid).startswith('9'):
                     limited.add(str(uid))
+    # Every unit whose wiki page was checked (content/unit_release_global.json, 2026-11-10) takes the wiki's own
+    # flag: Limited / Collaboration / Seasonal, or No (Gilgamesh (FFV), a Rare Summon unit the rule above caught).
+    # A blank flag keeps the rules above. A Japan-version page ("/JP", a unit Global never sold) can mark a unit
+    # limited (a collaboration is one everywhere) but its "No" is Japan's record, so it doesn't clear the flag.
+    try:
+        import os
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content', 'unit_release_global.json'),
+                  encoding='utf-8') as fh:
+            doc = json.load(fh)
+        for uid, row in (doc.get('units') or {}).items():
+            flag = (row or {}).get('limited', '')
+            if flag in ('Yes', 'Collaboration', 'Seasonal'):
+                limited.add(str(uid))
+            elif flag == 'No' and not str((row or {}).get('page', '')).endswith('/JP'):
+                limited.discard(str(uid))
+    except (OSError, ValueError, KeyError):
+        pass
     _LIMITED = limited
     return _LIMITED
 

@@ -235,8 +235,78 @@ def weekly_events(rows=None, now=None):
     holiday_areas = {area for areas in HOLIDAY_EVENTS.values() for area in areas}
     dated.sort(key=lambda r: (str(r['area']) in holiday_areas, str(r.get('release') or ''), int(r['area'])),
                reverse=True)
-    return dated + ranked + permanent
+    return only_existing_quests(dated + ranked + permanent, win)
 
+
+
+# --- only the quests that existed in that run (operator's request, 2026-11-10) -----------------------
+# An open event used to serve every quest its area holds, including ones a later run added (Chamber of the
+# Vengeful's 2024 "The Empress's Vengeance" in 2019, with its 8th Anniversary currency). content/
+# event_quest_dates.json (ios-server/devtools/build_event_quest_dates.py, from Global's update history) dates
+# the quests that came after their event's first run, and the permanent trial events (Chamber of Arms, of the
+# Fallen, of the Vengeful, Training the Soul) by their first trial. A dated event serves a quest only if it
+# ran by the run that opened it this week; a permanent event only once the replay's history has reached it,
+# and not at all before its first trial. Ranked events (own periods) are unchanged. An event left with no
+# quest is not opened. The quests held back are listed in `held_back` (the Vortex drops shipped rows for
+# them). EXVIUS_EVENT_RUN_QUESTS=0 serves every quest, as before.
+_QUEST_DATES = None
+
+
+def run_quests_enabled():
+    import os
+    return str(os.environ.get('EXVIUS_EVENT_RUN_QUESTS', '1')).strip().lower() not in ('0', 'off', 'false', 'no')
+
+
+def quest_dates():
+    global _QUEST_DATES
+    if _QUEST_DATES is None:
+        path = Path(__file__).with_name('content').joinpath('event_quest_dates.json')
+        try:
+            _QUEST_DATES = json.loads(path.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            _QUEST_DATES = {}
+    return _QUEST_DATES
+
+
+def only_existing_quests(rows, win=None):
+    """This week's rows with the quests of later runs left out (see above)."""
+    if not run_quests_enabled():
+        return rows
+    from player_state import mission_row
+    dates = quest_dates()
+    first_trial, later = dates.get('events') or {}, dates.get('missions') or {}
+    reached = win['to'].isoformat() if win else None
+    out = []
+    for row in rows:
+        area = str(row['area'])
+        if row.get('windows'):
+            out.append(row)
+            continue
+        if row.get('group') == 'permanent':
+            if reached is None:
+                out.append(row)
+                continue
+            if first_trial.get(area, '') >= reached:
+                continue
+            cut, inclusive = reached, False
+        else:
+            cut, inclusive = str(row.get('release') or ''), True
+            if not cut:
+                out.append(row)
+                continue
+        quests = [str(m) for m in row.get('missions') or []]
+        keep = [m for m in quests if m not in later or (later[m] <= cut if inclusive else later[m] < cut)]
+        if len(keep) == len(quests):
+            out.append(row)
+            continue
+        if not keep:
+            continue
+        dungeon = {m: str((mission_row(m) or {}).get('U9iHsau3') or '') for m in keep}
+        kept_dungeons = [d for d in row.get('dungeons') or [] if d in set(dungeon.values())]
+        out.append(dict(row, missions=keep, held_back=[m for m in quests if m not in keep],
+                        dungeons=kept_dungeons or row.get('dungeons'), first_mission=keep[0],
+                        first_dungeon=dungeon[keep[0]] or row.get('first_dungeon')))
+    return out
 
 # --- banners of the added events -------------------------------------------------------------------
 

@@ -61,7 +61,12 @@ TABLES = {
     "F_TEXT_DAILY_QUEST_NAME": ("FBBD8vv6", "BhDl8FWG"),
     "F_TEXT_DAILY_QUEST_DETAIL": ("gCfFcx75", "xpLyjA9A"),
     "F_TEXT_CHALLENGE_NAME": ("4bQbA2FH", "SFaS7rXZ"),     # restored challenges (reward_overrides.py)
+    # Exchange stores named after the merchant opening them this week (captain_menu.merchants, 2026-11-10).
+    "F_TEXT_TOWN_STORE": ("h23JuUGF", "Jovaw62m"),
+    "F_TEXT_TOWN_STORE_OWNER_NAME": ("KFL34pbm", "Q9HMWNZG"),
 }
+# Tables whose text follows the replay week: they also take captain_menu's names revision, which only goes up.
+WEEKLY = ("F_TEXT_TOWN_STORE", "F_TEXT_TOWN_STORE_OWNER_NAME")
 # Per reward kind: (name table, prefix), (short table, prefix), (long table, prefix).
 ITEM_TEXT = {
     "20": (("F_TEXT_ITEM_NAME", "MST_ITEM_NAME_"), ("F_TEXT_ITEM_EXPLAIN_SHORT", "MST_ITEM_SHORTDESCRIPTION_"),
@@ -103,8 +108,10 @@ TICKET_LONG = " The summon appears on the Summon screen while you hold this tick
 # 2 = item descriptions and the Android hook texts (2026-11-05), 3 = exchange shop product names (2026-11-07),
 # 4 = Bonus Present Ticket and Hill of Fortune bundles (2026-11-07), 5 = NV Unit Select exchanges (2026-11-07),
 # 6 = custom daily quests' names and descriptions (2026-11-07, daily_custom.py),
-# 7 = event exchanges' product names (2026-11-09, content/event_exchanges.json).
-GENERATION = 7
+# 7 = event exchanges' product names (2026-11-09, content/event_exchanges.json),
+# 8 = Orbonne Monastery Vaults' exchange added to them (2026-11-10),
+# 9 = the two exchange-store name tables added (2026-11-10, WEEKLY).
+GENERATION = 9
 
 _CACHE: dict = {}
 _JAPANESE = re.compile("[\u3040-\u30ff\u3400-\u9fff]")
@@ -341,6 +348,24 @@ def bump() -> int:
     return _CACHE["bump"]
 
 
+def _weekly(name: str) -> tuple[int, dict]:
+    """(revision, entries) of a WEEKLY table from the last login (captain_menu.refresh)."""
+    if name not in WEEKLY:
+        return 0, {}
+    try:
+        import captain_menu
+        return captain_menu.names_rev(), captain_menu.store_texts().get(name, {})
+    except Exception:  # noqa: BLE001
+        return 0, {}
+
+
+def index_bump() -> int:
+    """Added to the text index's advertised version: `bump`, plus the store names' revision."""
+    if not bump():
+        return 0
+    return bump() + _weekly(WEEKLY[0])[0]
+
+
 def _ecb(key_text: str, decrypt: bool, data: bytes) -> bytes:
     from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     from ffbe_crypto import key16
@@ -427,7 +452,8 @@ def _base_versions(*roots) -> dict[str, int]:
 
 def patched_table(name: str, *roots) -> tuple[bytes, int, int] | None:
     """(bytes, records changed, served version) of one patched text table, cached."""
-    cache_key = ("table", name, bump())
+    rev, weekly = _weekly(name)
+    cache_key = ("table", name, bump(), rev)
     if cache_key in _CACHE:
         return _CACHE[cache_key]
     base = _base_versions(*roots).get(name)
@@ -437,8 +463,8 @@ def patched_table(name: str, *roots) -> tuple[bytes, int, int] | None:
     for root in roots:
         path = os.path.join(root or "", "localized_texts", "en", f"Ver{base}_{token}.dat")
         if root and os.path.isfile(path):
-            data, changed = patch_text(open(path, "rb").read(), key_text, additions()[name])
-            _CACHE[cache_key] = (data, changed, base + bump())
+            data, changed = patch_text(open(path, "rb").read(), key_text, {**additions()[name], **weekly})
+            _CACHE[cache_key] = (data, changed, base + bump() + rev)
             return _CACHE[cache_key]
     return None
 

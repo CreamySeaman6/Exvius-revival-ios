@@ -70,7 +70,7 @@ def _catalogue(cutoff=None):
     excluded = {entry.strip() for entry in os.environ.get('EXVIUS_LAPIS_SHOP_EXCLUDE', '10:900020401').split(',')
                 if entry.strip()}
 
-    def product(pid, did, reward, price, limit, currency, monthly=False):
+    def product(pid, did, reward, price, limit, currency, monthly=False, medal=None):
         if currency[0] == 50 and ':'.join(str(reward).split(':')[:2]) in excluded:
             return
         if cutoff:
@@ -85,7 +85,8 @@ def _catalogue(cutoff=None):
                '6uvHX2JG': '', 'VjJQ51uG': START, 'm8ivD4NX': END, 'fbcj5Aq9': '', 'JasF1S3u': ''}
         products.append(row)
         offers[str(pid)] = {'detail': str(did), 'rewards': parse(reward), 'cost': currency,
-                            'price': int(price), 'limit': int(limit), 'monthly': monthly}
+                            'price': int(price), 'limit': int(limit), 'monthly': monthly,
+                            'medal': str(medal) if medal else None}
 
     for index, (currency, stock) in enumerate(sorted(currencies.items(), key=lambda pair: int(pair[0]))):
         did = 850000000 + index
@@ -93,7 +94,7 @@ def _catalogue(cutoff=None):
         for row, _reward in stock:
             limit = int(row['x0NDnEC9']) if row['kR4n5DxP'] == '1' else 2147483647
             product(900000000 + int(row['S21FT3L8']), did, row['7iJpH5zZ'], row['Qy5EvcK1'],
-                    limit, (20, currency))
+                    limit, (20, currency), medal=row['S21FT3L8'])
 
     # NV Unit Select exchanges: trade the ticket a deal summon paid for one NV of the listed ones (the client's
     # own rows). Units not yet released in the replay are left out by product() like everywhere else.
@@ -108,7 +109,7 @@ def _catalogue(cutoff=None):
         for row in unit_rows[currency]:
             limit = int(row['x0NDnEC9']) if row['kR4n5DxP'] == '1' else 2147483647
             product(900000000 + int(row['S21FT3L8']), did, row['7iJpH5zZ'], row['Qy5EvcK1'],
-                    limit, (20, currency))
+                    limit, (20, currency), medal=row['S21FT3L8'])
         TICKET_SHOPS[str(did)] = (20, currency)
 
     # Original monthly VIP stock and prices, recorded on the preservation wiki.
@@ -169,7 +170,7 @@ def _catalogue(cutoff=None):
         for row in rows:
             limit = int(row['x0NDnEC9']) if row['kR4n5DxP'] == '1' else 2147483647
             product(960000000 + int(row['S21FT3L8']), did, row['7iJpH5zZ'], row['Qy5EvcK1'],
-                    limit, (20, currency))
+                    limit, (20, currency), medal=row['S21FT3L8'])
         EVENT_SHOPS[str(did)] = ([str(area) for area in shop['event_areas']], 20, currency)
         EXCHANGE_RUNS[str(did)] = str(shop.get('first_run') or '')
     return details, products, offers
@@ -270,6 +271,34 @@ def labels():
     return result
 
 
+# One stock per exchange row (operator, 2026-11-10). The Shop's exchange list sells F_MEDAL_EXCHANGE_MST rows
+# (fragment exchanges, NV Unit Select, event exchanges: offer['medal']) that the town stores sell too (King Mog,
+# the Minister, the Captain; exvius_actions_shops.medal_exchange). Both now count a row in the town's counter,
+# `exvius_medal_exchange.counts[row]`, so a limit of 2 means 2 in all, as on Global. Purchases the Shop counted
+# on its own before (`exvius_shop_catalogue.counts[product]`) are added to the row's count, never moved.
+def _medal_pids() -> dict:
+    """{exchange row: [Shop product ids selling it]}."""
+    out = defaultdict(list)
+    for pid, offer in catalogue()[2].items():
+        if offer.get('medal'):
+            out[offer['medal']].append(pid)
+    return out
+
+
+def shared_medal_counts(data=None) -> dict:
+    """{exchange row: bought}, the Shop and the town stores together."""
+    data = State.player.data if data is None else data
+    medal = (data.get('exvius_medal_exchange') or {}).get('counts', {})
+    shop = (data.get('exvius_shop_catalogue') or {}).get('counts', {})
+    out = {str(row): int(count or 0) for row, count in medal.items()}
+    if shop:
+        for row, pids in _medal_pids().items():
+            earlier = sum(int(shop.get(pid, 0) or 0) for pid in pids)
+            if earlier:
+                out[row] = out.get(row, 0) + earlier
+    return out
+
+
 def entry(spec, req):
     details, products, offers = catalogue()
     hidden = hidden_details()
@@ -277,8 +306,10 @@ def entry(spec, req):
     out['F2rNo6qf'] = [dict(row) for row in details if row['3X1gLufw'] not in hidden]
     out['TPrh6Ay3'] = [dict(row) for row in products if row['3X1gLufw'] not in hidden]
     counts = _feature('shop_catalogue').get('counts', {})
+    shared = shared_medal_counts()
     out['qS62ewjH'] = [{'jPV7Xc4N': pid, '3X1gLufw': offer['detail'],
-                        'Q8GLK1pz': str(counts.get(receipt_key(pid, offer), 0))}
+                        'Q8GLK1pz': str(shared.get(offer['medal'], 0) if offer.get('medal')
+                                        else counts.get(receipt_key(pid, offer), 0))}
                        for pid, offer in offers.items() if offer['detail'] not in hidden]
     return out
 
@@ -292,7 +323,8 @@ def purchase(spec, req):
     quantity = _int(node.get('Qy5EvcK1'), 1)
     counts = dict(_feature('shop_catalogue').get('counts', {}))
     key = receipt_key(pid, offer)
-    bought = int(counts.get(key, 0))
+    row = offer.get('medal')
+    bought = shared_medal_counts().get(row, 0) if row else int(counts.get(key, 0))
     _require(bought + quantity <= offer['limit'], 'exchange stock exhausted')
     rewards = [dict(row, count=row['count'] * quantity) for row in offer['rewards']]
     _rewards(rewards)
@@ -303,8 +335,14 @@ def purchase(spec, req):
     else:
         _pay([{'kind': kind, 'id': currency, 'count': amount}])
     _grant(rewards)
-    counts[key] = bought + quantity
-    _store('shop_catalogue', {'counts': counts})
+    if row:      # the town stores' counter: one stock for the Shop and the stores
+        medal = dict(_feature('medal_exchange'))
+        medal['counts'] = dict(medal.get('counts', {}))
+        medal['counts'][row] = int(medal['counts'].get(row, 0)) + quantity
+        _store('medal_exchange', medal)
+    else:
+        counts[key] = bought + quantity
+        _store('shop_catalogue', {'counts': counts})
     out = _reply(spec)
-    out['4owH1uT2'] = [{'jPV7Xc4N': pid, '3X1gLufw': offer['detail'], 'Q8GLK1pz': str(counts[key])}]
+    out['4owH1uT2'] = [{'jPV7Xc4N': pid, '3X1gLufw': offer['detail'], 'Q8GLK1pz': str(bought + quantity)}]
     return out

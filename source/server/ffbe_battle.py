@@ -1326,6 +1326,12 @@ def serve_version_table(spec):
                 and str(r.get("wM9AfX6I", "")).isdigit() else r
                 for r in rows]
     # Tables the iPhone server serves patched (ios_tables.py); a higher version makes the phone fetch them.
+    # The Farplane Captain's menu is worked out here, once per login (captain_menu.py), before the bumps.
+    try:
+        import captain_menu
+        captain_menu.refresh()
+    except Exception as exc:  # noqa: BLE001 -- the phone keeps the menu it has
+        _note(f"captain menu: not refreshed ({exc!r})")
     import ios_tables
     bumps = ios_tables.version_bumps()
     if bumps:

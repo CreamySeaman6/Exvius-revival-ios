@@ -8,7 +8,7 @@ sg_summons_list.php`) and posts `gacha_id=<banner>&localization=<lang>` (`sgGach
 The page lists exactly what a pull draws from: the pool comes from `player_state.summon_pool` and the
 guaranteed slots from `summon_guarantee_pool` / `summon_slots`, the same functions `PlayerState.roll_gacha`
 uses, so it follows the historical replay, rate-ups and every other pool rule as they are this week. Units
-are grouped by rarity, lowest first, each with its sprite (the notice pages' `/exvius/notice-art/unit/<id>.png`),
+are grouped by rarity, lowest first, each with its picture (the game's own, `/exvius/notice-art/unit/<id>.png`, unit_art.py),
 name, rarity and chance per draw.
 """
 from functools import lru_cache
@@ -91,10 +91,8 @@ def _name(row) -> str:
     return reward_name(row)
 
 
-_NEXT_SPRITE = ("var a=(this.dataset.alt||'').split('|').filter(Boolean);"
-                "if(a.length){this.dataset.alt=a.slice(1).join('|');this.src=a[0];}"
-                "else{this.onerror=null;this.classList.add('none');}")
-_PLACEHOLDER = "if(this.naturalWidth==300&&this.naturalHeight==171)this.onerror();"
+# A unit with no picture in the game data (unit_art.py): the server answers 404 and the space stays blank.
+_NO_PICTURE = "this.onerror=null;this.classList.add('none');"
 
 
 def _card(row, share: float | None, tail: str | None = None) -> str:
@@ -102,11 +100,10 @@ def _card(row, share: float | None, tail: str | None = None) -> str:
     count = int(row.get('count', 1) or 1)
     name = escape(_name(row)) + (f' &times;{count}' if count != 1 else '')
     if _is_unit(row):
-        from replay_notices import sprite_urls
+        import unit_art
         uid = str(row['unit_id'])
-        alt = '|'.join(sprite_urls(uid))
         art = (f'<img src="/exvius/notice-art/unit/{escape(uid)}.png" alt="" loading="lazy" '
-               f'data-alt="{escape(alt)}" onerror="{_NEXT_SPRITE}" onload="{_PLACEHOLDER}">')
+               f'onerror="{_NO_PICTURE}">') if unit_art.enabled() else ''
     else:
         art = '<span class="token" aria-hidden="true">&#x2756;</span>'
     return f'<li>{art}<b>{name}</b>{_stars(rarity)}<em>{tail if tail is not None else _pct(share)}</em></li>'

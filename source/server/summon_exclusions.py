@@ -43,6 +43,16 @@ def excluded() -> frozenset:
     return frozenset(_doc().get("excluded") or {})
 
 
+def limited_out() -> frozenset:
+    """Limited, collaboration and seasonal units (gacha_archive.limited_unit_ids: the FFBE wiki's flag where the
+    unit page was checked): on Global they came only from banners that featured them (operator, 2026-11-10), so a
+    rarity tier's default draw leaves them out. Empty when EXVIUS_LIMITED_FEATURED_ONLY=0."""
+    if not _on("EXVIUS_LIMITED_FEATURED_ONLY"):
+        return frozenset()
+    import gacha_archive
+    return frozenset(gacha_archive.limited_unit_ids())
+
+
 def sell_prices() -> dict:
     """Unit table row id -> sell Gil for the story units (empty when switched off)."""
     if not _on("EXVIUS_SELL_STORY_UNITS"):

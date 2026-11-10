@@ -1209,6 +1209,11 @@ def expand_pool(banner: dict) -> list:
     # (summon_exclusions.py, operator 2026-11-10); a featured one is added back below.
     import summon_exclusions
     left_out = summon_exclusions.excluded()
+    # Limited, collaboration and seasonal units came only from the banners that featured them (operator,
+    # 2026-11-10): out of a rarity tier's default draw unless this banner features them.
+    banner_featured = {str(u) for t in tiers for u in (t.get("featured") or [])}
+    banner_featured |= {str(u) for u in ((banner.get("community") or {}).get("unit_ids") or [])}
+    left_out = left_out | (summon_exclusions.limited_out() - banner_featured)
     out: list = []
     for tier in tiers:
         rate = max(0.0, float(tier.get("rate", 0)))
@@ -4770,13 +4775,16 @@ class PlayerState:
         if recipes:
             out['ZrDPm3j5'] = recipes
         medal = self.data.get('exvius_medal_exchange')
-        if medal is not None:
+        if medal is not None or (self.data.get('exvius_shop_catalogue') or {}).get('counts'):
             # GL9 UserMedalExchangeInfoResponse is a full count map. Product
             # IDs share their limit across merchants and survive reopening.
-            out['R5kozET8'] = [{'S21FT3L8': str(iid), 'ngQX7a3N': str(count)}
-                              for iid, count in sorted(medal.get('counts', {}).items(),
-                                                       key=lambda entry: int(entry[0]))
-                              if int(count) > 0]
+            # The Shop's exchange list sells the same rows and shares the count (2026-11-10).
+            from exvius_shop_catalogue import shared_medal_counts
+            counts = shared_medal_counts(self.data)
+            if medal is not None or counts:
+                out['R5kozET8'] = [{'S21FT3L8': str(iid), 'ngQX7a3N': str(count)}
+                                  for iid, count in sorted(counts.items(), key=lambda entry: int(entry[0]))
+                                  if int(count) > 0]
         quests = self.data.get('exvius_map', {}).get('quests')
         if quests is not None:
             out['hQKAwj18'] = list(quests.values())

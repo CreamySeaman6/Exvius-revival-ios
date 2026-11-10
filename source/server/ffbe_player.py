@@ -96,9 +96,10 @@ def serve_lapis_shop(spec, reply_id, plaintext=None):
     rate = Decimal(str(base.get('FBjo93gK') or '120')) / Decimal(str(base.get('AOHRcCC2') or '0.99'))
     out = copy.deepcopy(spec) if isinstance(spec, dict) else {}
     if reply_id == user_info_id:
-        from exvius_actions_shops import archived_store_schedules
+        # The store schedule follows the replay (exvius_actions_shops.store_schedules, 2026-11-10).
+        from exvius_actions_shops import store_schedules
         existing = {str(row.get('Z20mNDvL')): dict(row) for row in out.get('3VS1Bhmf', [])}
-        existing.update({row['Z20mNDvL']: dict(row) for row in archived_store_schedules()})
+        existing.update({row['Z20mNDvL']: dict(row) for row in store_schedules()})
         out['3VS1Bhmf'] = list(existing.values())
     definitions, items = {}, {}
     for payload in list(State.replies.values()) + [out]:
@@ -3076,8 +3077,17 @@ def serve_event_gate(spec, reply_id):
         return spec
     spec = _as_spec(spec)
     rows = [dict(r) for r in (spec.get(EVENT_GATE_TAG) or []) if isinstance(r, dict)]
+    # Quests a later run added are held back this week (event_archive.only_existing_quests), shipped rows too
+    # (the carriers hold Chamber of the Fallen's 2021 Heavenly Flames).
+    held = {str(r['area']): {str(m) for m in r.get('held_back') or []} for r in archive_events or []}
+    if any(held.values()):
+        kept = [r for r in rows if str(r.get('qo3PECw6')) not in held.get(str(r.get('uv60hgDW')), ())]
+        gate_dropped = len(kept) != len(rows)
+        rows = kept
+    else:
+        gate_dropped = False
     have = {str(r.get("uv60hgDW")) for r in rows}
-    gate_changed = False
+    gate_changed = gate_dropped
     selected = {f[0] for f in facts}
     from exvius_raid_progress import personal_event
     raids = {area: personal_event(dungeon_id=dungeon) for area, dungeon, _mission in facts}
