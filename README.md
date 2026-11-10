@@ -248,7 +248,7 @@ docker compose logs -f server
 | The game crashes when the first battle starts | Close it fully and open it again (step 7.2). |
 | A scene has no music | That track hasn't downloaded yet (step 7.3). |
 
-**Logs from the game itself.** iOS hides apps' logs, so the server asks the game to upload its own error log. Each upload is saved in `FFBE_DIR/server/client-reports/`, and the server log shows a `CLIENT REPORT` line when one arrives. The game uploads at its next launch, so the newest report covers the session before it. To read one:
+**Logs from the game itself.** iOS hides apps' logs, but the game can upload its own error log to the server. This is off by default, since each upload is tens of MB. While it's on, the game uploads its log once each time you open it. Turn it on when you need a log: set `EXVIUS_CLIENT_REPORTS: "1"` in `docker-compose.yml` (on Unraid, the `EXVIUS_CLIENT_REPORTS` variable in the template), run `docker compose up -d`, open the game and repeat what went wrong, then open the game once more. Each upload is saved in `FFBE_DIR/server/client-reports/`, and the server log shows a `CLIENT REPORT` line when one arrives. Set it back to `"0"` afterwards. To read one:
 
 ```bash
 pip install cryptography
@@ -302,7 +302,8 @@ The server keeps its own records for troubleshooting and trims them every hour, 
 | --- | --- |
 | `FFBE_REQUEST_LOG_DAYS` | Request records (`server/requests/`, one per game request) older than this many days are deleted. Default `3`. |
 | `FFBE_REQUEST_LOG_MB` | Request records are also trimmed, oldest first, to stay under this many MB in total. Default `300`. |
-| `FFBE_CLIENT_REPORTS_KEEP` | How many of the game's uploaded logs (`server/client-reports/`, a few MB each) to keep, newest first. Default `30`. |
+| `EXVIUS_CLIENT_REPORTS` | `0` (default) doesn't ask the game for its error log; a log the game already has queued is answered but not saved (the server log shows its size). `1` asks the game to upload its log and saves each upload in `server/client-reports/`, for troubleshooting: while it's on, the game uploads its log (tens of MB) once each time you open it. See "Logs from the game itself" in [If it doesn't work](#if-it-doesnt-work). |
+| `FFBE_CLIENT_REPORTS_KEEP` | How many of the game's uploaded logs (`server/client-reports/`, up to tens of MB each, only while `EXVIUS_CLIENT_REPORTS` is `1`) to keep, newest first. Default `30`. |
 
 The container's own log (`docker logs ffbe`) is capped at 60 MB by Docker (3 files of 20 MB).
 
@@ -434,7 +435,7 @@ The preserved game data comes from the Android version, and the iPhone app was n
 5. **Garbled music and sound effects.** Every Android sound bank uses CRI HCA cipher type 1, a fixed keyless scrambling table. The iPhone played the banks as loud noise, the same noise a decoder makes when it skips that table. The server removes the cipher as it sends each bank (`sound_compat.py`): it decrypts every audio frame, marks the file unencrypted and rewrites the checksums. The audio and the file size stay exactly the same. Because the phone never re-downloads a file it already has, the server also gives every sound file a new version number whenever these settings change.
 6. **Names showing as codes.** The Android build fills in some names itself, with code hooks inside the app (for example the Shop's local bundles, `MST_BUNDLE_NAME_990000108`). The stock iPhone app has no hooks, so it showed the raw keys. The server adds those names to the game's own text tables instead, and gives the changed tables new versions so the phone downloads them (`ios_texts.py`). The same goes for everything else the Android hooks fill in (reconstructed abilities, monster names, event mode names) and for obtainable items that never had English text, such as the SP Summon Tickets' descriptions (`ios_text_items.json`).
 7. **Blank Vortex tiles, and a crash on the Enhance tab.** Each Vortex tile's picture is loaded by name from the game's mounted data packs, and the archive's event banners only existed as loose PNG files, which the Android version hands to the game with in-app code. The server now rebuilds the game's own Vortex banner pack with those pictures added, gives it a new version, and puts it in the up-front download (`ios_art.py`).
-8. **Seeing what the phone is doing.** iOS hides apps' logs, so the server enables the game's own crash-report upload and saves what it sends (`client_reports.py`). Every step above was diagnosed from those reports.
+8. **Seeing what the phone is doing.** iOS hides apps' logs, so the server can turn on the game's own crash-report upload and save what it sends (`client_reports.py`, `EXVIUS_CLIENT_REPORTS=1`; off by default since 2026-11-10, and when on it asks once per launch). Every step above was diagnosed from those reports.
 
 The weekly summon rotation is in `source/server/gacha_rotation.py`, the historical replay in `source/server/replay.py` (unit release dates in `unit_release.json`), and the News board notices in `source/server/replay_notices.py`. The notice rows use the layout the app's own notice reader expects, read from the Android build of the game.
 

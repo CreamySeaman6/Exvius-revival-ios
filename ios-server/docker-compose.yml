@@ -38,6 +38,9 @@ services:
       FFBE_REQUEST_LOG_DAYS: "3"
       FFBE_REQUEST_LOG_MB: "300"
       FFBE_CLIENT_REPORTS_KEEP: "30"
+      # 1 asks the game to upload its own error log (saved in server/client-reports/) for troubleshooting,
+      # once per launch (tens of MB each). Leave it 0 otherwise.
+      EXVIUS_CLIENT_REPORTS: "0"
       # Weekly summon rotation (see source/server/gacha_rotation.py). Set to 0 to show every banner.
       EXVIUS_SUMMON_ROTATION: "1"
       EXVIUS_ROTATION_TZ: America/New_York

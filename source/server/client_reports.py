@@ -16,6 +16,13 @@ and waits for a "report state" group in the answer. Read from the Android 9.0 li
 This matters for a stock client such as the iPhone app, whose own system log is redacted: its reports
 are the only place the client says what went wrong. Turned on with EXVIUS_CLIENT_REPORTS=1; each upload
 is saved under <server data>/client-reports/.
+
+OFF BY DEFAULT since 2026-11-10. The request used to ride on every RoutineHomeUpdateRequest reply too, which the
+game sends about every 15 seconds, and the game then uploaded its whole log each time (a player measured about
+22 MB every 15 seconds, public repo PR #2), so loading was slow. Off, the server asks for nothing; an upload
+the game already has queued is still answered (report state 0) so it doesn't retry, but not saved, and the
+server prints one line with its size. The per-request records (capture_server) never keep a report's body.
+On, the request goes out once per launch, on the GameSettingRequest reply only (operator, 2026-11-10).
 """
 from __future__ import annotations
 
@@ -29,9 +36,10 @@ REPORT_BACK_HOLD = "da99ba05"
 REPORT_STATE_GROUP = "cd87bd8b"
 REPORT_STATE_VALUE = "950510b8"
 STORE_LOG_REQUEST = "6611dc2f"
-# Replies that carry the request: the first call of every launch, and the last one before the table load.
-CARRIERS = {"OTX6Fmvu",   # GameSettingRequest
-            "Daud71Hn"}   # RoutineHomeUpdateRequest
+# The reply that carries the request: the first call of every launch, so the game uploads once per launch.
+# Not RoutineHomeUpdateRequest (Daud71Hn): it comes about every 15 seconds, and each reply made the game upload
+# its whole log again (2026-11-10).
+CARRIERS = {"OTX6Fmvu"}   # GameSettingRequest
 
 
 def enabled() -> bool:
@@ -72,14 +80,18 @@ def _save(plaintext) -> str:
 
 
 def handle(spec, reply_id, plaintext):
-    """Add the report-back request to carrier replies, and answer and save a log upload."""
+    """Add the report-back request to carrier replies (when on), and answer a log upload (saved when on)."""
+    if reply_id == STORE_LOG_REQUEST:
+        size = len(plaintext or "")
+        if enabled():
+            path = _save(plaintext or "")
+            print(f"CLIENT REPORT: game uploaded its log ({size} chars) -> {path}", flush=True)
+        else:
+            print(f"CLIENT REPORT: game uploaded a queued log ({size} chars); not saved "
+                  f"(EXVIUS_CLIENT_REPORTS=0)", flush=True)
+        return {REPORT_STATE_GROUP: [{REPORT_STATE_VALUE: "0"}]}
     if not enabled():
         return spec
-    if reply_id == STORE_LOG_REQUEST:
-        path = _save(plaintext or "")
-        size = len(plaintext or "")
-        print(f"CLIENT REPORT: game uploaded its log ({size} chars) -> {path}", flush=True)
-        return {REPORT_STATE_GROUP: [{REPORT_STATE_VALUE: "0"}]}
     if reply_id in CARRIERS and isinstance(spec, dict):
         spec = dict(spec)
         # A time in the past: upload as soon as the report scheduler next runs.

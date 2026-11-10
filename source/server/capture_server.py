@@ -343,6 +343,9 @@ class Handler(BaseHTTPRequestHandler):
             data = b""
 
         State.requests += 1
+        # The game's own log upload (client_reports.py) can be tens of MB: never copy it into the record.
+        import client_reports
+        log_upload = reply_id == client_reports.STORE_LOG_REQUEST
         rec = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "method": self.command,
@@ -353,9 +356,9 @@ class Handler(BaseHTTPRequestHandler):
             "ciphertext_len": len(ciphertext) if ciphertext else 0,
             "endpoint": ep,
             "selected_by": how,
-            "plaintext": plaintext,
+            "plaintext": None if log_upload else plaintext,
             "decrypt_error": decrypt_error,
-            "body_raw": body_text if not envelope else None,
+            "body_raw": body_text if not envelope and not log_upload else None,
             "reply": {
                 "len": len(data),
                 "sha256_16": hashlib.sha256(data).hexdigest()[:16],

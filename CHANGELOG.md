@@ -2,6 +2,10 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-10 (fifth update)
+
+- The game loads faster: the server no longer asks it to upload its error log over and over (about 22 MB every 15 seconds). Uploads are now off by default; when you turn them on to get a log, the game sends it once per launch. See the README ("Logs from the game itself").
+
 ## 2026-11-10 (fourth update)
 
 - King Mog and the Mog Minister now trade for the event that is on this week, like in Global (for example Candy during Mana Mystery), instead of always Star Quartz and Auracite Shards. Between events they keep the exchange of an event currency you still have.

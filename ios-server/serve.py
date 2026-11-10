@@ -78,8 +78,9 @@ def configure_engine() -> None:
                        ('EXVIUS_IOS_BANNER_FIT_NAMES', '1'),
                        # A stock client keeps tables of its own; make it take this server's whole set.
                        ('EXVIUS_TABLE_VERSION_OFFSET', '200000'),  # raise it to make the phone re-download every table
-                       # Ask the game to upload its own error log (saved under server/client-reports/).
-                       ('EXVIUS_CLIENT_REPORTS', '1'),
+                       # The game's own error log upload (server/client-reports/), off by default. 1 turns it on for
+                       # troubleshooting: the game then uploads its log (tens of MB) once per launch.
+                       ('EXVIUS_CLIENT_REPORTS', '0'),
                        # Serve rebuilt tables with LF line endings; the iPhone client rejects CRLF.
                        ('EXVIUS_TABLE_LF', '1'),
                        # Re-flag HCA-MX waveforms in the Android sound banks as plain HCA for the iPhone.
