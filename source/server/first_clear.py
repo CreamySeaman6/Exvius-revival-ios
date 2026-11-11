@@ -264,3 +264,103 @@ def deliver_backpay(spec, reply_id):
           f"{(len(rows) + BACKPAY_PART - 1) // BACKPAY_PART} mail(s): "
           + ",".join(f"{r['kind']}:{r['id']}x{r['count']}" for r in rows), flush=True)
     return spec
+
+
+# --- Missed first clears (operator, 2026-11-11: "Pay first-clear rewards (Lapis, items, units) for any quest the
+# save has cleared but has no record of being paid, whichever build the clear happened on. Never pay twice") -----
+# Any cleared quest (progress.cleared_missions) with a first-clear reward that is not in the ledger's `paid` list
+# is paid by mail at login, after the one-time back-pay above, and recorded as paid. A unit reward is left out when
+# the save already holds that unit (the clear's unit came some other way), a recipe when the save already owns it.
+# EXVIUS_FIRST_CLEAR_MISSED: `1` (default, operator 2026-11-11) mails it, `0` turns it off, `preview` only logs what
+# it would pay ("first-clear missed (preview)").
+MISSED_TITLE = "Missed First-Clear Rewards"
+
+
+def missed_mode() -> str:
+    value = os.environ.get("EXVIUS_FIRST_CLEAR_MISSED", "1").strip().lower()
+    return value if value in ("0", "1", "preview") else "1"
+
+
+def missed_enabled() -> bool:
+    return enabled() and missed_mode() != "0"
+
+
+def missed_rows(player) -> tuple[list[str], list[dict]]:
+    """(missions, rows): cleared quests with a first-clear reward this save has no record of being paid."""
+    led = player.data.get(LEDGER) or {}
+    paid = set(led.get("paid", []))
+    held_units = {str(u.get("master_id")) for u in player.data.get("roster", [])}
+    import story_recipes
+    owned_recipes = story_recipes._owned_recipes(player)     # a story recipe already mailed or bought
+    cleared = [str(m) for m in player.data.get("progress", {}).get("cleared_missions", [])]
+    missions, merged, extra = [], {}, []
+    for mid in dict.fromkeys(cleared):
+        if mid in paid or not raw(mid):
+            continue
+        missions.append(mid)
+        for row in rewards(mid):
+            if row["kind"] == 10 and str(row["id"]) in held_units:
+                continue              # already holds that clear's unit
+            if row["kind"] == 60 and str(row["id"]) in owned_recipes:
+                continue
+            if not player._can_credit(row):
+                continue
+            if set(row) == {"kind", "id", "count"}:
+                key = (row["kind"], row["id"])
+                merged[key] = merged.get(key, 0) + row["count"]
+            else:
+                extra.append(row)
+    rows = [{"kind": k, "id": i, "count": c} for (k, i), c in merged.items()] + extra
+    return missions, rows
+
+
+def deliver_missed(spec, reply_id):
+    """Pipeline step (login carriers): mail first-clear rewards of cleared quests never paid."""
+    from ffbe_config import ANNIVERSARY_TICKET_CARRIER
+    from ffbe_state import State
+    player = State.player
+    if (not missed_enabled() or reply_id not in ANNIVERSARY_TICKET_CARRIER.split(",") or player is None
+            or not isinstance(spec, dict) or player.mode == "frozen"):
+        return spec
+    led = player.data.get(LEDGER)
+    if not isinstance(led, dict) or not led.get("backpaid"):
+        return spec               # the one-time back-pay goes first (deliver_backpay)
+    missions, rows = missed_rows(player)
+    if not missions:
+        return spec
+    if missed_mode() == "preview":
+        lapis = sum(r["count"] for r in rows if r["kind"] == 50)
+        print(f"first-clear missed (preview, nothing mailed): {len(missions)} quest(s), {lapis} Lapis before the "
+              f"multiplier, {len(rows)} reward row(s): "
+              + ",".join(f"{r['kind']}:{r['id']}x{r['count']}" for r in rows), flush=True)
+        return spec
+    before, dirty_before = copy.deepcopy(player.data), player.dirty
+    try:
+        parts = [rows[i:i + BACKPAY_PART] for i in range(0, len(rows), BACKPAY_PART)]
+        for n, part in enumerate(parts, 1):
+            led["missed_mails"] = int(led.get("missed_mails", 0)) + 1
+            title = MISSED_TITLE + (f" ({n}/{len(parts)})" if len(parts) > 1 else "")
+            entry = player.deliver_mail(
+                title, [(r["kind"], r["id"], r["count"]) for r in part],
+                mail_id=str(932000000000 + led["missed_mails"]),
+                message=f"First-clear rewards for {len(missions)} quest(s) you cleared that were never paid. "
+                        "Lapis is multiplied when you receive it, like all earned Lapis.",
+                icon_type=2, attach_type=1)
+            if entry is None:
+                raise RuntimeError("missed first-clear mail refused")
+            for item, row in zip(entry["items"], part):
+                meta = {k: v for k, v in row.items() if k not in ("kind", "id", "count")}
+                if meta:
+                    item["meta"] = meta
+        led["paid"].extend(m for m in missions if m not in led["paid"])
+        import story_recipes
+        for mid in missions:
+            story_recipes.note_paid(player, mid)
+        player.dirty = True
+        State.state_dirty = True
+    except Exception:
+        player.data, player.dirty = before, dirty_before
+        raise
+    print(f"first-clear missed: {len(missions)} quest(s), {len(rows)} reward row(s): "
+          + ",".join(f"{r['kind']}:{r['id']}x{r['count']}" for r in rows), flush=True)
+    return spec

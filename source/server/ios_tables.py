@@ -86,6 +86,10 @@ MAP_CHECKSUM = ("F_RESOURCE_MAP_CHECKSUM_MST", "2RZ4uDoK", "29Rd7ra0")
 # The 5★ Select Summon's unit list (exvius_gacha_select.extra_unit_rows, 2026-11-10): limited and collab units added.
 # GachaSelectUnitMstResponse::readParam reads `3HriTp6B`, `e4mG8jTc`, `VjJQ51uG`, `m8ivD4NX`.
 SELECT_UNIT = ("F_GACHA_SELECT_UNIT_MST", "qRb73JSY", "H9Jye1j3")
+# Vision Card search (2026-11-11): VisionCardMstResponse::readParam reads `cnLF6Cz1` as the card's search reading,
+# which the Japanese data fills in katakana for 216 of 339 cards, so an English search never found them
+# (`GameUtils::getSearchUserVisionCardInfoList`). Served with the English name there (`vision_search_names`).
+VISION_CARD = ("F_VISION_CARD_MST", "G9K8kLXz", "6MS9LGhA")
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -249,6 +253,8 @@ def table_bump(spec, *roots) -> int:
     if spec == MAP_CHECKSUM:
         import captain_menu
         return 1000 + captain_menu.table_bump()   # the menu's revision changes with the pack, and only goes up
+    if spec == VISION_CARD:
+        return 1000 + zlib.crc32(b"vision-search-english-v1") % 1000 if english_search() else 0
     if spec == SELECT_UNIT:
         import exvius_gacha_select
         extra = [r["3HriTp6B"] for r in exvius_gacha_select.extra_unit_rows()]
@@ -265,7 +271,7 @@ def version_bumps() -> dict[str, int]:
     import ios_texts
     out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.index_bump()}
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM, SELECT_UNIT):
+                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -284,7 +290,7 @@ def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM, SELECT_UNIT):
+                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -382,6 +388,37 @@ def patch_unit_sell(raw: bytes) -> tuple[bytes, int]:
         price = prices.get(str(row.get("3HriTp6B")))
         if price and str(row.get("u18nfD7p") or "0") == "0":
             line = _encrypt(UNIT[2], dict(row, u18nfD7p=str(price)), double)
+            changed += 1
+        out.append(line)
+    return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
+def english_search() -> bool:
+    return str(os.environ.get("EXVIUS_ENGLISH_SEARCH", "1")).strip().lower() not in ("0", "off", "false", "no")
+
+
+def vision_search_names() -> dict:
+    """Vision Card id -> English name (F_TEXT_VISION_CARD_NAME)."""
+    from data_paths import TEXT_DIR
+    out = {}
+    path = os.path.join(TEXT_DIR, "F_TEXT_VISION_CARD_NAME.ndjson")
+    if os.path.exists(path):
+        for line in open(path, encoding="utf-8"):
+            row = json.loads(line)
+            name = (row.get("v") or [""])[0].strip()
+            if name:
+                out[row["key"].rsplit("_", 1)[-1]] = name
+    return out
+
+
+def patch_vision_search(raw: bytes) -> tuple[bytes, int]:
+    """`F_VISION_CARD_MST` with each card's search reading (`cnLF6Cz1`) set to its English name."""
+    names = vision_search_names()
+    out, changed = [], 0
+    for line, row, double in _rows(raw, VISION_CARD[2]):
+        name = names.get(str(row.get("5giCMUd2")))
+        if name and row.get("cnLF6Cz1") != name:
+            line = _encrypt(VISION_CARD[2], dict(row, cnLF6Cz1=name), double)
             changed += 1
         out.append(line)
     return ("\n".join(out) + "\n").encode("ascii"), changed
@@ -514,6 +551,9 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == UNIT:
             data, changed = patch_unit_sell(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} story-unit row(s) given a sell price"
+        if spec == VISION_CARD:
+            data, changed = patch_vision_search(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} Vision Card search name(s) set to English"
         if spec == SELECT_UNIT:
             data, changed = patch_select_units(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} limited/collab unit(s) added to the 5★ Select list"

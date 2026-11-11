@@ -2,6 +2,20 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: Missed first-clear rewards
+
+- First-clear rewards (Lapis, items, units) for quests you cleared but were never paid for now arrive by mail the next time you start the game, once per quest. Rewards you already got aren't sent again. To turn this off, set `EXVIUS_FIRST_CLEAR_MISSED` to `0` (see the README).
+
+## 2026-11-11: Chamber drops
+
+- The always-open chambers now drop what they dropped on Global: Holy Crystal and Sacred Crystal in the Chamber of Awakening, and the missing items in the Chambers of Crystals, Crysts, Forticite, Enlightenment and Creation and the esper Tests. The 5★ Chamber of Awakening also has its rare drops (Calamity Gem and others) at a low rate.
+
+## 2026-11-11: Unit search, NV summons, pots
+
+- Fixed the unit search finding nothing ("No displayable units"). It only lists units the Guide knows about, and the Guide was empty until the previous update; with that update, searching for a unit's name works. The Vision Card search now also finds cards by their English names.
+- Pulling a Neo Vision unit now plays the Neo Vision summon animation instead of the treasure-chest one.
+- Fixed unit pots from battles (for example Reno's pots in The Youngest Turk in History) never arriving. They now go to the unit's enhancement points.
+
 ## 2026-11-11: Farplane Tower of Earth gifts
 
 - If you beat a Tower of Earth boss in the Farplane (White Dragon, Demon Chimera, Brachiosaur, Erinyes) but never got its gift (Murasame, Force Armor, Killer Bow, Apollo Harp), it now arrives by mail the next time you start the game. Gifts you already have aren't sent again.

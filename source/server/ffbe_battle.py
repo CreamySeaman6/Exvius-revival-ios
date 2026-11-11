@@ -517,13 +517,28 @@ def _credit_mission_rewards(plaintext: str | None, spec=None):
         before = int(State.player.currencies.get("gil", 0))
         if State.player.add_currency("gil", int(gil)) != before:
             paid.append(f"{int(gil)}gil")
+    # Each reported drop goes through `_grant_items`, which puts every kind where the phone reads it. A unit's
+    # pot (kind 28, e.g. Reno's Power/Shield/... Pots from The Youngest Turk in History's collection stages) is
+    # unit-series points (`exvius_unit_points`), not a bag item: `grant_item` filed it in the bag, which nothing
+    # shows, so pots never arrived (player report, 2026-11-11).
+    reported = {}
     for entry in str(src.get("xF9Sr1a6") or "").split(","):
         f = entry.split(":")
         if len(f) < 3 or not f[0].isdigit() or not f[1].isdigit() or not f[2].isdigit():
             continue
-        before = State.player.item_count(int(f[0]), f[1])
-        if State.player.grant_item(int(f[0]), f[1], int(f[2])) != before:
+        row = {"kind": int(f[0]), "id": int(f[1]), "count": int(f[2])}
+        reported[(row["kind"], str(row["id"]))] = reported.get((row["kind"], str(row["id"])), 0) + row["count"]
+        if State.player._can_credit(row) and State.player._grant_items([row]) == [row]:
             paid.append(f"{f[0]}:{f[1]}x{f[2]}")
+    # Pots the battle dropped that the phone didn't report (its drop list only names kinds 20-23): paid here on
+    # a cleared run, from what the bundle placed (exvius_repeat.observe_load keeps it on the attempt).
+    if mission_result_from(plaintext).get('cleared') is True:
+        attempt = State.player.data.get("exvius_repeat", {}).get("attempt", {})
+        for iid, count in (attempt.get("series_drops") or {}).items():
+            missing = int(count) - reported.get((28, str(iid)), 0)
+            row = {"kind": 28, "id": int(iid), "count": missing}
+            if missing > 0 and State.player._can_credit(row) and State.player._grant_items([row]) == [row]:
+                paid.append(f"28:{iid}x{missing} (not reported)")
     # Rank points come from the REPLY (the request never carries them): `wuUakq71` is the delta granted
     # for this battle. Credit the total into `rank.exp` so the next `3oU9Ktb7` agrees with the client.
     if isinstance(spec, dict):

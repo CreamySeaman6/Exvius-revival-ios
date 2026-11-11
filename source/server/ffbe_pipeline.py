@@ -269,6 +269,8 @@ PIPELINE: tuple = (
          "state", "State.player.mailbox", "one summon gift per rotation week, by mail (lapis_economy.py)"),
     Step("deliver_first_clear_backpay", lambda c: __import__("first_clear").deliver_backpay(c.spec, c.reply_id),
          "state", "State.player.mailbox", "old clears' first-clear rewards, once per save, by mail (first_clear.py)"),
+    Step("deliver_missed_first_clears", lambda c: __import__("first_clear").deliver_missed(c.spec, c.reply_id),
+         "state", "State.player.mailbox", "first-clear rewards of cleared quests never paid, by mail (first_clear.py)"),
     Step("register_guide", lambda c: __import__("guide").register(c.spec, c.reply_id),
          "state", "State.player.guide", "keep held units/items/gear/materia/cards in the Guide register (guide.py)"),
     Step("deliver_story_recipes", lambda c: __import__("story_recipes").deliver(c.spec, c.reply_id),

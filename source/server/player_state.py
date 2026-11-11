@@ -1372,6 +1372,24 @@ def effect_pattern_for(rarity, gacha_id=None) -> str | None:
         exact = ids_for(lambda r: str(r.get("X1IuZnj2")) == str(gacha_id))
         if exact:
             return str(exact[0])
+    # The fallback skips the effect groups that aren't a unit's crystal (2026-11-11): 100001 is the chest
+    # (item) animation, which the lowest 6★ and 7★ rows (19, 20; gacha 71016) belong to, so every NV pulled from a
+    # banner without its own rows opened a chest; 200009 is the Vision Card animation (VC_EFFECT_PATTERN_BASE).
+    # A 7★ draws one of Global's generic NV patterns (group 200008, gacha 0: 35-38) by their weights `ixDq7yJ8`;
+    # a rarity with no unit pattern of its own (6★) uses the one below it.
+    unit_row = lambda r: str(r.get("K6XrFi79")) not in ("100001", "200009")  # noqa: E731
+    if str(rarity) == "7":
+        nv = [r for r in rows if str(r.get("9fW0TePj")) == "7" and str(r.get("K6XrFi79")) == "200008"
+              and str(r.get("X1IuZnj2") or "0") == "0" and str(r.get("zoU5J3Kq", "")).isdigit()]
+        if nv:
+            weights = [max(0, int(r.get("ixDq7yJ8") or 0)) for r in nv]
+            pick = random.choices(nv, weights=weights)[0] if sum(weights) else nv[0]
+            return str(pick["zoU5J3Kq"])
+    allids = ids_for(unit_row)
+    if allids:
+        return str(allids[0])
+    if str(rarity).isdigit() and int(rarity) > 1:
+        return effect_pattern_for(int(rarity) - 1, gacha_id)
     allids = ids_for(lambda r: True)
     return str(allids[0]) if allids else None
 
