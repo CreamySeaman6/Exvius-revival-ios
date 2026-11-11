@@ -2,6 +2,11 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-10: Ticket summons show up
+
+- Fixed bought summon tickets with no summon to use them on, such as the 1/10 NV Summon Tickets from the VIP Shop. While you hold them, NV Guaranteed EX Summon shows on the summon screen; one summon takes 10 tickets. The same fix covers the 5★ Select, Arena and 5+1 ticket summons.
+- Summon tickets aren't listed under Items. They show on the summon that uses them, with how many you have.
+
 ## 2026-11-10: Mana Mystery listed once
 
 - Mana Mystery now lists its five quests once instead of twice. The second set (same stages, double mission Lapis) is gone. Producer of the Crystal is now a single quest.

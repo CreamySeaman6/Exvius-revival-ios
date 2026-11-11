@@ -251,10 +251,14 @@ def held_ticket_ids(player, banners):
     for banner in banners:
         cost = banner.get('cost')
         cost = cost[0] if isinstance(cost, list) and cost else cost
-        if not isinstance(cost, dict) or cost.get('kind') != 'item' or not cost.get('item_id'):
+        # `item` costs are bag items (type 20); `important` costs are important items (type 23), e.g. the
+        # 1/10 NV Summon Ticket 110260 (9200022/9200023), the 5★ Select ticket 260, the Arena ticket 60 and the
+        # 5+1 ticket 912. Only type 20 used to count, so a held important ticket never opened its banner.
+        kind = cost.get('kind') if isinstance(cost, dict) else None
+        if kind not in ('item', 'important') or not cost.get('item_id'):
             continue
         try:
-            held = player.item_count(20, cost['item_id'])
+            held = player.item_count(20 if kind == 'item' else 23, cost['item_id'])
         except Exception:  # noqa: BLE001 -- no inventory, no banner
             held = 0
         if held > 0:
