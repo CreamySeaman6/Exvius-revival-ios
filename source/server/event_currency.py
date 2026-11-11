@@ -94,29 +94,77 @@ def pay(spec, mid, plaintext):
     if (player is None or player.mode == "frozen" or not mid or not isinstance(spec, dict)
             or RESULT_TAG not in spec):
         return spec
-    found = amount_for(mid)
-    if not found:
-        return spec
     from first_clear import _succeeded
     attempt = player.data.get("exvius_repeat", {}).get("attempt", {})
+    if attempt.get("mid") != str(mid):
+        attempt = {}
     mark = [str(mid), attempt.get("sequence")]
     led = player.data.get(LEDGER) or {}
-    if led.get("last") == mark or not _succeeded(player, str(mid), plaintext):
+    found = amount_for(mid)
+    if found:
+        currency, base = found
+        pays = [(currency, max(1, round(base * random.uniform(0.9, 1.1))))]
+    else:
+        pays = _shortfall(attempt, plaintext, mid)
+    if not pays or led.get("last") == mark or not _succeeded(player, str(mid), plaintext):
         return spec
-    currency, base = found
-    count = max(1, round(base * random.uniform(0.9, 1.1)))
-    row = {"kind": 20, "id": int(currency), "count": count}
-    if not player._can_credit(row) or player._grant_items([row]) != [row]:
-        print(f"event-currency: mission {mid}: 20:{currency} could not be credited", flush=True)
+    credited = []
+    for currency, count in pays:
+        row = {"kind": 20, "id": int(currency), "count": count}
+        if not player._can_credit(row) or player._grant_items([row]) != [row]:
+            print(f"event-currency: mission {mid}: 20:{currency} could not be credited", flush=True)
+            continue
+        credited.append((currency, count))
+    if not credited:
         return spec
     player.data[LEDGER] = dict(led, last=mark)
     player.dirty = True
     State.state_dirty = True
-    print(f"event-currency: mission {mid} paid 20:{currency}x{count}", flush=True)
+    print(f"event-currency: mission {mid} paid " + ", ".join(f"20:{c}x{n}" for c, n in credited)
+          + ("" if found else " (enemy drops the phone didn't report)"), flush=True)
     import copy
     spec = copy.deepcopy(spec)
     for result in spec.get(RESULT_TAG, []):
         if isinstance(result, dict):
             drops = str(result.get("xF9Sr1a6") or "")
-            result["xF9Sr1a6"] = drops + ("," if drops else "") + f"20:{currency}:{count}"
+            extra = ",".join(f"20:{c}:{n}" for c, n in credited)
+            result["xF9Sr1a6"] = drops + ("," if drops else "") + extra
     return spec
+
+
+def backstop_enabled() -> bool:
+    return str(os.environ.get("EXVIUS_CURRENCY_BACKSTOP", "1")).strip().lower() not in ("0", "off", "false", "no")
+
+
+def _reported(plaintext) -> dict:
+    """{"<currency id>": count} of kind-20 items in the phone's MissionEnd report (`xF9Sr1a6`)."""
+    out: dict = {}
+    try:
+        req = json.JSONDecoder().raw_decode(plaintext or "")[0]
+        rows = req.get("09HRWXDf") or []
+        src = rows[0] if rows and isinstance(rows[0], dict) else {}
+    except Exception:  # noqa: BLE001
+        return out
+    for entry in str(src.get("xF9Sr1a6") or "").split(","):
+        parts = entry.split(":")
+        if len(parts) >= 3 and parts[0] == "20" and parts[2].isdigit():
+            out[parts[1]] = out.get(parts[1], 0) + int(parts[2])
+    return out
+
+
+def _shortfall(attempt: dict, plaintext, mid) -> list:
+    """Enemy-drop currency (global_drops.py) the bundle for this attempt carried but the phone didn't report:
+    [(currency id, missing count)]. The phone's report is credited by credit_mission_rewards as before."""
+    placed = attempt.get("currency_placed") or {}
+    if not placed or not backstop_enabled():
+        return []
+    got = _reported(plaintext)
+    out = []
+    for item, total in placed.items():
+        currency = str(item).split(":")[-1]
+        missing = int(total) - got.get(currency, 0)
+        print(f"event-currency: mission {mid}: bundle dropped 20:{currency}x{total}, phone reported "
+              f"{got.get(currency, 0)}", flush=True)
+        if missing > 0:
+            out.append((currency, missing))
+    return out

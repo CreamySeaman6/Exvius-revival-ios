@@ -235,8 +235,8 @@ def weekly_events(rows=None, now=None):
     holiday_areas = {area for areas in HOLIDAY_EVENTS.values() for area in areas}
     dated.sort(key=lambda r: (str(r['area']) in holiday_areas, str(r.get('release') or ''), int(r['area'])),
                reverse=True)
-    return only_existing_quests([row for row in dated + ranked + permanent
-                                 if str(row.get('area')) not in hidden_areas()], win)
+    return hide_clone_quests(only_existing_quests([row for row in dated + ranked + permanent
+                                                   if str(row.get('area')) not in hidden_areas()], win))
 
 
 
@@ -324,6 +324,50 @@ def only_existing_quests(rows, win=None):
         out.append(dict(row, missions=keep, held_back=[m for m in quests if m not in keep],
                         dungeons=kept_dungeons or row.get('dungeons'), first_mission=keep[0],
                         first_dungeon=dungeon[keep[0]] or row.get('first_dungeon')))
+    return out
+
+# --- exact copies of a quest within one event (operator's request, 2026-11-10) -------------------------------
+# Some events hold the same quest several times over (Chamber of Challenges' 930-933: up to six copies of each
+# trial; Elemental Turn Challenge; Producer of the Crystal), all served at once. content/clone_quests.json
+# (ios-server/devtools/build_clone_quests.py; report ios-server/research/CLONE_QUESTS.md) lists the copies that
+# match the quest kept in every respect: quest row apart from its own switches, the battle, missions and
+# first-clear rewards. They join `held_back`, so the Vortex leaves them out. EXVIUS_HIDE_CLONE_QUESTS=0 serves
+# them again.
+_CLONES = None
+
+
+def clone_quests():
+    """area -> {copy quest id: quest kept}."""
+    global _CLONES
+    if _CLONES is None:
+        path = Path(__file__).with_name('content').joinpath('clone_quests.json')
+        try:
+            doc = json.loads(path.read_text(encoding='utf-8'))
+            _CLONES = {area: dict(v.get('hidden') or {}) for area, v in (doc.get('areas') or {}).items()}
+        except (OSError, ValueError):
+            _CLONES = {}
+    return _CLONES
+
+
+def hide_clones_enabled():
+    import os
+    return str(os.environ.get('EXVIUS_HIDE_CLONE_QUESTS', '1')).strip().lower() not in ('0', 'off', 'false', 'no')
+
+
+def hide_clone_quests(rows):
+    if not hide_clones_enabled():
+        return rows
+    clones = clone_quests()
+    out = []
+    for row in rows:
+        hidden = clones.get(str(row['area']))
+        quests = [str(m) for m in row.get('missions') or []]
+        if not hidden or not any(m in hidden for m in quests):
+            out.append(row)
+            continue
+        keep = [m for m in quests if m not in hidden]
+        out.append(dict(row, missions=keep,
+                        held_back=list(row.get('held_back') or []) + [m for m in quests if m in hidden]))
     return out
 
 # --- banners of the added events -------------------------------------------------------------------

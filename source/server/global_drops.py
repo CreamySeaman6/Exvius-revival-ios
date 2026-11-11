@@ -16,6 +16,10 @@ and the enemies that carry it. `_add_currency` puts that amount x `multiplier` o
 enemies. Areas listed in `currency_areas` get no per-clear lump from event_currency.py. An exploration's entry
 (`explore`, Orbonne Monastery Vaults' Auracite) goes on its random encounter rows instead
 (`_add_encounter_currency`).
+
+BACKSTOP (2026-11-10, Candy not arriving from Mana Mystery ELT): `_add_currency` notes each quest's placed
+total (`placed`); observe_load keeps it on the attempt, and event_currency.pay credits, on a successful clear,
+whatever part of it the phone's MissionEnd didn't report. `EXVIUS_CURRENCY_BACKSTOP=0` turns that off.
 """
 from __future__ import annotations
 
@@ -39,6 +43,12 @@ def wiki_rate() -> int:
 
 
 _DOC: dict | None = None
+_PLACED: dict = {}
+
+
+def placed(mid) -> dict:
+    """{"20:<currency>": total} the last battle bundle for this quest put on its waves (empty when none)."""
+    return dict(_PLACED.get(str(mid)) or {})
 
 
 def _doc() -> dict:
@@ -58,8 +68,30 @@ def missions() -> dict:
 
 
 def currency_for(mid) -> list:
-    """The quest's event currency drops: [{item, base, carriers, placed_by}] (empty when it has none)."""
-    return (_doc().get("currency") or {}).get(str(mid)) or [] if enabled() else []
+    """The quest's event currency drops: [{item, base, carriers, placed_by}] (empty when it has none).
+
+    A quest of a covered event area with no entry of its own (Mana Mystery's second quest set 7080106-7080110,
+    and 98 more in 17 other events; HANDOFF "Event currency missing from 103 quests") drops the per-clear amount
+    event_currency.py paid it before 2026-11-10, already sized (no multiplier), spread over all its waves."""
+    if not enabled():
+        return []
+    own = (_doc().get("currency") or {}).get(str(mid))
+    if own:
+        return own
+    try:
+        from player_state import mission_row
+        area = str((mission_row(str(mid)) or {}).get("uv60hgDW") or "")
+        if area not in covered_areas():
+            return []
+        import event_currency
+        n = event_currency.runs()
+        found = event_currency._plan(n).get(str(mid)) if n > 0 else None
+    except Exception:  # noqa: BLE001
+        return []
+    if not found or f"20:{found[0]}" not in covered_areas().get(area, []):
+        return []
+    return [{"item": f"20:{found[0]}", "base": found[1], "carriers": [], "placed_by": "per-clear amount",
+             "sized": True}]
 
 
 def covered_areas() -> dict:
@@ -85,6 +117,7 @@ def apply(spec, mid):
     """A copy of `spec` with each wave's drop list from the Global lists, or `spec` itself if none apply."""
     if not enabled() or not isinstance(spec, dict) or mid is None:
         return spec
+    _PLACED.pop(str(mid), None)
     lists = missions().get(str(mid)) or {}
     coins = currency_for(mid)
     explore = [c for c in coins if c.get("explore")]
@@ -165,6 +198,7 @@ def _add_currency(rows: list, coins: list, mid, group_of: dict, slots: dict) -> 
     from player_state import mission_row
     area = str((mission_row(str(mid)) or {}).get("uv60hgDW") or "")
     rows = [dict(r) if isinstance(r, dict) else r for r in rows]
+    _PLACED[str(mid)] = {}
     waves = [i for i, r in enumerate(rows) if isinstance(r, dict) and "9BetM2Ds" in r]
     for coin in coins:
         item = coin["item"]
@@ -173,8 +207,12 @@ def _add_currency(rows: list, coins: list, mid, group_of: dict, slots: dict) -> 
                                            if e and ":".join(e.split(":")[:2]) != item)
         carriers = set(coin.get("carriers") or [])
         hit = [i for i in waves if carriers & set(slots.get(group_of.get(str(rows[i].get("6v7y3QcJ"))), []))]
+        if coin.get("sized"):
+            hit = waves                 # per-clear amount: every wave's enemies carry a share
         hit = hit or waves[-1:]
-        total = max(1, round(coin["base"] * multiplier(item, area) * random.uniform(0.9, 1.1)))
+        scale = 1.0 if coin.get("sized") else multiplier(item, area)
+        total = max(1, round(coin["base"] * scale * random.uniform(0.9, 1.1)))
+        _PLACED[str(mid)][item] = total
         for n, i in enumerate(hit):
             count = total // len(hit) + (total % len(hit) if n == len(hit) - 1 else 0)
             if count > 0:

@@ -174,6 +174,10 @@ def observe_load(spec, mid, is_battle_bundle, plaintext=None):
             helper = helper_from_request(plaintext)
             if helper:
                 State.player.data['exvius_repeat']['attempt']['helper'] = helper
+            import global_drops     # event currency this bundle drops: event_currency.pay's backstop
+            coins = global_drops.placed(mid) if spec.get('y35YvQjZ') is not None else {}
+            if coins:
+                State.player.data['exvius_repeat']['attempt']['currency_placed'] = coins
             from exvius_raid_progress import observe_personal_raid
             observe_personal_raid(State.player, mid, spec)
             State.state_dirty = True

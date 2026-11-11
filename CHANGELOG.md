@@ -2,6 +2,23 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-10: Mana Mystery listed once
+
+- Mana Mystery now lists its five quests once instead of twice. The second set (same stages, double mission Lapis) is gone. Producer of the Crystal is now a single quest.
+- If you cleared quests in Mana Mystery's second set, the matching quests in the remaining set pay their first-clear rewards again.
+
+## 2026-11-10: Copied quests removed
+
+- Events that listed the same quest several times now list it once: Chamber of Challenges (each area went from up to 110 quests to 20), Elemental Turn Challenge and Producer of the Crystal. Only exact copies were removed: same battle, missions and rewards.
+
+## 2026-11-10: Event currency on every event quest
+
+- Fixed event currency never dropping in some event quests, such as Mana Mystery's second set of quests (its ELT included). 103 quests in 18 events had no currency drops; their monsters now drop it, about as much as the event's other quests of the same level.
+
+## 2026-11-10: Event currency from battles
+
+- Fixed event currency from enemies (such as Candy in Mana Mystery) not arriving. If the game doesn't count the currency the enemies dropped, the server now adds it at the end of the battle, so every clear pays it.
+
 ## 2026-11-10: Vision Cards, Aquapolis hidden
 
 - Vision Cards equipped on Neo Vision units (such as Blade of Vengeance Ibara) now stay equipped; before, the slot looked empty. Loading a saved party no longer takes units' Vision Cards off.
