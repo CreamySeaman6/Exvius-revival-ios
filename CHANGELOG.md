@@ -2,6 +2,15 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: Farplane Tower of Earth gifts
+
+- If you beat a Tower of Earth boss in the Farplane (White Dragon, Demon Chimera, Brachiosaur, Erinyes) but never got its gift (Murasame, Force Armor, Killer Bow, Apollo Harp), it now arrives by mail the next time you start the game. Gifts you already have aren't sent again.
+
+## 2026-11-11: Story recipes, the Guide
+
+- Fixed recipes the story gives never unlocking: the crafting tutorial's Bronze Knife recipe (with 3 Copper Ore) now comes after Earth Shrine - Exit, and the Magic Key recipe with the first clear of Grandshelt Castle - Throne Room. If you're already past those points, they arrive by mail the next time you start the game.
+- The Guide now checks off units, items, equipment, materia and Vision Cards you have, including the lower forms of units you've awakened (for example 2★ Rain and Lasswell). Monsters are checked off from battles you fight from now on, with their knockdown counts and Libra scans. Units and items you sold or used up before this update can't be recovered.
+
 ## 2026-11-11: Daily summons, Mana Mystery shop
 
 - Fixed once-a-day summons (such as the Lunar New Year free summon) showing a pull available again in the evening after you'd used it. The day now resets at 04:00 UTC (11 pm New York time in winter), like the server's other daily resets, and the summon screen shows it the same way.

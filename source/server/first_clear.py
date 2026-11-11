@@ -40,7 +40,10 @@ def raw(mid) -> str:
     value = str(row.get("1x4bG2J8") or "").strip()
     import reward_overrides          # the wiki's reward where the operator chose it (2026-11-10)
     value = reward_overrides.first_clear(mid, value).strip()
-    return "" if value == "0" else value
+    value = "" if value == "0" else value
+    import story_recipes             # recipes the story gave that Global's final data dropped (issue #3)
+    more = story_recipes.extra(mid)
+    return ",".join(v for v in (value, more) if v)
 
 
 def rewards(mid) -> list[dict]:
@@ -160,6 +163,8 @@ def pay(spec, mid, plaintext):
         granted, skipped = grant(player, rewards(mid))
         led = ledger(player)
         led["paid"].append(mid)
+        import story_recipes
+        story_recipes.note_paid(player, mid)
         text = shown(granted)
         led["last"] = {"mid": mid, "sequence": attempt.get("sequence"), "shown": text}
         player.dirty = True
@@ -247,6 +252,9 @@ def deliver_backpay(spec, reply_id):
         led = ledger(player)
         led["paid"].extend(missions)
         led["backpaid"] = True
+        import story_recipes
+        for mid in missions:
+            story_recipes.note_paid(player, mid)
         player.dirty = True
         State.state_dirty = True
     except Exception:

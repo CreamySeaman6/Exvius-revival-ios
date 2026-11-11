@@ -4841,6 +4841,8 @@ class PlayerState:
         recipes = self.recipe_book_rows()
         if recipes:
             out['ZrDPm3j5'] = recipes
+        import guide                     # the Guide's units/items/equipment/materia/cards/monsters (issue #4)
+        out.update(guide.rows(self))
         medal = self.data.get('exvius_medal_exchange')
         if medal is not None or (self.data.get('exvius_shop_catalogue') or {}).get('counts'):
             # GL9 UserMedalExchangeInfoResponse is a full count map. Product

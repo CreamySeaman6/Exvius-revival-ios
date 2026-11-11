@@ -183,6 +183,8 @@ PIPELINE: tuple = (
     # The EMBLEM EVENT's weekly objectives ride the SAME mission end: a cleared mission that a campaign
     # objective names earns its crest, and a crest can cross a tier, so the tier mail is composed here
     # rather than waiting for the screen (the mailbox is state; the reply only carries the counters).
+    Step("record_guide_monsters", lambda c: __import__("guide").record_battle(c.spec, c.plaintext),
+         "state", "State.player.guide", "the battle's monsters for the Guide (guide.py)"),
     Step("credit_emblem_objectives", lambda c: credit_emblem_objectives(c.plaintext, c.spec),
          "state", "State.player.emblem_event / mailbox",
          "credits the live campaign's mission-shaped objectives and mails any tier they reach"),
@@ -267,6 +269,10 @@ PIPELINE: tuple = (
          "state", "State.player.mailbox", "one summon gift per rotation week, by mail (lapis_economy.py)"),
     Step("deliver_first_clear_backpay", lambda c: __import__("first_clear").deliver_backpay(c.spec, c.reply_id),
          "state", "State.player.mailbox", "old clears' first-clear rewards, once per save, by mail (first_clear.py)"),
+    Step("register_guide", lambda c: __import__("guide").register(c.spec, c.reply_id),
+         "state", "State.player.guide", "keep held units/items/gear/materia/cards in the Guide register (guide.py)"),
+    Step("deliver_story_recipes", lambda c: __import__("story_recipes").deliver(c.spec, c.reply_id),
+         "state", "State.player.mailbox", "story recipes cleared quests never paid, by mail (story_recipes.py)"),
     Step("deliver_replay_mails", lambda c: __import__("replay_mails").deliver(c.spec, c.reply_id),
          "state", "State.player.mailbox", "Global's dated all-player mails, once history reaches them (replay_mails.py)"),
     Step("serve_login_bonus", lambda c: serve_login_bonus(c.spec, c.reply_id),

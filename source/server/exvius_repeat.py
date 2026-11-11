@@ -174,6 +174,10 @@ def observe_load(spec, mid, is_battle_bundle, plaintext=None):
             helper = helper_from_request(plaintext)
             if helper:
                 State.player.data['exvius_repeat']['attempt']['helper'] = helper
+            import guide            # the battle's monsters, for the Guide at MissionEnd (guide.record_battle)
+            monsters = guide.monster_map(spec)
+            if monsters:
+                State.player.data['exvius_repeat']['attempt']['guide_monsters'] = monsters
             import global_drops     # event currency this bundle drops: event_currency.pay's backstop
             coins = global_drops.placed(mid) if spec.get('y35YvQjZ') is not None else {}
             if coins:
