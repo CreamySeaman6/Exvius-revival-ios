@@ -2,6 +2,15 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-10: More units in the 5★ Select Summon
+
+- The 5★ Select Summon now also offers Global's limited and collaboration 5★ units (80 more, such as 2B, Sora, Edward Elric and Lara Croft), at the same 10 tickets. Open the game twice so it picks up the new list.
+
+## 2026-11-10: 5★ Select Summon works
+
+- Fixed the 5★ Select Summon's "Ticket Summon" button doing nothing. It now opens the unit list; pick a unit and 10 5★ Select tickets are spent on it.
+- The 5★ Select Summon shows its animated field again.
+
 ## 2026-11-10: Ticket summons show up
 
 - Fixed bought summon tickets with no summon to use them on, such as the 1/10 NV Summon Tickets from the VIP Shop. While you hold them, NV Guaranteed EX Summon shows on the summon screen; one summon takes 10 tickets. The same fix covers the 5★ Select, Arena and 5+1 ticket summons.

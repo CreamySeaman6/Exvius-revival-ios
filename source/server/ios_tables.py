@@ -83,6 +83,9 @@ AREA = ("F_AREA_MST", "Fvix6V0n", "pR2DHS6i")
 # the pack actually served, or the phone downloads it again on every visit (captain_menu.served_size, 2026-11-10).
 # The second column (`mYtcPkQQ`) is never read by the game (the name isn't in libgame).
 MAP_CHECKSUM = ("F_RESOURCE_MAP_CHECKSUM_MST", "2RZ4uDoK", "29Rd7ra0")
+# The 5★ Select Summon's unit list (exvius_gacha_select.extra_unit_rows, 2026-11-10): limited and collab units added.
+# GachaSelectUnitMstResponse::readParam reads `3HriTp6B`, `e4mG8jTc`, `VjJQ51uG`, `m8ivD4NX`.
+SELECT_UNIT = ("F_GACHA_SELECT_UNIT_MST", "qRb73JSY", "H9Jye1j3")
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -246,6 +249,10 @@ def table_bump(spec, *roots) -> int:
     if spec == MAP_CHECKSUM:
         import captain_menu
         return 1000 + captain_menu.table_bump()   # the menu's revision changes with the pack, and only goes up
+    if spec == SELECT_UNIT:
+        import exvius_gacha_select
+        extra = [r["3HriTp6B"] for r in exvius_gacha_select.extra_unit_rows()]
+        return 1000 + zlib.crc32(",".join(extra).encode()) % 1000 if extra else 0
     if spec == AREA:
         import vortex_order
         order = vortex_order.priorities()
@@ -258,7 +265,7 @@ def version_bumps() -> dict[str, int]:
     import ios_texts
     out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.index_bump()}
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM):
+                 MAP_CHECKSUM, SELECT_UNIT):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -277,7 +284,7 @@ def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM):
+                 MAP_CHECKSUM, SELECT_UNIT):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -378,6 +385,19 @@ def patch_unit_sell(raw: bytes) -> tuple[bytes, int]:
             changed += 1
         out.append(line)
     return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
+def patch_select_units(raw: bytes) -> tuple[bytes, int]:
+    """`F_GACHA_SELECT_UNIT_MST` with the limited and collab 5★ units added (exvius_gacha_select.extra_unit_rows)."""
+    import exvius_gacha_select
+    out, have, double = [], set(), False
+    for line, row, dbl in _rows(raw, SELECT_UNIT[2]):
+        out.append(line)
+        have.add(str(row.get("3HriTp6B")))
+        double = dbl
+    added = [r for r in exvius_gacha_select.extra_unit_rows() if r["3HriTp6B"] not in have]
+    out += [_encrypt(SELECT_UNIT[2], row, double) for row in added]
+    return ("\n".join(out) + "\n").encode("ascii"), len(added)
 
 
 def patch_area_order(raw: bytes) -> tuple[bytes, int]:
@@ -494,6 +514,9 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == UNIT:
             data, changed = patch_unit_sell(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} story-unit row(s) given a sell price"
+        if spec == SELECT_UNIT:
+            data, changed = patch_select_units(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} limited/collab unit(s) added to the 5★ Select list"
         if spec == AREA:
             data, changed = patch_area_order(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} Vortex area(s) given their tile order"

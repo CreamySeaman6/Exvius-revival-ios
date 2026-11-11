@@ -76,6 +76,19 @@ def button_art_index() -> dict:
 def _btn_exists(base: str) -> bool:
     idx = button_art_index()
     return f"{base}_1.png" in idx or f"{base}_ticket_1.png" in idx
+def _ticket_group_of(cost: dict):
+    """The `F_TICKET_MST` group (`zF6QIY2r`) holding the cost item (`89EvGKHx` type, `tL6G9egd` id), or None."""
+    from player_state import _load_ndjson
+    kind = '23' if str(cost.get('kind')) == 'important' else '20'
+    rows = _load_ndjson('F_TICKET_MST.ndjson')
+    rows = rows.get('__rows__') or list(rows.values())
+    for row in rows:
+        if (isinstance(row, dict) and str(row.get('89EvGKHx')) == kind
+                and str(row.get('tL6G9egd')) == str(cost.get('item_id')) and row.get('zF6QIY2r')):
+            return int(row['zF6QIY2r'])
+    return None
+
+
 def _primary_cost(banner: dict) -> dict:
     """The banner's FIRST cost entry as a dict (for a class check). `cost` may be a LIST (multi-entry)."""
     cost = banner.get("cost")
@@ -144,6 +157,12 @@ def gacha_field_units(banner: dict) -> list:
                         ids += [str(unit) for unit in units if str(unit).isdigit()]
         elif isinstance(pool, list):
             ids += [str(row['unit_id']) for row in pool if row.get('unit_id')]
+    if not ids and banner.get('selection'):
+        # A select summon has no pool; pose the first unit its list offers so the pay scene draws its field.
+        from player_state import _load_ndjson
+        rows = _load_ndjson('F_GACHA_SELECT_UNIT_MST.ndjson')
+        rows = rows.get('__rows__') or list(rows.values())
+        ids += [str(r['3HriTp6B']) for r in rows[:1] if isinstance(r, dict) and r.get('3HriTp6B')]
     return ids[:1]
 _CAMPAIGN_DOC = None          # lazily loaded `gacha_campaigns.json`
 _CAMPAIGN_LOGGED = [False]    # the selection is announced once, not on every reply
@@ -380,6 +399,15 @@ def with_global_buttons(b: dict) -> dict:
             and not b.get('purchase_limit')
             and b.get('ticket_group_id') in (None, 10010, '10010')):
         b['ticket_group_id'] = 10020
+    # A select summon (GachaMst type 6, e.g. 9200030 5★ Select Summon) opens its unit list only when the
+    # ticket it costs is in the detail row's ticket group: GachaDetailScene::touchEnded (0x213f9cc, type 6 ->
+    # 0x213fbf4) asks TicketMstList::getMstObject(detail, type, id) (0x1c632fc), which searches only the
+    # tickets of group detail+0x88 (`RZ6z12Dt`). With no group the tap silently did nothing (2026-11-10).
+    if (str(b.get('type')) == 'select' and not b.get('ticket_group_id')
+            and str(cost.get('kind')) in ('important', 'item') and cost.get('item_id')):
+        group = _ticket_group_of(cost)
+        if group:
+            b['ticket_group_id'] = group
     if str(cost.get('kind')) in ('lapis', 'free'):
         b['img_btn_primary'] = _gold_button(cost, draws)
     else:
