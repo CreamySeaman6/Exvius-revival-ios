@@ -77,14 +77,14 @@ def _catalogue(cutoff=None):
             import replay
             from datetime import date
             if any(r['kind'] == 10 and not replay.released_by(r['id'], date.fromisoformat(cutoff))
-                   for r in parse(reward)):
+                   for r in parse(reward, exchange=bool(medal))):
                 return
         row = {'jPV7Xc4N': str(pid), '3X1gLufw': str(did), 'P4puB2ch': reward,
                'e4mG8jTc': str(price), 'uYcL8IQ1': str(-1 if int(limit) == 2147483647 else limit),
                'Z0EN6jSh': str(len(products) + 1),
                '6uvHX2JG': '', 'VjJQ51uG': START, 'm8ivD4NX': END, 'fbcj5Aq9': '', 'JasF1S3u': ''}
         products.append(row)
-        offers[str(pid)] = {'detail': str(did), 'rewards': parse(reward), 'cost': currency,
+        offers[str(pid)] = {'detail': str(did), 'rewards': parse(reward, exchange=bool(medal)), 'cost': currency,
                             'price': int(price), 'limit': int(limit), 'monthly': monthly,
                             'medal': str(medal) if medal else None}
 
@@ -186,7 +186,7 @@ def _exchange_ok(reward) -> bool:
     from exvius_actions_shops import _rewards
     from player_state import _load_ndjson
     try:
-        rows = parse(reward)
+        rows = parse(reward, exchange=True)     # exchange rows: any rate field (exvius_rewards.parse)
         for row in rows:
             if row['kind'] == 60:
                 book = _load_ndjson('F_RECIPE_BOOK_MST.ndjson', 'staFu8U1').get(str(row['id']))

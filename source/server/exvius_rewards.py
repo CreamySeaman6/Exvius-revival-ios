@@ -33,14 +33,18 @@ def _substitutes():
     return _SUBSTITUTES
 
 
-def parse(raw):
+def parse(raw, exchange=False):
+    """Reward tuples `kind:id:count[:rate[:...]]`. A rate other than 100 is refused, except for an exchange
+    (`exchange=True`): a purchase always pays, and four F_MEDAL_EXCHANGE_MST rows carry other values there
+    (Mana Mystery's Aura Glove 70712 `:101` and Ninja's Trump 70713 `:102`; 226406/228606 `:0`). Refusing
+    them raised in King Mog's store and the phone showed "A connection error has occurred" (2026-11-11)."""
     result = []
     for entry in filter(None, str(raw or '').split(',')):
         fields = [field.strip() for field in entry.split(':')]
         if len(fields) not in (3, 4, 5, 7, 9, 10) or not all(f.isascii() and f.isdigit() for f in fields):
             raise ValueError('invalid native reward tuple: ' + entry)
         kind, iid, count = map(int, fields[:3])
-        if count <= 0 or (len(fields) > 3 and fields[3] != '100'):
+        if count <= 0 or (len(fields) > 3 and fields[3] != '100' and not exchange):
             raise ValueError('invalid native reward quantity or rate')
         reward = {'kind': kind, 'id': iid, 'count': count}
         if kind == 60:

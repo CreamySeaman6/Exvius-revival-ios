@@ -2,9 +2,20 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: Daily summons, Mana Mystery shop
+
+- Fixed once-a-day summons (such as the Lunar New Year free summon) showing a pull available again in the evening after you'd used it. The day now resets at 04:00 UTC (11 pm New York time in winter), like the server's other daily resets, and the summon screen shows it the same way.
+- Fixed "A connection error has occurred" when buying Aura Glove or Ninja's Trump in the Mana Mystery (Secret of Mana) shop. Both can be bought now, and they also show in the Shop's exchange list. Every other exchange item was checked and buys fine.
+
+## 2026-11-10: Free summons after ticket summons, extra ticket banners
+
+- Fixed a free daily summon (such as Celebrating Lunar New Year) showing a white crystal and giving nothing after you'd used a ticket summon. The game was still naming the last ticket you used; the server now ignores a ticket the summon doesn't take, and a free summon never uses up a ticket.
+- A summon that fails no longer shows "Already Summoned" when it wasn't counted.
+- Holding a ticket now only adds that ticket's own summon. The 2019 "5★ Select Ticket Lapis Summon" no longer appears in Limited Time, and summons that were listed twice (NV Guaranteed EX Summon, Bonus Present Ticket Summon) show once.
+
 ## 2026-11-10: More units in the 5★ Select Summon
 
-- The 5★ Select Summon now also offers Global's limited and collaboration 5★ units (80 more, such as 2B, Sora, Edward Elric and Lara Croft), at the same 10 tickets. Open the game twice so it picks up the new list.
+- The 5★ Select Summon now also offers Global's limited and collaboration 5★ units (80 more, such as 2B, Sora, Edward Elric and Lilith), at the same 10 tickets. Open the game twice so it picks up the new list.
 
 ## 2026-11-10: 5★ Select Summon works
 

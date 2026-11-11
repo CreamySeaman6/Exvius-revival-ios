@@ -744,7 +744,7 @@ def medal_exchange(spec, req):
         _product(20, currency)
         costs.append({"kind": 20, "id": currency, "count": _int(row["Qy5EvcK1"]) * quantity})
         from exvius_rewards import parse
-        for reward in parse(row.get('7iJpH5zZ')):
+        for reward in parse(row.get('7iJpH5zZ'), exchange=True):
             reward['count'] *= quantity
             rewards.append(reward)
         counts[iid] = _int(counts.get(iid, 0)) + quantity

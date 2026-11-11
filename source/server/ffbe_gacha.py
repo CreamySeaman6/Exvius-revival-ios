@@ -807,6 +807,16 @@ def serve_gacha(spec, plaintext: str | None = None, reply_id=None):
                            "zoU5J3Kq": "1", "oY0vAuE9": "0"}]
         if State.player:
             out.update(State.player.currency_groups())
+            # The server's own per-banner counts, so a refused once-a-day pull isn't shown as "Already
+            # Summoned" (it wasn't counted: roll_gacha records the day only after a pull succeeds).
+            try:
+                banners = all_banners()
+                if os.environ.get('EXVIUS_SUMMON_ARCHIVE') == '1':
+                    from gacha_archive import visible_banners
+                    banners = visible_banners(State.player, banners)
+                out[GACHA_USER_INFO_TAG] = State.player.gacha_user_rows(banners)
+            except Exception as exc:  # noqa: BLE001 -- the decline itself must still go out
+                _note(f"gacha: counts not refreshed on a declined pull ({exc!r})")
         return out
     if banner is not None:
         # The CLIENT's request tokens (verified live 2026-09-21, `out/requests/*`, GachaExeRequest):

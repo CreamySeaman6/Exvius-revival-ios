@@ -1167,14 +1167,30 @@ def ticket_by_id(ticket_id) -> tuple | None:
     return None
 
 
-def gacha_period(banner):
-    """Calendar bounds used by both purchase limits and the native used-count row."""
-    from datetime import date, timedelta
-    today = date.fromtimestamp(time.time())
+GACHA_DAY_RESET = 14400       # 04:00 UTC: the offline daily reset (exvius_actions_expedition.DAY_ANCHOR)
+
+
+def gacha_period(banner, now: float | None = None):
+    """(period key, first moment, last moment) of a once-a-day (or once-a-week) summon's current period.
+
+    The day runs from 04:00 UTC to 03:59:59 UTC, the server's daily reset (2026-11-11; it was the server's
+    local midnight). The two moments are UTC "YYYY-MM-DD HH:MM:SS" strings because the phone reads the
+    used-count row's window that way: `UserGachaInfoList::getObjectToday` (0x1dfb9e0) converts both with
+    `CommonUtils::convertToTime` (strptime + timegm) and compares them with the server-adjusted time. A window
+    of New York calendar dates read as UTC ended at 7 pm New York time, so the Lunar New Year free summon
+    showed a pull available again for the rest of the evening (the server still refused it). A weekly period
+    starts on Monday at the same reset. The key is the UTC date the period starts on."""
+    from datetime import datetime, timedelta, timezone
+    now = time.time() if now is None else now
+    day = (int(now) - GACHA_DAY_RESET) // 86400
+    start = datetime.fromtimestamp(day * 86400 + GACHA_DAY_RESET, timezone.utc)
+    length = 1
     if banner.get('weekly_limit'):
-        start = today - timedelta(days=today.weekday())
-        return str(start), str(start), str(start + timedelta(days=6))
-    return str(today), str(today), str(today)
+        start -= timedelta(days=start.weekday())
+        length = 7
+    end = start + timedelta(days=length) - timedelta(seconds=1)
+    fmt = '%Y-%m-%d %H:%M:%S'
+    return start.strftime('%Y-%m-%d'), start.strftime(fmt), end.strftime(fmt)
 
 
 def expand_pool(banner: dict) -> list:
@@ -4339,6 +4355,25 @@ class PlayerState:
         # 9100203 + ticket 12 with 10 held -> lapis 500 > 340 -> "refused (cost/affordability)", no award, so
         # nothing ever accumulated. The `elif` below (no ticket named) stays for a ticket-ONLY banner.
         named = ticket_by_id(ticket_id) if ticket_id not in (None, "", 0, "0") else None
+        # A ticket the banner can't take is ignored, not refused or spent (2026-11-10). The phone keeps the
+        # last ticket in UserState+0x88 (GachaTicketConfirmScene::checkExeTicketGacha 0x2169cbc and the select
+        # path set it) and not every summon path clears it, so a free daily pulled after a ticket summon named
+        # the NV ticket 110260: refused as "unknown ticket" -> white crystal, nothing awarded. A known ticket
+        # (5★ Select 27, 5★ EX 12) on a banner with no ticket group was even spent on the free pull. A banner
+        # takes a ticket only through its ticket group or, for an item-paid banner, its cost item (below).
+        item_paid = (isinstance(cost, dict) and str(cost.get("kind")) in ("item", "important")
+                     and cost.get("item_id"))
+        group = banner.get("ticket_group_id")
+        if item_paid:     # only its own cost item; an unknown id falls back to that item below
+            cost_type = 23 if str(cost.get("kind")) == "important" else 20
+            stale = named is not None and (int(named[0]), int(named[1])) != (cost_type, int(cost["item_id"]))
+        else:
+            stale = ticket_id not in (None, "", 0, "0") and (
+                not group or named is None or named not in ticket_group_items(group))
+        if stale:
+            print(f"    gacha: ticket {ticket_id} isn't one banner {banner.get('id')} takes "
+                  f"(group {group!r}); left unused, the banner's own cost applies", flush=True)
+            ticket_id, named = None, None
         if ticket_id not in (None, "", 0, "0") and named is None:
             if isinstance(cost, dict) and str(cost.get("kind")) in ("item", "important") and cost.get("item_id"):
                 # An item-paid banner (the SP Summon Tickets, global_bundles.json) has no F_TICKET_MST row: the
@@ -4568,7 +4603,7 @@ class PlayerState:
                 used = daily.get(state_id) or {}
                 period, first, last = gacha_period(b)
                 rows.append({"X1IuZnj2": str(b["id"]), "nqzG3b2v": str(b.get("detail_id", "")),
-                             "Lqenh7d2": first + " 00:00:00", "u7dM3XwK": last + " 23:59:59",
+                             "Lqenh7d2": first, "u7dM3XwK": last,
                              "08MuyfqD": str(int(used.get("count") or 0) if used.get("date") == period else 0),
                              "L4QmV0Nz": str(self.banner_state(state_id)["total_exe_count"])})
                 continue
