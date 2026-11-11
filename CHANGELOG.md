@@ -2,6 +2,11 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: Farplane intro, Convert screen
+
+- Fixed every way into the Farplane (the monuments, or walking from King Mog's area to the Tower of Earth) replaying the first Farplane scene and sending you back to Mitra. Open the game twice after updating. Two lost Farplane scenes (the Crest scene and the end of the Moogle quests) stay left out.
+- Convert to Prism, Convert to Fragments and Trust Coin conversion list your units again, NV units included. This was fixed by the Guide update earlier today.
+
 ## 2026-11-11: Missed first-clear rewards
 
 - First-clear rewards (Lapis, items, units) for quests you cleared but were never paid for now arrive by mail the next time you start the game, once per quest. Rewards you already got aren't sent again. To turn this off, set `EXVIUS_FIRST_CLEAR_MISSED` to `0` (see the README).

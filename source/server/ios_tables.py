@@ -54,6 +54,9 @@ freezes or closes the iPhone app on the quest screen. `F_QUEST_MST` is served wi
 with his menu worked out at login; `F_RESOURCE_MAP_VERSION_MST_LOCALIZE` gives it a new version whenever the list
 changes, `F_RESOURCE_MAP_CHECKSUM_MST` the size of the pack served (else the phone downloads it on every visit),
 and this module serves it.
+
+10. THE FARPLANE INTRO ON EVERY VISIT (2026-11-11). `F_MAP_EXT_RESOURCE_MST` is served without the two Farplane scene
+packs the content fill had filled with a copy of the intro (`STAND_IN_SCENES`, `EXVIUS_FARPLANE_SCENES`).
 """
 from __future__ import annotations
 
@@ -90,6 +93,17 @@ SELECT_UNIT = ("F_GACHA_SELECT_UNIT_MST", "qRb73JSY", "H9Jye1j3")
 # which the Japanese data fills in katakana for 216 of 339 cards, so an English search never found them
 # (`GameUtils::getSearchUserVisionCardInfoList`). Served with the English name there (`vision_search_names`).
 VISION_CARD = ("F_VISION_CARD_MST", "G9K8kLXz", "6MS9LGhA")
+# Which scene packs a town or quest loads (2026-11-11). `MissionStartScene::setupMapExtResource` (GL 0x1e63434) loads
+# a row's packs (`Y4PER0gB`) when its `a3u6d1re` switches are all on and none of its `ECcDwp14` switches is; an empty
+# `a3u6d1re` never loads. Served with the Farplane scenes the content fill replaced with the Farplane intro left out
+# (`farplane_scenes`).
+MAP_EXT = ("F_MAP_EXT_RESOURCE_MST", "En90A5BC", "9dA6bguS")
+# The two Farplane scene packs the content fill (`fill_content_from_memorial.py`, LEGACY_STORY_PACKAGES until
+# 2026-11-11) filled with a copy of the Farplane intro (211020101.cpk), which plays the intro and moves the player to
+# Mitra. The Crest scene loads on every visit to the Farplane once it is open (switch 10005001, which every save
+# here has for the Vortex), so every way in played the intro. Neither real scene survives in English.
+STAND_IN_SCENES = {"390001201": "211020111.cpk (the Crest scene)",
+                   "390001213": "211020123.cpk (the end of the Moogle quests)"}
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -255,6 +269,10 @@ def table_bump(spec, *roots) -> int:
         return 1000 + captain_menu.table_bump()   # the menu's revision changes with the pack, and only goes up
     if spec == VISION_CARD:
         return 1000 + zlib.crc32(b"vision-search-english-v1") % 1000 if english_search() else 0
+    if spec == MAP_EXT:
+        # Off still serves the table (the shipped rows) one version higher, so a phone that got the fixed rows
+        # goes back to the shipped ones.
+        return 1000 if farplane_scenes() else 1001
     if spec == SELECT_UNIT:
         import exvius_gacha_select
         extra = [r["3HriTp6B"] for r in exvius_gacha_select.extra_unit_rows()]
@@ -271,7 +289,7 @@ def version_bumps() -> dict[str, int]:
     import ios_texts
     out = {RESOURCE[0]: version_bump(), ios_texts.INDEX[0]: ios_texts.index_bump()}
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD):
+                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD, MAP_EXT):
         out[spec[0]] = table_bump(spec)
     return {name: bump for name, bump in out.items() if bump}
 
@@ -290,7 +308,7 @@ def _which(rel: str):
     if version_bump() and _path(RESOURCE[1]).search(rel):
         return RESOURCE
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
-                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD):
+                 MAP_CHECKSUM, SELECT_UNIT, VISION_CARD, MAP_EXT):
         if _path(spec[1]).search(rel) and table_bump(spec):
             return spec
     return None
@@ -419,6 +437,28 @@ def patch_vision_search(raw: bytes) -> tuple[bytes, int]:
         name = names.get(str(row.get("5giCMUd2")))
         if name and row.get("cnLF6Cz1") != name:
             line = _encrypt(VISION_CARD[2], dict(row, cnLF6Cz1=name), double)
+            changed += 1
+        out.append(line)
+    return ("\n".join(out) + "\n").encode("ascii"), changed
+
+
+def farplane_scenes() -> bool:
+    """EXVIUS_FARPLANE_SCENES (default on; 0 = off): leave out the Farplane scenes in STAND_IN_SCENES."""
+    return os.environ.get("EXVIUS_FARPLANE_SCENES", "1").strip().lower() not in ("0", "off", "false", "no")
+
+
+def patch_map_ext(raw: bytes) -> tuple[bytes, int]:
+    """`F_MAP_EXT_RESOURCE_MST` with the STAND_IN_SCENES packs taken out of their rows; a row left with no pack
+    gets an empty `a3u6d1re`, so it never loads."""
+    out, changed = [], 0
+    for line, row, double in _rows(raw, MAP_EXT[2]):
+        packs = [p for p in str(row.get("Y4PER0gB") or "").split(",") if p]
+        kept = [p for p in packs if p not in STAND_IN_SCENES]
+        if len(kept) != len(packs):
+            row = dict(row, Y4PER0gB=",".join(kept))
+            if not kept:
+                row["a3u6d1re"] = ""
+            line = _encrypt(MAP_EXT[2], row, double)
             changed += 1
         out.append(line)
     return ("\n".join(out) + "\n").encode("ascii"), changed
@@ -554,6 +594,11 @@ def serve(rel: str, *roots: str | None) -> tuple[bytes | None, str | None]:
         if spec == VISION_CARD:
             data, changed = patch_vision_search(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} Vision Card search name(s) set to English"
+        if spec == MAP_EXT:
+            if not farplane_scenes():
+                return open(src, "rb").read(), f"{os.path.basename(src)}, shipped rows (EXVIUS_FARPLANE_SCENES=0)"
+            data, changed = patch_map_ext(open(src, "rb").read())
+            return data, f"{os.path.basename(src)}, {changed} Farplane stand-in scene row(s) left out"
         if spec == SELECT_UNIT:
             data, changed = patch_select_units(open(src, "rb").read())
             return data, f"{os.path.basename(src)}, {changed} limited/collab unit(s) added to the 5★ Select list"
