@@ -203,6 +203,9 @@ PIPELINE: tuple = (
     # Event currency on every clear (event_currency.py): the battle drops Global's exchange events paid.
     Step("pay_event_currency", lambda c: __import__("event_currency").pay(c.spec, c.mid, c.plaintext),
          "state", "State.player.inventory", "an exchange event's currency, paid on each clear and listed"),
+    # A quest's own clear Gil (mission_gil.py): the phone only counts its monsters' Gil.
+    Step("pay_mission_gil", lambda c: __import__("mission_gil").pay(c.spec, c.mid, c.plaintext),
+         "state", "State.player.currencies", "the quest's clear Gil, paid on each clear and shown"),
     Step("grant_cleared_mission", lambda c: grant_cleared_mission(c.spec, c.mid, c.plaintext),
          "state", "State.player.switches", "the completed mission grants its own open switch"),
     # Story units join once their story point is cleared (story_units.py); a save already past it gets

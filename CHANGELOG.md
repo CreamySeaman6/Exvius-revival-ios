@@ -2,6 +2,16 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: NV awakening
+
+- NV awakening no longer needs level 120 or 100% Super Trust, as on Global since Version 7.0.0 (March 2022). It still costs its materials and Gil.
+- If an awakening can't be completed, the game now shows a message saying why instead of crashing in the awakening animation. Nothing is used.
+
+## 2026-11-11: Convert table, Chamber of Riches Gil
+
+- Correction to the previous entry: the Convert to Prism and Convert to Fragments lists also need a game table the game never loaded on iPhone. The game now downloads it again; open the game twice after updating.
+- Quests now pay their own clear Gil. The Chamber of Riches pays almost all its Gil this way (1,500 to 85,000 per run), so it paid nothing before. Runs before this update aren't paid back.
+
 ## 2026-11-11: Farplane intro, Convert screen
 
 - Fixed every way into the Farplane (the monuments, or walking from King Mog's area to the Tower of Earth) replaying the first Farplane scene and sending you back to Mitra. Open the game twice after updating. Two lost Farplane scenes (the Crest scene and the end of the Moogle quests) stay left out.

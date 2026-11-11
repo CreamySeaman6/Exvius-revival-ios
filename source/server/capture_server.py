@@ -287,6 +287,8 @@ class Handler(BaseHTTPRequestHandler):
         # docs/SERVER_REFACTOR_PLAN.md Phase 2). Everything that is the REQUEST's I/O rather than the
         # REPLY's construction -- dispatch, the hot-reload checks, the record, the envelope -- stays here.
         if missing_battle is None:
+            import client_message
+            client_message.clear()   # a message belongs to this request only
             spec = reply_pipeline(spec, reply_id=reply_id, plaintext=plaintext,
                                   mid=None if menu_resource else mid, spec_key=spec_key)
         # Ask a stock client for its own error log, and keep what it uploads (client_reports.py).
@@ -337,6 +339,11 @@ class Handler(BaseHTTPRequestHandler):
             payload = {"t7n6cVWf": [{"qrVcDe48": b64}], "TEAYk6R1": [hdr]}
         else:
             raise SystemExit(f"unknown ENVELOPE mode {mode!r}")
+        # A message the phone shows instead of the result (client_message.py: a refused awakening).
+        import client_message
+        message = client_message.take()
+        if message:
+            payload["bCf65yoK"] = message
         is_action = "/actionSymbol/" in self.path
         data = json.dumps(payload).encode() if is_action else b"{}"
         if missing_battle:

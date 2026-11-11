@@ -57,6 +57,13 @@ def mission_restart(spec, req):
     return _refresh(spec)
 
 
+def _refuse_awakening(spec, why):
+    """A refused awakening: the phone shows this instead of opening the animation (client_message.py)."""
+    import client_message
+    client_message.set(f"The awakening couldn't be completed ({why}). Nothing was used.")
+    return spec
+
+
 def unit_class_up(spec, req):
     """UnitClassUpRequest (awakening): group `sWc7EH69`, `og2GHy49` = the base unit. F_UNIT_CLASS_UP_MST
     names the next rarity (`t74crqAL`), its gil (`7UR4J2SE`) and materials (`KCk8u0am`). The reply is
@@ -67,18 +74,18 @@ def unit_class_up(spec, req):
     unit = next((u for u in State.player.data["roster"] if str(u["instance_id"]) == iid), None)
     if unit is None or State.player.mode == 'frozen':
         _note(f"unit-class-up: unit {iid or '?'} not in the roster")
-        return spec
+        return _refuse_awakening(spec, "the unit isn't in your unit list")
     step = _mst("F_UNIT_CLASS_UP_MST.ndjson", "3HriTp6B").get(str(unit["master_id"]))
     if not step:
         _note(f"unit-class-up: no F_UNIT_CLASS_UP_MST row for {unit['master_id']}")
-        return spec
+        return _refuse_awakening(spec, "this unit has no further awakening")
     materials = str(step.get("KCk8u0am") or "")
     gil = int(step.get("7UR4J2SE") or 0)
     rows = [m.split(":") for m in materials.split(",") if m.count(":") == 2]
     if any(State.player.item_count(int(k), i) < int(c) for k, i, c in rows) or \
             int(State.player.currencies.get("gil", 0)) < gil:
         _note(f"unit-class-up: {unit['master_id']} lacks materials or gil; not awakened")
-        return spec
+        return _refuse_awakening(spec, "not enough materials or gil")
     for k, i, c in rows:
         State.player.spend_item(int(k), i, int(c))
     State.player.spend_currency("gil", gil)

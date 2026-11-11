@@ -104,6 +104,13 @@ MAP_EXT = ("F_MAP_EXT_RESOURCE_MST", "En90A5BC", "9dA6bguS")
 # here has for the Vortex), so every way in played the intro. Neither real scene survives in English.
 STAND_IN_SCENES = {"390001201": "211020111.cpk (the Crest scene)",
                    "390001213": "211020123.cpk (the end of the Moogle quests)"}
+# Tables advertised one step higher so the phone downloads them again, served as shipped (`_cdn_fetch` maps any
+# `Ver<N>_<token>.dat` back to the one shipped file). F_SACRIFICE_MST (2026-11-11): a player's game error log showed
+# "Failed to load MST. REASON=File does not exist. MSTNAME=F_SACRIFICE_MST MSTFILE=w5JFGPh3" 42 times (unit menus,
+# Convert). The server advertises and serves it (sandbox), so the phone holds the version without the table: it loads
+# this table through a row index it builds after the download (`mst/w5JFGPh3.i`, GL 0x1c4cfa8) and never built it.
+# A new version makes it download the table and build the index again. `EXVIUS_REFETCH_TABLES=0` turns it off.
+REFETCH = {"F_SACRIFICE_MST": "w5JFGPh3"}
 URL_KEY_FIELD = "gu8McTA6"
 # The host the Drop Rates page is opened on. NOT v900 (the notice host): `WebViewCommon::showWebView`
 # (GL 0x258bbf8) skips the page's posted fields (`gacha_id`) when the address contains the game setting
@@ -291,7 +298,15 @@ def version_bumps() -> dict[str, int]:
     for spec in (RESOURCE_VERSION, RESOURCE_MAP_VERSION, RESOURCE_CHECKSUM, QUEST, URL, CHALLENGE, MISSION, UNIT, AREA,
                  MAP_CHECKSUM, SELECT_UNIT, VISION_CARD, MAP_EXT):
         out[spec[0]] = table_bump(spec)
+    if refetch_tables():
+        for name in REFETCH:
+            out[name] = out.get(name, 0) + 1000
     return {name: bump for name, bump in out.items() if bump}
+
+
+def refetch_tables() -> bool:
+    """EXVIUS_REFETCH_TABLES (default on; 0 = off): advertise the REFETCH tables 1000 higher."""
+    return os.environ.get("EXVIUS_REFETCH_TABLES", "1").strip().lower() not in ("0", "off", "false", "no")
 
 
 def _path(token: str):
