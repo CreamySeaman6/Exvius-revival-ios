@@ -179,7 +179,13 @@ def unit_equip(spec, req):
 
 
 def sacrifice(spec, req, group="6kvFj2Kw"):
-    """Consume eligible units only after resolving the fragment rewards for the full batch."""
+    """Consume eligible units only after resolving the rewards for the full batch.
+
+    The phone's two buttons (convert_rules.py): `SacrificeRequest` rows with `ijEey5f7` 0 are Convert to Prism (the
+    family's prism only), 1 Convert to Fragments (the fragments of the row the phone showed, no prism);
+    `NvSacrificeRequest` is Convert to Fragments for summoned NVs. Before 2026-11-12 both buttons paid prism and
+    fragments."""
+    import convert_rules
     from exvius_actions_shops import deployed_unit_ids
     from player_state import unit_mst
 
@@ -187,7 +193,6 @@ def sacrifice(spec, req, group="6kvFj2Kw"):
     nodes = req.get(group)
     if player.mode == "frozen" or not isinstance(nodes, list) or not nodes:
         return spec
-    table = _mst("F_SACRIFICE_MST.ndjson", "woghJa61")
     deployed = deployed_unit_ids(player)
     ids, rewards, result = set(), [], []
     for node in nodes:
@@ -196,16 +201,10 @@ def sacrifice(spec, req, group="6kvFj2Kw"):
         if not unit or iid in ids or iid in deployed or unit.get("favourite"):
             return _refresh(spec)
         master = unit_mst(unit["master_id"]) or {}
-        row = table.get(str(unit["master_id"])) or table.get(master.get("woghJa61"))
-        if not row:
-            return _refresh(spec)
-        # The native picker can send pure NV units through SacrificeRequest.
-        # The unit's master row determines its rewards for either request.
-        items = str(row.get("1swM3H4T") or row.get("q1PJQ3eE") or "")
+        to_prism = group != "4Ncra9DF" and str(node.get("ijEey5f7", "1")) == "0"
+        prism = (convert_rules.prism(master) or "0") if to_prism else "0"
+        items = "" if to_prism else (convert_rules.fragments(master) or "")
         unit_rewards = _parse_rewards(items)
-        prism = str(row.get("tL6G9egd") or "0")
-        if group == "4Ncra9DF":
-            prism = "0"
         if prism != "0":
             unit_rewards.insert(0, {"kind": 20, "id": int(prism), "count": 1})
         if not unit_rewards or any(not player._can_credit(reward) for reward in unit_rewards):

@@ -107,9 +107,9 @@ STAND_IN_SCENES = {"390001201": "211020111.cpk (the Crest scene)",
 # Tables advertised one step higher so the phone downloads them again, served as shipped (`_cdn_fetch` maps any
 # `Ver<N>_<token>.dat` back to the one shipped file). F_SACRIFICE_MST (2026-11-11): a player's game error log showed
 # "Failed to load MST. REASON=File does not exist. MSTNAME=F_SACRIFICE_MST MSTFILE=w5JFGPh3" 42 times (unit menus,
-# Convert). The server advertises and serves it (sandbox), so the phone holds the version without the table: it loads
-# this table through a row index it builds after the download (`mst/w5JFGPh3.i`, GL 0x1c4cfa8) and never built it.
-# A new version makes it download the table and build the index again. `EXVIUS_REFETCH_TABLES=0` turns it off.
+# Convert). The server advertises and serves it (sandbox), so the phone held a version whose file it didn't have
+# (GL 0x1c4cfa8 checks `Ver<version>_w5JFGPh3.dat`; the row index `mst/w5JFGPh3.i` it builds itself, and rebuilds when
+# the version changes, 2026-11-12). A new version makes it download the file. `EXVIUS_REFETCH_TABLES=0` turns it off.
 REFETCH = {"F_SACRIFICE_MST": "w5JFGPh3"}
 # Ability descriptions (`T7aEx3Mj`) of restored units still in Japanese (content/restored_unit_text.json; Kira's
 # variants, 2026-11-12). Token/key from libgame.

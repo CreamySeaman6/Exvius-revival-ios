@@ -2,6 +2,17 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Convert to Prism and Fragments
+
+- NV units you got by NV awakening (Dark Fina, Lightning and the like) now show in Convert to Fragments.
+- Convert to Prism now gives only the prism, and Convert to Fragments only the fragments. Before, both gave both.
+- Which units each list shows, as on Global:
+  - Convert to Prism lists units at 5★ or 6★ that have a prism. That's nearly every unit that starts at 5★, but only 10 units that start at 3★ or 4★, and those only once they reach 5★. A 4★ unit at 4★ and any 7★ unit are never listed.
+  - Convert to Fragments lists units with NV fragments, and NV units.
+  - Trust Coin and Gil conversion never list NV units.
+- New setting `EXVIUS_NV_AWAKENED_FLAG` (see the README).
+- Open the game twice after updating.
+
 ## 2026-11-12: Game data download location
 
 - The game data is now downloaded from a copy hosted with this project. Rebuild to pick up the change (`docker compose build && docker compose up -d`); nothing downloads again, your installed data is unchanged.
