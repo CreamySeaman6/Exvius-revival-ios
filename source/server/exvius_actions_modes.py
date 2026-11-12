@@ -335,7 +335,7 @@ def _challenges(mid, run, req, base_result=None):
     result.setdefault('kcb0tsM6', '0')
     result.setdefault('16LQuC5r', '0')
     if rewards:
-        result["REB5tAL9"] = ",".join(f"{r['kind']}:{r['id']}:{r['count']}" for r in rewards)
+        result["REB5tAL9"] = __import__('exvius_rewards').reward_text(rewards)
     if fresh:
         result["qdhWF7z9"] = ",".join(fresh)
     return [result]

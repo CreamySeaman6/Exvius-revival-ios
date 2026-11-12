@@ -2,6 +2,15 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Friend 10x, LB EXP, Kira, Metal Gigantuar card, all banners
+
+- The friend point Standard Summon has a 10x button: 10 units for 2,000 friend points.
+- Clearing a quest now gives LB EXP to every unit in your party, as on Global: 100 per stamina, 250 per raid orb, 100 per weapon-enhancement orb. Losing or retiring gives none.
+- Kira's abilities that showed no name in battle now have English names and descriptions.
+- Fixed the game crashing when you view the Metal Gigantuar's Here! vision card in the VIP Shop (and other vision cards sold or won the same way).
+- `EXVIUS_SUMMON_ROTATION` set to `0` now shows every banner at once and also turns the historic replay off. Change it in `docker-compose.yml`, then run `docker compose up -d` (see the README).
+- Open the game twice after updating.
+
 ## 2026-11-11: Omniprism
 
 - Awakening a 6★ unit to 7★ with an Omniprism now works. Before, the server only accepted the unit's own prism and refused the awakening.

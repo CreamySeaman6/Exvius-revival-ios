@@ -41,7 +41,8 @@ services:
       # 1 asks the game to upload its own error log (saved in server/client-reports/) for troubleshooting,
       # once per launch (tens of MB each). Leave it 0 otherwise.
       EXVIUS_CLIENT_REPORTS: "0"
-      # Weekly summon rotation (see source/server/gacha_rotation.py). Set to 0 to show every banner.
+      # Weekly summon rotation (see source/server/gacha_rotation.py). Set to 0 to show every banner at once;
+      # that also turns the historic replay below off. Then run: docker compose up -d
       EXVIUS_SUMMON_ROTATION: "1"
       EXVIUS_ROTATION_TZ: America/New_York
       EXVIUS_ROTATION_DAY: "6"        # 0 = Monday ... 6 = Sunday

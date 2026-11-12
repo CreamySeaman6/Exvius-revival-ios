@@ -339,7 +339,7 @@ def _lv_half(level, exp, stats, lb_level, lb_exp, trust=0) -> str:
     fields += [str(int(trust or 0)), str(lb_level), str(lb_exp), str(exp), "0", "0"]   # f9, LbLv, LbExp, a12=EXP, a13, a14
     assert len(fields) == 15, len(fields)
     return ":".join(fields)
-def mission_lv_info(player, exp_gain: int, trust: dict | None = None) -> str:
+def mission_lv_info(player, exp_gain: int, trust: dict | None = None, lb: dict | None = None) -> str:
     """The `Qic38SuC` value: one row per party member, `KEY@BEFORE_AFTER`.
 
     WHY THE KEY IS THE WHOLE POINT: `UserUnitLvInfo::init` stores the part before `@` as the LOOKUP KEY, and
@@ -351,6 +351,7 @@ def mission_lv_info(player, exp_gain: int, trust: dict | None = None) -> str:
     `quest_trust.roll`; a unit not in it shows its current trust in both halves (no change animated).
     """
     trust = trust or {}
+    lb = lb or {}       # instance id -> (lb level, lb exp before, after) from lb_exp.plan
     rows = []
     for iid in player.party_instance_ids():
         u = player.roster_row(iid)
@@ -365,8 +366,9 @@ def mission_lv_info(player, exp_gain: int, trust: dict | None = None) -> str:
         now = (list(u.get("affinity_points") or [""]) + [""])[0]
         now = int(now) if str(now).isdigit() else 0
         t_before, t_after = trust.get(str(iid), (now, now))
+        lbl, lbe, lbl_after, lbe_after = lb.get(str(iid), (lbl, lbe, lbl, lbe))
         before = _lv_half(lv, ex, unit_stats(u["master_id"], lv), lbl, lbe, t_before)
-        after = _lv_half(new_lv, new_ex, unit_stats(u["master_id"], new_lv), lbl, lbe, t_after)
+        after = _lv_half(new_lv, new_ex, unit_stats(u["master_id"], new_lv), lbl_after, lbe_after, t_after)
         rows.append(f"{iid}@{before}_{after}")
     return ",".join(rows)
 def per_unit_exp(total_exp) -> tuple[int, int, int]:
@@ -565,7 +567,22 @@ def _credit_mission_rewards(plaintext: str | None, spec=None):
             score_daily('trust_up', len(gains))
         for reward in trust.get('_rewards', []):
             paid.append(f"trust-master {reward['kind']}:{reward['id']}x{reward['count']}")
+    # LB EXP from the quest's stamina/orb cost (lb_exp.py), on a clear only. Planned from the current state so
+    # `Qic38SuC` shows the before/after halves, then written.
+    lb_gains = {}
+    if mission_result_from(plaintext).get('cleared') is True:
+        import lb_exp
+        lb_gains = lb_exp.plan(State.player, mission_id_from(plaintext))
+        lb_exp.apply(State.player, lb_gains)
+        if lb_gains:
+            paid.append('lb ' + ' '.join(f"{k}:{a}/{b}->{c}/{d}" for k, (a, b, c, d) in lb_gains.items()))
     uexp = src.get("S4U09svH")
+    if (lb_gains and isinstance(spec, dict)
+            and not (uexp is not None and str(uexp).isdigit() and int(uexp) > 0)):
+        lv_info = mission_lv_info(State.player, 0, trust, lb_gains)
+        for r in spec.get("09HRWXDf", []):
+            if isinstance(r, dict) and lv_info:
+                r["Qic38SuC"] = lv_info
     if uexp is not None and str(uexp).isdigit() and int(uexp) > 0 and isinstance(spec, dict):
         gain, n_members, remainder = per_unit_exp(uexp)
         # The party's TOTAL is logged alongside the share, so a run's exp can be re-derived from the log
@@ -573,7 +590,7 @@ def _credit_mission_rewards(plaintext: str | None, spec=None):
         # than only in the roster's levels.
         print(f"unit-exp: party total {int(uexp)} over {n_members} member(s) -> {gain} each"
               + (f" (remainder {remainder}, floored)" if remainder else ""), flush=True)
-        lv_info = mission_lv_info(State.player, gain, trust) if gain > 0 else ""
+        lv_info = mission_lv_info(State.player, gain, trust, lb_gains) if gain > 0 or lb_gains else ""
         levels = 0
         for iid in State.player.party_instance_ids():
             was = int((State.player.roster_row(iid) or {}).get("level", 1))
