@@ -2,6 +2,10 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Game data download location
+
+- The game data is now downloaded from a copy hosted with this project. Rebuild to pick up the change (`docker compose build && docker compose up -d`); nothing downloads again, your installed data is unchanged.
+
 ## 2026-11-12: Yuffie, Ayaka and Elly banners
 
 - Added three featured summons the replay was missing: Materia Hunter Yuffie (January 2023), Christmas 2022 Cheerful Caroler Ayaka, and Xenogears' Holy Mother Reborn Elly (December 2022). The 2017 Halloween summon now features its units.

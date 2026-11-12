@@ -89,7 +89,7 @@ Tailscale split DNS ── only gumi.sg / exvius.com questions ──▶  ffbe (
 - **Its own Tailscale address.** One container, `ffbe`, runs Tailscale (joining your tailnet as a machine called `ffbe`) and the game server together. If either stops, both restart together. Nothing listens on your computer's own ports, so it can't clash with anything else you run.
 - **A tiny DNS responder.** It answers only `gumi.sg` and `exvius.com` names. A Tailscale split-DNS rule sends the phone's lookups for those names to it. Nothing else about your phone's or tailnet's DNS changes.
 - **A private certificate** that can only vouch for `gumi.sg` and `exvius.com` (an X.509 name constraint). You install it on the phone once, and it can't be used for any other site.
-- **The game data** (about 14.6 GB) is downloaded from the Exvius Offline GitHub releases during setup.
+- **The game data** (about 14.6 GB) is downloaded during setup from a copy of Exvius Offline's data hosted with this project.
 
 Everything the stack creates lives in one folder (`FFBE_DIR`). [Removing everything](#removing-everything) is at the end.
 
@@ -487,6 +487,6 @@ Nothing else on your computer, network or tailnet is changed.
 
 ## Credits
 
-The game engine, the preserved game data and the original Android app are [Exvius Offline](https://github.com/Elvlin/exvius-offline) by Elvlin. This project adds the iPhone server around it. The game data is downloaded from that project's GitHub releases during setup.
+The game engine, the preserved game data and the original Android app are [Exvius Offline](https://github.com/Elvlin/exvius-offline) by Elvlin. This project adds the iPhone server around it.
 
 Final Fantasy Brave Exvius belongs to Square Enix and gumi. This is an unofficial fan project, not affiliated with either.
