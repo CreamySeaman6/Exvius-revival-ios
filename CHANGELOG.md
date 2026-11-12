@@ -2,6 +2,18 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Yuffie, Ayaka and Elly banners
+
+- Added three featured summons the replay was missing: Materia Hunter Yuffie (January 2023), Christmas 2022 Cheerful Caroler Ayaka, and Xenogears' Holy Mother Reborn Elly (December 2022). The 2017 Halloween summon now features its units.
+- The Embracer of Duty Edgar summon (November 2022) shows once instead of twice.
+
+## 2026-11-12: Replay runs, late banners
+
+- With the historic replay, banners and events now stay up for their whole Global run, so long ones (weekly free summons, anniversary campaigns) last several weeks. Some weeks are busier than others.
+- Added Global's banners from September 2023 to the end of service (about 200 new summons, many with estimated dates), and three missing earlier ones: Cloud Strife & Avalanche's Barret, Silent Knight Charlotte, and the FINAL FANTASY XI banner with Lady Shantotto.
+- Units Global released later than we had dated them (such as Silent Knight Charlotte) now wait for their Global date in summon pools.
+- New settings `EXVIUS_REPLAY_FULL_RUNS`, `EXVIUS_LATE_BANNERS` and `EXVIUS_LATE_UNCONFIRMED` (see the README).
+
 ## 2026-11-12: Friend 10x, LB EXP, Kira, Metal Gigantuar card, all banners
 
 - The friend point Standard Summon has a 10x button: 10 units for 2,000 friend points.
