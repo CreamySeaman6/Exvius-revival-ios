@@ -232,30 +232,12 @@ def _rng(f):
 
 
 def _carry(f, req):
-    node = _node(req, "nE7pV2wr")
-    if node is None:
-        return
-    run = f.get('active')
-    carry = run['carry'] if run else State.player.data['inventory']['carry_items']
-    before = {int(r["disp_order"]): r for r in carry}
-    after = {}
-    for part in str(node.get("jsvoa0I2") or "").split(","):
-        if not part:
-            continue
-        values = part.split(":")
-        _need(len(values) == 3, "malformed carry slot")
-        slot, iid, count = map(_number, values)
-        old = before.get(slot)
-        _need(slot not in after and old is not None and iid == int(old["item_id"])
-              and count <= int(old["count"]), "carry upload adds or replaces an item")
-        after[slot] = {"disp_order": slot, "item_id": iid, "count": count}
-    spent = {}
-    for slot, old in before.items():
-        iid = int(old["item_id"])
-        spent[iid] = spent.get(iid, 0) + int(old["count"]) - after.get(slot, {}).get("count", 0)
-    for iid, count in spent.items():
-        _need(State.player.spend_item(20, iid, count), "bag cannot cover consumed carry items")
-    State.player.data["inventory"]["carry_items"] = [after[s] for s in sorted(after)]
+    """The item set left after the battle (carry_report.apply, 2026-11-12): each slot keeps the smaller of its
+    saved and reported count and the bag loses the difference. Until then this compared the report with the set
+    saved at the run's start, so a Potion a field use had already taken was taken again, and a report that
+    raised a count refused the whole battle end."""
+    import carry_report
+    carry_report.apply(State.player, req)
 
 
 def _carry_reply(out):

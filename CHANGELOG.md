@@ -2,6 +2,20 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Items used in battle stay used
+
+- Potions and other items you use in a battle (won, lost or retired) now leave your item set and your bag for good. Before, the item set refilled after you restarted the game.
+- If a battle uses up every item in your set, the server keeps your previous set rather than risk emptying it by mistake.
+
+## 2026-11-12: Results EXP, item set, chests, Big Bridge
+
+- The results screen no longer shows level-ups that didn't happen. It now counts up only the EXP each unit earned.
+- Your battle item set (Potions, Antidotes and so on) is still there after you restart the game.
+- Treasure chests holding equipment, materia or key items (the Green Beret in Lanzelt Highlands and others) now give their item. Chests like these you opened in the last few days arrive once by mail, if the server still has the record. Other unpaid chests should be closed again and pay when you open them now.
+- The Big Bridge (Final Fantasy V event): five of its fixed fights, Gilgamesh included, had no enemy data, which could close the game. It now plays its 13 fixed battles, as on Global, with no extra random battles.
+- Other explorations whose fixed fights or bosses had no enemy data now have it.
+- New setting `EXVIUS_CHEST_BACKPAY` (see the README).
+
 ## 2026-11-12: Convert to Prism and Fragments
 
 - NV units you got by NV awakening (Dark Fina, Lightning and the like) now show in Convert to Fragments.
