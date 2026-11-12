@@ -2,6 +2,10 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-11: Omniprism
+
+- Awakening a 6★ unit to 7★ with an Omniprism now works. Before, the server only accepted the unit's own prism and refused the awakening.
+
 ## 2026-11-11: NV awakening
 
 - NV awakening no longer needs level 120 or 100% Super Trust, as on Global since Version 7.0.0 (March 2022). It still costs its materials and Gil.
