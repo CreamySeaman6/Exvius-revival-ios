@@ -2,6 +2,11 @@
 
 Each entry is one update to this repo. To update: in your repo folder run `git pull`, then from `ios-server` run `docker compose build && docker compose up -d`. Your save isn't touched. Open the game twice afterwards so it picks up the new data.
 
+## 2026-11-12: Town quests stay done; Quest Report
+
+- Town quests you've completed (in Mitra and every other town) are no longer offered again after you restart the game. Quests you completed before this update are fixed the first time you log in. Quests you're still on stay as they are.
+- The Quest Report now lists your ongoing and cleared quests, and the Episode tab its quests.
+
 ## 2026-11-12: Summon screen download error
 
 - Fixed the summon screen starting a data download that failed and sent the game back to the title. Summons whose art the server hadn't finished preparing now show a picture with the summon's name until the art is ready.
