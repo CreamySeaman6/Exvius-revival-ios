@@ -301,7 +301,7 @@ def _action(fn):
                         "yeXn0tk1", "j0e1xIv9", "Duz1v8x9", "dnUSYLgn", "2Xi0wuGA", "Rv1YV69s"):
                 out.pop(tag, None)
             if "WSH38iMI" in req:
-                out["h5XGny0N"] = deepcopy(list(_feature("gift").get("receipts", {}).values()))
+                out["h5XGny0N"] = _gift_rows()
             if fn.__name__ in AWAKENINGS:
                 # Without a result row the phone opens the awakening animation and crashes; a message stops it.
                 import client_message
@@ -1504,6 +1504,24 @@ def craft_end(spec, req):
     return out
 
 
+def _gift_rows(state=None):
+    """Outgoing rows mean 'sent today' to GL9; retain all incoming history for claims."""
+    state = _feature('gift') if state is None else state
+    today = time.strftime('%Y-%m-%d', time.gmtime())
+    uid = State.player.friend_id()
+    rows = []
+    for row in state.get('receipts', {}).values():
+        if str(row.get('m94IYp6a')) == uid:
+            try:
+                day = time.strftime('%Y-%m-%d', time.gmtime(int(row.get('f5LHNT4v') or 0)))
+            except (ValueError, TypeError, OverflowError, OSError):
+                day = state.get('sent', {}).get(str(row.get('bUfq8BJ3')))
+            if day != today:
+                continue
+        rows.append(deepcopy(row))
+    return rows
+
+
 @_action
 def gift_update(spec, req):
     n = _node(req, "WSH38iMI") or {}
@@ -1584,7 +1602,7 @@ def gift_update(spec, req):
             State.player.bump_progress(key, sent_count, cap=target or None,
                                        what=f'friend_gift -> daily quest {qid}')
     out = _reply(spec)
-    out["h5XGny0N"] = list(gifts.values())
+    out["h5XGny0N"] = _gift_rows(state)
     return out
 
 
@@ -1618,7 +1636,7 @@ def serve_feature_state(spec, reply_id=None):
         if changed:
             _store('craft', craft)
     out['PmR4z1S7'] = list(_service_master('gifts').values())
-    out['h5XGny0N'] = list(_feature('gift').get('receipts', {}).values())
+    out['h5XGny0N'] = _gift_rows()
     out['z36FApms'] = _point_rows()
     out['E4r63ukD'] = list(_service_master('trust_exchange').values())
     out['ibt8aCI7'] = [{'d9gKeu0T': str(i), '0zBQbX4N': str(count)}
