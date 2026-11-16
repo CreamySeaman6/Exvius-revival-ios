@@ -2987,7 +2987,9 @@ class PlayerState:
                 source, override = self._unit_trust_info(material, channel)
                 if not source or source[0] == 71:
                     continue
+                # Bound 906-series STMR moogles donate trust despite their own low rarity.
                 if (channel and source[0] != 70 and
+                        not str(material['master_id']).startswith('906') and
                         int((unit_mst(material['master_id']) or {}).get('9fW0TePj', 0)) < 7):
                     continue
                 if source[0] != 70 and source[:3] != target[:3]:
